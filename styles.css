@@ -1,0 +1,253 @@
+/* ─── tokens ─────────────────────────────────────────── */
+:root {
+  --bg:      #ffffff;
+  --fg:      #111111;
+  --muted:   #666666;
+  --border:  #d0d0d0;
+  --reading: 660px;
+  --wide:    860px;
+  --font:    -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  --mono:    "SF Mono", "Fira Code", "Cascadia Code", Consolas, monospace;
+}
+
+/* ─── reset ──────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── links ──────────────────────────────────────────── */
+a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--border);
+  transition: text-decoration-color 0.12s;
+}
+a:hover { text-decoration-color: var(--fg); }
+
+/* ─── nav ────────────────────────────────────────────── */
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+}
+
+.nav-name {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--fg);
+  text-decoration: none;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.nav-links a {
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.12s;
+}
+.nav-links a:hover { color: var(--fg); }
+
+/* ─── content — lands directly in body with theme:none ── */
+body > p,
+body > h1, body > h2, body > h3,
+body > ul, body > ol,
+body > blockquote,
+body > pre,
+body > section,
+body > div,
+body > header {
+  max-width: var(--wide);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+#title-block-header { display: none !important; }
+
+/* ─── typography ─────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--fg);
+}
+
+h1 { font-size: clamp(1.4rem, 3vw, 1.75rem); letter-spacing: -0.02em; margin: 0 0 0.4rem; }
+h2 { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); margin: 0 0 0.75rem; }
+h3 { font-size: 1rem; font-weight: 500; margin: 2rem 0 0.4rem; }
+
+p { max-width: var(--reading); margin: 0 0 1rem; }
+ul, ol { max-width: var(--reading); padding-left: 1.2rem; margin-bottom: 1rem; }
+li { margin-bottom: 0.2rem; }
+
+/* ─── homepage ───────────────────────────────────────── */
+.home-intro {
+  padding-top: 2rem !important;
+  margin-bottom: 0 !important;
+}
+
+.home-intro > p {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.home-posts {
+  margin-top: 1.25rem !important;
+  padding-bottom: 5rem;
+  border-top: 1px solid var(--border);
+}
+
+.post-row {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+  max-width: var(--reading);
+}
+
+/* Quarto wraps row content in a <p> */
+.post-row > p {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2rem;
+  margin: 0;
+}
+
+.post-title { font-size: 0.9rem; font-weight: 400; }
+.post-title a { text-decoration: none; }
+.post-title a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--fg);
+}
+.post-date { font-size: 0.78rem; color: var(--muted); white-space: nowrap; flex-shrink: 0; }
+
+/* ─── blog listing ───────────────────────────────────── */
+#quarto-content {
+  max-width: var(--wide);
+  margin: 0 auto;
+  padding: 2rem 2rem 5rem;
+}
+
+.quarto-listing-container-default { padding: 0 !important; }
+
+.quarto-post {
+  display: flex !important;
+  align-items: baseline !important;
+  justify-content: space-between !important;
+  gap: 2rem !important;
+  padding: 0.75rem 0 !important;
+  border-bottom: 1px solid var(--border) !important;
+  border-top: none !important;
+  max-width: var(--reading);
+}
+.quarto-post:first-child { border-top: 1px solid var(--border) !important; }
+.quarto-post .thumbnail { display: none !important; }
+.quarto-post .body { flex: 1; padding: 0 !important; }
+
+.quarto-post .body h3 {
+  font-size: 0.9rem;
+  font-weight: 400;
+  margin: 0 0 0.15rem;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--fg);
+}
+
+.quarto-post .body .listing-description {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.quarto-post .metadata {
+  font-size: 0.78rem;
+  color: var(--muted);
+  white-space: nowrap;
+  padding: 0 !important;
+  flex-shrink: 0;
+}
+
+.listing-category,
+.quarto-listing-category { display: none !important; }
+
+/* ─── inner pages (about, post) ──────────────────────── */
+.quarto-title-banner { display: none !important; }
+.quarto-title-meta { display: none; }
+
+.post-meta {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin: 0 0 2.5rem;
+}
+
+/* ─── code ───────────────────────────────────────────── */
+code {
+  font-family: var(--mono);
+  font-size: 0.875em;
+  background: #f5f5f5;
+  padding: 0.15em 0.35em;
+  border-radius: 3px;
+}
+
+pre {
+  background: #f8f8f8;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.1rem;
+  overflow-x: auto;
+  max-width: var(--reading);
+}
+pre code { background: none; padding: 0; font-size: 0.875rem; line-height: 1.6; }
+
+/* ─── hide quarto chrome ─────────────────────────────── */
+#quarto-sidebar,
+#quarto-margin-sidebar,
+#quarto-back-to-top,
+.quarto-secondary-nav,
+.breadcrumb,
+.page-navigation,
+footer.footer,
+.footer { display: none !important; }
+
+/* ─── responsive ─────────────────────────────────────── */
+@media (max-width: 640px) {
+  .site-nav { padding: 0.9rem 1.25rem; }
+
+  body > p,
+  body > h1, body > h2, body > h3,
+  body > section,
+  body > div,
+  body > header { padding-left: 1.25rem; padding-right: 1.25rem; }
+
+  #quarto-content { padding: 2rem 1.25rem 5rem; }
+
+  .post-row > p,
+  .quarto-post { flex-direction: column !important; gap: 0.1rem !important; }
+}

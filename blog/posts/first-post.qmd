@@ -1,0 +1,14 @@
+---
+title: "Why this site exists"
+date: 2026-04-18
+description: "A short note on what this is for."
+categories: [notes]
+---
+
+<div class="post-meta">April 2026</div>
+
+This site is for writing.
+
+Most things here will be short — experiments, notes, small observations. Some will be longer.
+
+The format is intentionally spare. The writing should do the work.

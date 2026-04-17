@@ -1,0 +1,19 @@
+---
+title: "Shohruh Miryusupov"
+page-layout: full
+---
+
+<div class="home-intro">
+
+Experiments, notes, and small studies.
+
+</div>
+
+<div class="home-posts">
+
+<div class="post-row">
+  <span class="post-title"><a href="/blog/posts/first-post.html">Why this site exists</a></span>
+  <span class="post-date">Apr 2026</span>
+</div>
+
+</div>

@@ -1,0 +1,11 @@
+---
+title: "Writing"
+listing:
+  contents: posts
+  type: default
+  sort: "date desc"
+  fields: [title, date, description]
+  date-format: "MMM YYYY"
+  filter-ui: false
+  sort-ui: false
+---

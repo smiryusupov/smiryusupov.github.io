@@ -1,0 +1,17 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "Shohruh Miryusupov"
+  site-url: "https://smiryusupov.github.io"
+
+format:
+  html:
+    theme: none
+    css: styles.css
+    toc: false
+    include-before-body: _nav.html
+    link-external-newwindow: true
+    anchor-sections: false
+    smooth-scroll: false

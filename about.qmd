@@ -1,0 +1,7 @@
+---
+title: "About"
+---
+
+Working on statistics, applied mathematics, and machine learning.
+
+This site is for notes and experiments — things worth writing down.
