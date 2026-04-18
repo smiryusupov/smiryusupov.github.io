@@ -201,6 +201,15 @@ li { margin-bottom: 0.2rem; }
 .quarto-title-banner { display: none !important; }
 .quarto-title-meta { display: none; }
 
+.epigraph {
+  padding-top: 2rem;
+  margin-bottom: 2rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.epigraph p { margin: 0; }
+.epigraph .translation { font-size: 0.75rem; margin-top: 0.25rem; }
+
 .post-meta {
   font-size: 0.78rem;
   color: var(--muted);

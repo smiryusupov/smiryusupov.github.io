@@ -2,6 +2,11 @@
 title: "About"
 ---
 
+<div class="epigraph" lang="el">
+<p>πάντες ἄνθρωποι τοῦ εἰδέναι ὀρέγονται φύσει.</p>
+<p class="translation" lang="en">By nature, all human beings desire to know.</p>
+</div>
+
 Working on statistics, applied mathematics, and machine learning.
 
 This site is for notes and experiments — things worth writing down.
