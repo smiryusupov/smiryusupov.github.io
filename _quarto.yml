@@ -12,6 +12,6 @@ format:
     css: styles.css
     toc: false
     include-before-body: _nav.html
-    link-external-newwindow: true
+    link-external-newwindow: false
     anchor-sections: false
     smooth-scroll: false
