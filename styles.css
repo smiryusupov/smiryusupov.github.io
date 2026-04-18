@@ -197,6 +197,10 @@ li { margin-bottom: 0.2rem; }
 .listing-category,
 .quarto-listing-category { display: none !important; }
 
+#listing-listing .listing-no-matching {
+  display: none !important;
+}
+
 /* ─── inner pages (about, post) ──────────────────────── */
 .quarto-title-banner { display: none !important; }
 .quarto-title-meta { display: none; }
