@@ -1,0 +1,528 @@
+---
+title: "Thin shells and misleading projections"
+date: 2026-04-18
+description: "A note on why high-dimensional structure can disappear in 2D."
+categories: [notes]
+jupyter: python3
+execute:
+  echo: false
+  warning: false
+  message: false
+  freeze: auto
+---
+
+<style>
+.narrow-figure {
+  max-width: 620px;
+  margin: 1.25rem auto;
+}
+.narrow-figure figure,
+.narrow-figure .quarto-figure {
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+.narrow-figure img {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+
+A recurring trap in high-dimensional exploratory data analysis is that a dataset can have strong geometric structure in the ambient space and still look ordinary in a low-dimensional plot.
+
+We use two examples.
+
+- For a standard Gaussian, the full cloud concentrates near a thin shell, even though every fixed 2D projection is again an ordinary Gaussian cloud.
+- For a symmetric Gaussian mixture, shell concentration still occurs, but the bimodality is directional rather than radial. A random 2D projection may hide it, while PCA can recover it.
+
+## Two models
+
+First, the isotropic Gaussian $X \sim \mathcal{N}(0, I_d)$.
+
+Second, the symmetric Gaussian mixture
+$X = S \Delta e_1 + Z$, where $S \in \{-1,+1\}$ is a Rademacher sign with equal probability and
+$Z \sim \mathcal{N}(0, I_d)$.
+
+Here $\Delta > 0$ is the separation parameter: the two mixture components are centered at $\pm \Delta e_1$. In the simulations below, we fix $\Delta = 4$.
+
+Equivalently,
+$$
+X \sim \frac{1}{2}\mathcal{N}(+\Delta e_1, I_d)
+  + \frac{1}{2}\mathcal{N}(-\Delta e_1, I_d).
+$$
+
+
+
+```{python}
+#| label: setup
+# The code below defines the helper functions used in all figures.
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+rng = np.random.default_rng(7)
+
+plt.rcParams["figure.dpi"] = 110
+plt.rcParams["axes.titlesize"] = 10
+plt.rcParams["axes.labelsize"] = 9
+
+dims = [2, 5, 20, 50, 200]
+n_gaussian = 1500
+n_mixture = 2200
+delta = 4.0
+
+
+def random_orthonormal_pair(d, rng):
+    G = rng.normal(size=(d, 2))
+    Q, _ = np.linalg.qr(G)
+    return Q[:, :2]
+
+
+def random_unit_vector(d, rng):
+    v = rng.normal(size=d)
+    return v / np.linalg.norm(v)
+
+
+def shell_proxy(X, scale=True, rng=None):
+    if rng is None:
+        rng = np.random.default_rng()
+    r = np.linalg.norm(X, axis=1)
+    if scale:
+        r = r / np.sqrt(X.shape[1])
+    theta = rng.uniform(0.0, 2.0 * np.pi, size=len(r))
+    return np.column_stack([r * np.cos(theta), r * np.sin(theta)])
+
+
+def random_projection(X, rng):
+    U = random_orthonormal_pair(X.shape[1], rng)
+    return X @ U, U
+
+
+def pca_projection(X):
+    Xc = X - X.mean(axis=0, keepdims=True)
+    _, S, Vt = np.linalg.svd(Xc, full_matrices=False)
+    scores = Xc @ Vt[:2].T
+    eigvals = (S[:2] ** 2) / (X.shape[0] - 1)
+    return scores, eigvals, Vt[:2]
+
+
+def style_equal_panel(ax, lim=None):
+    if lim is not None:
+        ax.set_xlim(-lim, lim)
+        ax.set_ylim(-lim, lim)
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.set_aspect("equal", adjustable="box")
+    ax.grid(False)
+
+
+def panel_limits(Y, pad_ratio=0.08):
+    xmin, ymin = Y.min(axis=0)
+    xmax, ymax = Y.max(axis=0)
+    xr = max(xmax - xmin, 1.0)
+    yr = max(ymax - ymin, 1.0)
+    return (
+        xmin - pad_ratio * xr,
+        xmax + pad_ratio * xr,
+        ymin - pad_ratio * yr,
+        ymax + pad_ratio * yr,
+    )
+
+
+def sample_bimodal_gaussian(d, n=2200, delta=4.0, rng=None):
+    if rng is None:
+        rng = np.random.default_rng()
+    labels = rng.integers(0, 2, size=n)
+    signs = 2 * labels - 1
+    X = rng.normal(size=(n, d))
+    X[:, 0] += delta * signs
+    return X, labels
+
+
+def gaussian_shell_vs_projection_figure(dims_subset, n=1500, rng=None):
+    if rng is None:
+        rng = np.random.default_rng()
+
+    fig, axes = plt.subplots(
+        2, len(dims_subset),
+        figsize=(2.1 * len(dims_subset), 3.5),
+        constrained_layout=True
+    )
+
+    if len(dims_subset) == 1:
+        axes = np.array(axes).reshape(2, 1)
+
+    for col, d in enumerate(dims_subset):
+        X = rng.normal(size=(n, d))
+
+        ax = axes[0, col]
+        S = shell_proxy(X, scale=True, rng=rng)
+        ax.scatter(S[:, 0], S[:, 1], s=5, alpha=0.22)
+        circle = plt.Circle((0, 0), 1.0, fill=False, ls="--", lw=1.0, alpha=0.7)
+        ax.add_patch(circle)
+        style_equal_panel(ax, lim=1.55)
+        ax.set_title(rf"$d={d}$")
+        if col == 0:
+            ax.set_ylabel("shell")
+
+        ax = axes[1, col]
+        P, _ = random_projection(X, rng)
+        ax.scatter(P[:, 0], P[:, 1], s=5, alpha=0.22)
+        style_equal_panel(ax, lim=4.2)
+        if col == 0:
+            ax.set_ylabel("random 2D")
+
+    return fig
+
+
+def mixture_views_figure(dims_subset, n=2200, delta=4.0, rng=None):
+    if rng is None:
+        rng = np.random.default_rng()
+
+    fig, axes = plt.subplots(
+        3, len(dims_subset),
+        figsize=(2.1 * len(dims_subset), 5.2),
+        constrained_layout=True
+    )
+
+    if len(dims_subset) == 1:
+        axes = np.array(axes).reshape(3, 1)
+
+    for col, d in enumerate(dims_subset):
+        X, labels = sample_bimodal_gaussian(d=d, n=n, delta=delta, rng=rng)
+        mask0 = labels == 0
+        mask1 = ~mask0
+
+        ax = axes[0, col]
+        if d == 2:
+            Y1 = X[:, :2]
+            title = rf"$d={d}$" + "\ncloud"
+        else:
+            Y1 = shell_proxy(X, scale=False, rng=rng)
+            title = rf"$d={d}$" + "\nshell proxy"
+
+        ax.scatter(Y1[mask0, 0], Y1[mask0, 1], s=3.5, alpha=0.24)
+        ax.scatter(Y1[mask1, 0], Y1[mask1, 1], s=3.5, alpha=0.24)
+        x0, x1, y0, y1 = panel_limits(Y1)
+        ax.set_xlim(x0, x1)
+        ax.set_ylim(y0, y1)
+        ax.set_xticks([])
+        ax.set_yticks([])
+        ax.set_aspect("equal")
+        ax.set_title(title, fontsize=9)
+        if col == 0:
+            ax.set_ylabel("shell proxy")
+
+        ax = axes[1, col]
+        Yr, U = random_projection(X, rng)
+        ax.scatter(Yr[mask0, 0], Yr[mask0, 1], s=3.5, alpha=0.24)
+        ax.scatter(Yr[mask1, 0], Yr[mask1, 1], s=3.5, alpha=0.24)
+        x0, x1, y0, y1 = panel_limits(Yr)
+        ax.set_xlim(x0, x1)
+        ax.set_ylim(y0, y1)
+        ax.set_xticks([])
+        ax.set_yticks([])
+        ax.set_aspect("equal")
+        vis = delta * np.linalg.norm(U[0, :])
+        ax.text(
+            0.03, 0.97, f"center separation = {vis:.2f}",
+            transform=ax.transAxes, va="top", fontsize=7.5,
+            bbox=dict(boxstyle="round,pad=0.16", alpha=0.10),
+        )
+        if col == 0:
+            ax.set_ylabel("random 2D")
+
+        ax = axes[2, col]
+        Yp, eigvals, pcs = pca_projection(X)
+        ax.scatter(Yp[mask0, 0], Yp[mask0, 1], s=3.5, alpha=0.24)
+        ax.scatter(Yp[mask1, 0], Yp[mask1, 1], s=3.5, alpha=0.24)
+        x0, x1, y0, y1 = panel_limits(Yp)
+        ax.set_xlim(x0, x1)
+        ax.set_ylim(y0, y1)
+        ax.set_xticks([])
+        ax.set_yticks([])
+        ax.set_aspect("equal")
+        ax.text(
+            0.03, 0.97, rf"$\lambda_1$ = {eigvals[0]:.2f}",
+            transform=ax.transAxes, va="top", fontsize=7.5,
+            bbox=dict(boxstyle="round,pad=0.16", alpha=0.10),
+        )
+        if col == 0:
+            ax.set_ylabel("PCA")
+
+    return fig
+```
+
+## Gaussian warm-up: shell in the full space, Gaussian in every fixed 2D view
+
+If $X \sim \mathcal{N}(0, I_d)$, then $\|X\|^2 \sim \chi_d^2$, so
+$$
+\mathbb{E}\|X\|^2 = d,
+\qquad
+\operatorname{Var}(\|X\|^2) = 2d.
+$$
+
+Hence the typical radius is about $\sqrt d$, while the relative shell thickness shrinks with dimension.
+
+At the same time, if $U \in \mathbb{R}^{d \times 2}$ has orthonormal columns, then $Y = U^\top X \sim \mathcal{N}(0, I_2)$.
+
+So the shell is a property of the full ambient-space norm, not of any single 2D projection.
+
+In the shell panels below, each point is placed at radius $\|X\|/\sqrt d$ with a random angle. This is not a true projection; it is only a visualization of radial concentration.
+
+::: {.narrow-figure}
+
+```{python}
+#| label: fig-gaussian-shell-small
+#| fig-cap: 'Gaussian warm-up for dimensions 2, 5, and 20.'
+
+fig = gaussian_shell_vs_projection_figure([2, 5, 20], n=n_gaussian, rng=rng)
+plt.show()
+```
+
+:::
+
+::: {.narrow-figure}
+
+```{python}
+#| label: fig-gaussian-shell-large
+#| fig-cap: 'Gaussian warm-up for dimensions 2, 5, and 20. The top row is a radius-only shell proxy; the bottom row is a genuine random 2D projection. As dimension grows, the shell becomes clearer in radius, while the 2D projection remains an ordinary Gaussian cloud.'
+
+fig = gaussian_shell_vs_projection_figure([50, 200], n=n_gaussian, rng=rng)
+plt.show()
+```
+
+:::
+
+A direct check of the normalized radius
+$$
+R_d = \frac{\|X\|}{\sqrt d}
+$$
+shows the same effect quantitatively.
+
+::: {.narrow-figure}
+
+```{python}
+#| label: fig-gaussian-radius-check
+#| fig-cap: 'The normalized Gaussian radius $\|X\|/d$ concentrates near $1$ as the ambient dimension grows.'
+
+fig, axes = plt.subplots(1, 2, figsize=(5.7, 2.9), constrained_layout=True)
+
+means = []
+stds = []
+
+for d in dims:
+    X = rng.normal(size=(7000, d))
+    r = np.linalg.norm(X, axis=1) / np.sqrt(d)
+    axes[0].hist(r, bins=55, density=True, alpha=0.35, label=rf"$d={d}$")
+    means.append(r.mean())
+    stds.append(r.std())
+
+axes[0].axvline(1.0, ls="--", lw=1.0)
+axes[0].set_xlabel(r"$\|X\| / \sqrt{d}$")
+axes[0].set_ylabel("density")
+axes[0].set_title("Normalized radius")
+axes[0].legend(frameon=False, fontsize=7)
+axes[0].grid(True, alpha=0.2)
+
+axes[1].plot(dims, means, marker="o", label="mean")
+axes[1].plot(dims, stds, marker="o", label="std")
+axes[1].axhline(1.0, ls="--", lw=1.0, label="reference")
+axes[1].set_xscale("log")
+axes[1].set_xlabel("dimension")
+axes[1].set_title(r"Mean and std of $\|X\| / \sqrt{d}$")
+axes[1].grid(True, alpha=0.2)
+axes[1].legend(frameon=False, fontsize=7)
+
+plt.show()
+```
+
+:::
+
+## Symmetric mixture: shell concentration is radial, separation is directional
+
+Now consider
+$$
+X = S \Delta e_1 + Z.
+$$
+
+This distribution is bimodal, but the bimodality is not primarily a radial phenomenon.
+
+Indeed,
+$$
+\|X\|^2
+= \|S\Delta e_1 + Z\|^2
+= \Delta^2 + \|Z\|^2 + 2S\Delta\, e_1^\top Z.
+$$
+Therefore
+$$
+\mathbb{E}\|X\|^2 = d + \Delta^2,
+\qquad
+\operatorname{Var}(\|X\|^2) = 2d + 4\Delta^2.
+$$
+
+So the norm still concentrates, and the cloud still lives near a shell of radius on the order of $\sqrt{d+\Delta^2}$.
+
+But the mixture separation lies along a specific direction, namely $e_1$. That is the central distinction:
+
+* shell concentration is **radial**
+* mixture separation is **directional**
+
+The next figures compare three views:
+
+* **Row 1:** the actual cloud when $d=2$, and a radius-only shell proxy when $d>2$
+* **Row 2:** a random 2D projection
+* **Row 3:** the 2D PCA projection
+
+::: {.narrow-figure}
+
+```{python}
+#| label: fig-mixture-small
+#| fig-cap: 'Symmetric Gaussian mixture in dimensions 2, 5, and 20. The first row shows the true cloud for $d=2$ and a radius-only shell proxy for $d>2$; the second row shows a random 2D projection; the third shows PCA. The shell persists, but a random projection can hide the bimodality.'
+
+fig = mixture_views_figure([2, 5, 20], n=n_mixture, delta=delta, rng=rng)
+plt.show()
+```
+
+:::
+
+::: {.narrow-figure}
+
+```{python}
+#| label: fig-mixture-large
+#| fig-cap: 'Symmetric Gaussian mixture in dimensions 50 and 200. The cloud remains shell-like in radius, but the bimodal structure becomes hard to see in a random 2D projection and is much clearer in PCA.'
+
+fig = mixture_views_figure([50, 200], n=n_mixture, delta=delta, rng=rng)
+plt.show()
+```
+
+:::
+
+The mixed first row is deliberate. In two dimensions, the true cloud should show the two blobs directly. In higher dimensions, the shell proxy isolates radial concentration and therefore suppresses directional information by construction.
+
+## Why random projections hide the mixture
+
+Under a 2D projection with orthonormal columns $U$,
+$$
+Y = U^\top X
+\sim
+\frac{1}{2}\mathcal{N}(+\Delta U^\top e_1, I_2)
++
+\frac{1}{2}\mathcal{N}(-\Delta U^\top e_1, I_2).
+$$
+
+So the visible separation is controlled by
+$$
+\Delta \|U^\top e_1\|.
+$$
+
+For a random 2D subspace,
+$$
+\mathbb{E}\|U^\top e_1\|^2 = \frac{2}{d},
+$$
+so the apparent signal is typically of order $\Delta \sqrt{2/d}$.
+
+That decay explains why the random projections become less informative as the ambient dimension grows.
+
+::: {.narrow-figure}
+
+```{python}
+#| label: fig-random-projection-signal
+#| fig-cap: 'Repeated random 2D projections of the mixture. The visible projected signal decays like $\Delta \sqrt{2/d}$, so random low-dimensional views become less informative as dimension grows.'
+
+trials = 800
+
+fig, ax = plt.subplots(figsize=(5.2, 3.0), constrained_layout=True)
+
+medians = []
+means = []
+theory = []
+
+for d in dims:
+    vals = []
+    for _ in range(trials):
+        U = random_orthonormal_pair(d, rng)
+        vals.append(delta * np.linalg.norm(U[0, :]))
+    vals = np.array(vals)
+    means.append(vals.mean())
+    medians.append(np.median(vals))
+    theory.append(delta * np.sqrt(2 / d))
+
+ax.plot(dims, means, marker="o", label="empirical mean")
+ax.plot(dims, medians, marker="o", label="empirical median")
+ax.plot(dims, theory, ls="--", label="theory")
+ax.set_xscale("log")
+ax.set_xlabel("dimension")
+ax.set_ylabel("center separation")
+ax.set_title("Random 2D projections lose signal as dimension grows")
+ax.grid(True, alpha=0.25)
+ax.legend(frameon=False, fontsize=7)
+
+plt.show()
+```
+
+:::
+
+## Why PCA helps in this model
+
+For this mixture,
+$$
+\mathbb{E}[X] = 0,
+\qquad
+\operatorname{Cov}(X) = I_d + \Delta^2 e_1 e_1^\top.
+$$
+
+So the leading population principal component is exactly $e_1$, with top eigenvalue $1+\Delta^2$. In this model, PCA aligns with the signal because the signal direction is also the dominant variance direction.
+
+A one-dimensional comparison makes this especially clear. Projection onto the signal coordinate remains bimodal, while projection onto a random direction becomes less informative in high dimension.
+
+::: {.narrow-figure}
+
+```{python}
+#| label: fig-signal-vs-random-1d
+#| fig-cap: 'One-dimensional projections of the mixture. Projection onto the signal coordinate remains bimodal, while projection onto a random direction becomes progressively less informative in higher dimension.'
+
+fig, axes = plt.subplots(1, len(dims), figsize=(6.1, 2.3), constrained_layout=True)
+
+for col, d in enumerate(dims):
+    X, labels = sample_bimodal_gaussian(d=d, n=4000, delta=delta, rng=rng)
+    signal_proj = X[:, 0]
+    v = random_unit_vector(d, rng)
+    rand_proj = X @ v
+
+    ax = axes[col]
+    ax.hist(signal_proj, bins=40, density=True, alpha=0.42, label="signal")
+    ax.hist(rand_proj, bins=40, density=True, alpha=0.42, label="random")
+    ax.set_title(rf"$d={d}$", fontsize=9)
+    ax.grid(True, alpha=0.2)
+    if col == 0:
+        ax.set_ylabel("density")
+        ax.legend(frameon=False, fontsize=6.5)
+
+plt.show()
+```
+
+:::
+
+## Takeaway
+
+A high-dimensional dataset can have all of the following properties at once:
+
+1. its norm is concentrated near a thin shell
+2. a random 2D projection looks simple
+3. a data-adaptive projection reveals strong structure
+
+That is why 2D plots in high dimension need interpretation, not just inspection.
+
+## References
+
+Roman Vershynin. *High-Dimensional Probability: An Introduction with Applications in Data Science*. Cambridge University Press, 2018.
+
+Persi Diaconis and David Freedman. “Asymptotics of Graphical Projection Pursuit.” *The Annals of Statistics* 12(3), 1984.
+
+Elizabeth S. Meckes. “Quantitative asymptotics of graphical projection pursuit.” *Electronic Communications in Probability* 14, 2009.
+
+Iain M. Johnstone and Debashis Paul. “PCA in High Dimensions: An Orientation.” *Proceedings of the IEEE* 106(8), 2018.

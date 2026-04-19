@@ -10,6 +10,7 @@ format:
   html:
     theme: none
     css: styles.css
+    html-math-method: katex
     toc: false
     include-before-body: _nav.html
     link-external-newwindow: false

@@ -1,5 +1,6 @@
 ---
-title: "Writing"
+title: "Writings"
+body-classes: section-page
 listing:
   contents: posts
   type: default

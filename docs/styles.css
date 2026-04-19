@@ -20,9 +20,10 @@ body {
   background: var(--bg);
   color: var(--fg);
   font-family: var(--font);
-  font-size: 16px;
-  line-height: 1.65;
+  font-size: 17px;
+  line-height: 1.72;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 /* ─── links ──────────────────────────────────────────── */
@@ -51,8 +52,8 @@ a:hover { text-decoration-color: var(--fg); }
 }
 
 .nav-name {
-  font-size: 0.875rem;
-  font-weight: 400;
+  font-size: 0.92rem;
+  font-weight: 500;
   color: var(--fg);
   text-decoration: none;
 }
@@ -64,16 +65,17 @@ a:hover { text-decoration-color: var(--fg); }
 }
 
 .nav-links a {
-  font-size: 0.8rem;
+  font-size: 0.84rem;
   color: var(--muted);
   text-decoration: none;
   transition: color 0.12s;
 }
 .nav-links a:hover { color: var(--fg); }
 
-/* ─── content — lands directly in body with theme:none ── */
+/* ─── content layout ─────────────────────────────────── */
 body > p,
 body > h1, body > h2, body > h3,
+body > h4, body > h5, body > h6,
 body > ul, body > ol,
 body > blockquote,
 body > pre,
@@ -87,23 +89,81 @@ body > header {
   padding-right: 2rem;
 }
 
-#title-block-header { display: none !important; }
-
 /* ─── typography ─────────────────────────────────────── */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font);
-  font-weight: 600;
-  line-height: 1.25;
   color: var(--fg);
 }
 
-h1 { font-size: clamp(1.4rem, 3vw, 1.75rem); letter-spacing: -0.02em; margin: 0 0 0.4rem; }
-h2 { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); margin: 0 0 0.75rem; }
-h3 { font-size: 1rem; font-weight: 500; margin: 2rem 0 0.4rem; }
+h1 {
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  font-weight: 650;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+  margin: 0 0 1rem;
+  max-width: var(--reading);
+}
 
-p { max-width: var(--reading); margin: 0 0 1rem; }
-ul, ol { max-width: var(--reading); padding-left: 1.2rem; margin-bottom: 1rem; }
-li { margin-bottom: 0.2rem; }
+h2 {
+  font-size: 1.45rem;
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  text-transform: none;
+  color: var(--fg);
+  margin: 3rem 0 0.9rem;
+  max-width: var(--reading);
+}
+
+h3 {
+  font-size: 1.14rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  margin: 2rem 0 0.65rem;
+  max-width: var(--reading);
+}
+
+h4, h5, h6 {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.35;
+  margin: 1.5rem 0 0.5rem;
+  max-width: var(--reading);
+}
+
+body.section-page h1 {
+  font-size: 1.55rem;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0 0 1.1rem;
+  max-width: var(--reading);
+}
+
+p {
+  max-width: var(--reading);
+  margin: 0 0 1.15rem;
+}
+
+ul, ol {
+  max-width: var(--reading);
+  padding-left: 1.25rem;
+  margin: 0 0 1.15rem;
+}
+
+li { margin-bottom: 0.28rem; }
+
+/* ─── optional eyebrow class for small uppercase labels ── */
+.eyebrow {
+  max-width: var(--reading);
+  font-size: 0.76rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 2.5rem 0 0.75rem;
+}
 
 /* ─── homepage ───────────────────────────────────────── */
 .home-intro {
@@ -112,7 +172,7 @@ li { margin-bottom: 0.2rem; }
 }
 
 .home-intro > p {
-  font-size: 0.9rem;
+  font-size: 0.96rem;
   color: var(--muted);
   margin: 0;
 }
@@ -124,12 +184,11 @@ li { margin-bottom: 0.2rem; }
 }
 
 .post-row {
-  padding: 0.75rem 0;
+  padding: 0.85rem 0;
   border-bottom: 1px solid var(--border);
   max-width: var(--reading);
 }
 
-/* Quarto wraps row content in a <p> */
 .post-row > p {
   display: flex;
   align-items: baseline;
@@ -138,7 +197,7 @@ li { margin-bottom: 0.2rem; }
   margin: 0;
 }
 
-.post-title { font-size: 0.9rem; font-weight: 400; }
+.post-title { font-size: 0.96rem; font-weight: 500; }
 .post-title a { text-decoration: none; }
 .post-title a:hover {
   text-decoration: underline;
@@ -146,13 +205,18 @@ li { margin-bottom: 0.2rem; }
   text-underline-offset: 3px;
   text-decoration-color: var(--fg);
 }
-.post-date { font-size: 0.78rem; color: var(--muted); white-space: nowrap; flex-shrink: 0; }
+.post-date {
+  font-size: 0.8rem;
+  color: var(--muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
 
 /* ─── blog listing ───────────────────────────────────── */
 #quarto-content {
   max-width: var(--wide);
   margin: 0 auto;
-  padding: 2rem 2rem 5rem;
+  padding: 2.25rem 2rem 5rem;
 }
 
 .quarto-listing-container-default { padding: 0 !important; }
@@ -162,7 +226,7 @@ li { margin-bottom: 0.2rem; }
   align-items: baseline !important;
   justify-content: space-between !important;
   gap: 2rem !important;
-  padding: 0.75rem 0 !important;
+  padding: 0.85rem 0 !important;
   border-bottom: 1px solid var(--border) !important;
   border-top: none !important;
   max-width: var(--reading);
@@ -172,22 +236,22 @@ li { margin-bottom: 0.2rem; }
 .quarto-post .body { flex: 1; padding: 0 !important; }
 
 .quarto-post .body h3 {
-  font-size: 0.9rem;
-  font-weight: 400;
-  margin: 0 0 0.15rem;
+  font-size: 0.98rem;
+  font-weight: 500;
+  margin: 0 0 0.18rem;
   text-transform: none;
   letter-spacing: 0;
   color: var(--fg);
 }
 
 .quarto-post .body .listing-description {
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   color: var(--muted);
   margin: 0;
 }
 
 .quarto-post .metadata {
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   color: var(--muted);
   white-space: nowrap;
   padding: 0 !important;
@@ -201,23 +265,45 @@ li { margin-bottom: 0.2rem; }
   display: none !important;
 }
 
-/* ─── inner pages (about, post) ──────────────────────── */
+/* ─── inner pages ────────────────────────────────────── */
 .quarto-title-banner { display: none !important; }
 .quarto-title-meta { display: none; }
 
 .epigraph {
   padding-top: 2rem;
   margin-bottom: 2rem;
-  font-size: 0.8rem;
+  font-size: 0.84rem;
   color: var(--muted);
 }
 .epigraph p { margin: 0; }
-.epigraph .translation { font-size: 0.75rem; margin-top: 0.25rem; }
+.epigraph .translation { font-size: 0.78rem; margin-top: 0.25rem; }
 
 .post-meta {
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   color: var(--muted);
   margin: 0 0 2.5rem;
+  max-width: var(--reading);
+}
+
+/* ─── math ───────────────────────────────────────────── */
+p .math.inline,
+li .math.inline {
+  font-size: 1.03em;
+}
+
+.math.display {
+  margin: 1rem 0 1.15rem;
+  max-width: var(--reading);
+}
+
+.katex {
+  font-size: 1.08em;
+}
+
+.katex-display {
+  margin: 1rem 0 1.15rem;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 /* ─── code ───────────────────────────────────────────── */
@@ -237,7 +323,12 @@ pre {
   overflow-x: auto;
   max-width: var(--reading);
 }
-pre code { background: none; padding: 0; font-size: 0.875rem; line-height: 1.6; }
+pre code {
+  background: none;
+  padding: 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
 
 /* ─── hide quarto chrome ─────────────────────────────── */
 #quarto-sidebar,
@@ -255,12 +346,23 @@ footer.footer,
 
   body > p,
   body > h1, body > h2, body > h3,
+  body > h4, body > h5, body > h6,
+  body > ul, body > ol,
+  body > blockquote,
+  body > pre,
   body > section,
   body > div,
-  body > header { padding-left: 1.25rem; padding-right: 1.25rem; }
+  body > header {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
 
   #quarto-content { padding: 2rem 1.25rem 5rem; }
 
+  h1 { font-size: 2rem; }
+  h2 { font-size: 1.28rem; }
+  h3 { font-size: 1.08rem; }
+
   .post-row > p,
-  .quarto-post { flex-direction: column !important; gap: 0.1rem !important; }
+  .quarto-post { flex-direction: column !important; gap: 0.12rem !important; }
 }

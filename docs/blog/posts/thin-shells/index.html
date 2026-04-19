@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="dcterms.date" content="2026-04-18">
+<meta name="description" content="A note on why high-dimensional structure can disappear in 2D.">
 
-<title>Writings – Shohruh Miryusupov</title>
+<title>Thin shells and misleading projections – Shohruh Miryusupov</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -26,45 +28,14 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="../site_libs/quarto-listing/list.min.js"></script>
-<script src="../site_libs/quarto-listing/quarto-listing.js"></script>
-<script src="../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../site_libs/quarto-html/tabby.min.js"></script>
-<script src="../site_libs/quarto-html/popper.min.js"></script>
-<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
-<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-html-640605f58ae58ee79329c070719e555b.min.css" rel="stylesheet" append-hash="true" data-mode="light">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script>
-
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-title','listing-date','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-html/tabby.min.js"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-html-640605f58ae58ee79329c070719e555b.min.css" rel="stylesheet" append-hash="true" data-mode="light">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 
   <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
   <script>document.addEventListener("DOMContentLoaded", function () {
@@ -110,27 +81,248 @@ window.Quarto = {
 };
 </script>
 
-<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="../../../styles.css">
 </head>
 
-<body class="section-page">
+<body>
 
 <nav class="site-nav">
-  <a class="nav-name" href="../">Shohruh Miryusupov</a>
+  <a class="nav-name" href="../../../">Shohruh Miryusupov</a>
   <div class="nav-links">
-    <a href="../blog/">Writing</a>
-    <a href="../about.html">About</a>
+    <a href="../../../blog/">Writing</a>
+    <a href="../../../about.html">About</a>
     <a href="https://github.com/smiryusupov">GitHub</a>
   </div>
 </nav>
 
 <header id="title-block-header">
-<h1 class="title">Writings</h1>
+<h1 class="title">Thin shells and misleading projections</h1>
 
+<p class="date">2026-04-18</p>
 </header>
 
 
-
+<style>
+.narrow-figure {
+  max-width: 620px;
+  margin: 1.25rem auto;
+}
+.narrow-figure figure,
+.narrow-figure .quarto-figure {
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+.narrow-figure img {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+<p>A recurring trap in high-dimensional exploratory data analysis is that a dataset can have strong geometric structure in the ambient space and still look ordinary in a low-dimensional plot.</p>
+<p>We use two examples.</p>
+<ul>
+<li>For a standard Gaussian, the full cloud concentrates near a thin shell, even though every fixed 2D projection is again an ordinary Gaussian cloud.</li>
+<li>For a symmetric Gaussian mixture, shell concentration still occurs, but the bimodality is directional rather than radial. A random 2D projection may hide it, while PCA can recover it.</li>
+</ul>
+<h2 id="two-models">Two models</h2>
+<p>First, the isotropic Gaussian <span class="math inline">X \sim \mathcal{N}(0, I_d)</span>.</p>
+<p>Second, the symmetric Gaussian mixture <span class="math inline">X = S \Delta e_1 + Z</span>, where <span class="math inline">S \in \{-1,+1\}</span> is a Rademacher sign with equal probability and <span class="math inline">Z \sim \mathcal{N}(0, I_d)</span>.</p>
+<p>Here <span class="math inline">\Delta &gt; 0</span> is the separation parameter: the two mixture components are centered at <span class="math inline">\pm \Delta e_1</span>. In the simulations below, we fix <span class="math inline">\Delta = 4</span>.</p>
+<p>Equivalently, <span class="math display">
+X \sim \frac{1}{2}\mathcal{N}(+\Delta e_1, I_d)
+  + \frac{1}{2}\mathcal{N}(-\Delta e_1, I_d).
+</span></p>
+<h2 id="gaussian-warm-up-shell-in-the-full-space-gaussian-in-every-fixed-2d-view">Gaussian warm-up: shell in the full space, Gaussian in every fixed 2D view</h2>
+<p>If <span class="math inline">X \sim \mathcal{N}(0, I_d)</span>, then <span class="math inline">\|X\|^2 \sim \chi_d^2</span>, so <span class="math display">
+\mathbb{E}\|X\|^2 = d,
+\qquad
+\operatorname{Var}(\|X\|^2) = 2d.
+</span></p>
+<p>Hence the typical radius is about <span class="math inline">\sqrt d</span>, while the relative shell thickness shrinks with dimension.</p>
+<p>At the same time, if <span class="math inline">U \in \mathbb{R}^{d \times 2}</span> has orthonormal columns, then <span class="math inline">Y = U^\top X \sim \mathcal{N}(0, I_2)</span>.</p>
+<p>So the shell is a property of the full ambient-space norm, not of any single 2D projection.</p>
+<p>In the shell panels below, each point is placed at radius <span class="math inline">\|X\|/\sqrt d</span> with a random angle. This is not a true projection; it is only a visualization of radial concentration.</p>
+<div class="narrow-figure">
+<div id="cell-fig-gaussian-shell-small" class="cell" data-execution_count="2">
+<div class="cell-output cell-output-display">
+<div id="fig-gaussian-shell-small" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-gaussian-shell-small-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-gaussian-shell-small-output-1.png" width="677" height="397">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-gaussian-shell-small-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Gaussian warm-up for dimensions 2, 5, and 20.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div class="narrow-figure">
+<div id="cell-fig-gaussian-shell-large" class="cell" data-execution_count="3">
+<div class="cell-output cell-output-display">
+<div id="fig-gaussian-shell-large" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-gaussian-shell-large-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-gaussian-shell-large-output-1.png" width="446" height="397">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-gaussian-shell-large-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Gaussian warm-up for dimensions 2, 5, and 20. The top row is a radius-only shell proxy; the bottom row is a genuine random 2D projection. As dimension grows, the shell becomes clearer in radius, while the 2D projection remains an ordinary Gaussian cloud.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<p>A direct check of the normalized radius <span class="math display">
+R_d = \frac{\|X\|}{\sqrt d}
+</span> shows the same effect quantitatively.</p>
+<div class="narrow-figure">
+<div id="cell-fig-gaussian-radius-check" class="cell" data-execution_count="4">
+<div class="cell-output cell-output-display">
+<div id="fig-gaussian-radius-check" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-gaussian-radius-check-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-gaussian-radius-check-output-1.png" width="639" height="331">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-gaussian-radius-check-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: The normalized Gaussian radius <span class="math inline">\|X\|/d</span> concentrates near <span class="math inline">1</span> as the ambient dimension grows.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<h2 id="symmetric-mixture-shell-concentration-is-radial-separation-is-directional">Symmetric mixture: shell concentration is radial, separation is directional</h2>
+<p>Now consider <span class="math display">
+X = S \Delta e_1 + Z.
+</span></p>
+<p>This distribution is bimodal, but the bimodality is not primarily a radial phenomenon.</p>
+<p>Indeed, <span class="math display">
+\|X\|^2
+= \|S\Delta e_1 + Z\|^2
+= \Delta^2 + \|Z\|^2 + 2S\Delta\, e_1^\top Z.
+</span> Therefore <span class="math display">
+\mathbb{E}\|X\|^2 = d + \Delta^2,
+\qquad
+\operatorname{Var}(\|X\|^2) = 2d + 4\Delta^2.
+</span></p>
+<p>So the norm still concentrates, and the cloud still lives near a shell of radius on the order of <span class="math inline">\sqrt{d+\Delta^2}</span>.</p>
+<p>But the mixture separation lies along a specific direction, namely <span class="math inline">e_1</span>. That is the central distinction:</p>
+<ul>
+<li>shell concentration is <strong>radial</strong></li>
+<li>mixture separation is <strong>directional</strong></li>
+</ul>
+<p>The next figures compare three views:</p>
+<ul>
+<li><strong>Row 1:</strong> the actual cloud when <span class="math inline">d=2</span>, and a radius-only shell proxy when <span class="math inline">d&gt;2</span></li>
+<li><strong>Row 2:</strong> a random 2D projection</li>
+<li><strong>Row 3:</strong> the 2D PCA projection</li>
+</ul>
+<div class="narrow-figure">
+<div id="cell-fig-mixture-small" class="cell" data-execution_count="5">
+<div class="cell-output cell-output-display">
+<div id="fig-mixture-small" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-mixture-small-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-mixture-small-output-1.png" width="705" height="567">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mixture-small-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Symmetric Gaussian mixture in dimensions 2, 5, and 20. The first row shows the true cloud for <span class="math inline">d=2</span> and a radius-only shell proxy for <span class="math inline">d&gt;2</span>; the second row shows a random 2D projection; the third shows PCA. The shell persists, but a random projection can hide the bimodality.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div class="narrow-figure">
+<div id="cell-fig-mixture-large" class="cell" data-execution_count="6">
+<div class="cell-output cell-output-display">
+<div id="fig-mixture-large" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-mixture-large-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-mixture-large-output-1.png" width="474" height="562">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mixture-large-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: Symmetric Gaussian mixture in dimensions 50 and 200. The cloud remains shell-like in radius, but the bimodal structure becomes hard to see in a random 2D projection and is much clearer in PCA.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<p>The mixed first row is deliberate. In two dimensions, the true cloud should show the two blobs directly. In higher dimensions, the shell proxy isolates radial concentration and therefore suppresses directional information by construction.</p>
+<h2 id="why-random-projections-hide-the-mixture">Why random projections hide the mixture</h2>
+<p>Under a 2D projection with orthonormal columns <span class="math inline">U</span>, <span class="math display">
+Y = U^\top X
+\sim
+\frac{1}{2}\mathcal{N}(+\Delta U^\top e_1, I_2)
++
+\frac{1}{2}\mathcal{N}(-\Delta U^\top e_1, I_2).
+</span></p>
+<p>So the visible separation is controlled by <span class="math display">
+\Delta \|U^\top e_1\|.
+</span></p>
+<p>For a random 2D subspace, <span class="math display">
+\mathbb{E}\|U^\top e_1\|^2 = \frac{2}{d},
+</span> so the apparent signal is typically of order <span class="math inline">\Delta \sqrt{2/d}</span>.</p>
+<p>That decay explains why the random projections become less informative as the ambient dimension grows.</p>
+<div class="narrow-figure">
+<div id="cell-fig-random-projection-signal" class="cell" data-execution_count="7">
+<div class="cell-output cell-output-display">
+<div id="fig-random-projection-signal" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-random-projection-signal-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-random-projection-signal-output-1.png" width="584" height="342">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-random-projection-signal-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: Repeated random 2D projections of the mixture. The visible projected signal decays like <span class="math inline">\Delta \sqrt{2/d}</span>, so random low-dimensional views become less informative as dimension grows.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<h2 id="why-pca-helps-in-this-model">Why PCA helps in this model</h2>
+<p>For this mixture, <span class="math display">
+\mathbb{E}[X] = 0,
+\qquad
+\operatorname{Cov}(X) = I_d + \Delta^2 e_1 e_1^\top.
+</span></p>
+<p>So the leading population principal component is exactly <span class="math inline">e_1</span>, with top eigenvalue <span class="math inline">1+\Delta^2</span>. In this model, PCA aligns with the signal because the signal direction is also the dominant variance direction.</p>
+<p>A one-dimensional comparison makes this especially clear. Projection onto the signal coordinate remains bimodal, while projection onto a random direction becomes less informative in high dimension.</p>
+<div class="narrow-figure">
+<div id="cell-fig-signal-vs-random-1d" class="cell" data-execution_count="8">
+<div class="cell-output cell-output-display">
+<div id="fig-signal-vs-random-1d" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-signal-vs-random-1d-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-signal-vs-random-1d-output-1.png" width="683" height="265">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-signal-vs-random-1d-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7: One-dimensional projections of the mixture. Projection onto the signal coordinate remains bimodal, while projection onto a random direction becomes progressively less informative in higher dimension.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<h2 id="takeaway">Takeaway</h2>
+<p>A high-dimensional dataset can have all of the following properties at once:</p>
+<ol type="1">
+<li>its norm is concentrated near a thin shell</li>
+<li>a random 2D projection looks simple</li>
+<li>a data-adaptive projection reveals strong structure</li>
+</ol>
+<p>That is why 2D plots in high dimension need interpretation, not just inspection.</p>
+<h2 id="references">References</h2>
+<p>Roman Vershynin. <em>High-Dimensional Probability: An Introduction with Applications in Data Science</em>. Cambridge University Press, 2018.</p>
+<p>Persi Diaconis and David Freedman. “Asymptotics of Graphical Projection Pursuit.” <em>The Annals of Statistics</em> 12(3), 1984.</p>
+<p>Elizabeth S. Meckes. “Quantitative asymptotics of graphical projection pursuit.” <em>Electronic Communications in Probability</em> 14, 2009.</p>
+<p>Iain M. Johnstone and Debashis Paul. “PCA in High Dimensions: An Orientation.” <em>Proceedings of the IEEE</em> 106(8), 2018.</p>
 
 
 <script id="quarto-html-after-body" type="application/javascript">
@@ -534,42 +726,4 @@ window.Quarto = {
 
 
 
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="bm90ZXM=" data-listing-date-sort="1776463200000" data-listing-file-modified-sort="1776619651811" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="13" data-listing-word-count-sort="2600">
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../blog/posts/thin-shells/index.html" class="no-external">Thin shells and misleading projections</a>
-</h3>
-<div class="delink listing-description"><a href="../blog/posts/thin-shells/index.html" class="no-external">
-<p>A note on why high-dimensional structure can disappear in 2D.</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="../blog/posts/thin-shells/index.html" class="no-external">
-<div class="listing-date">
-Apr 2026
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="1" data-categories="bm90ZXM=" data-listing-date-sort="1776463200000" data-listing-file-modified-sort="1776468818148" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="31">
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../blog/posts/first-post.html" class="no-external">Why this site exists</a>
-</h3>
-<div class="delink listing-description"><a href="../blog/posts/first-post.html" class="no-external">
-<p>A short note on what this is for.</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="../blog/posts/first-post.html" class="no-external">
-<div class="listing-date">
-Apr 2026
-</div>
-</a>
-</div>
-</div>
-</div>
-<div class="listing-no-matching d-none">No matching items</div>
-</div></body></html>
+</body></html>

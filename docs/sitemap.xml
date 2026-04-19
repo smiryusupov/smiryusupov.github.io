@@ -2,15 +2,19 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://www.miryusupov.com/index.html</loc>
-    <lastmod>2026-04-17T23:28:43.913Z</lastmod>
+    <lastmod>2026-04-19T14:42:50.328Z</lastmod>
   </url>
   <url>
-    <loc>https://www.miryusupov.com/blog/index.html</loc>
-    <lastmod>2026-04-17T23:33:35.091Z</lastmod>
+    <loc>https://www.miryusupov.com/blog/posts/thin-shells/index.html</loc>
+    <lastmod>2026-04-19T17:27:31.811Z</lastmod>
   </url>
   <url>
     <loc>https://www.miryusupov.com/about.html</loc>
-    <lastmod>2026-04-18T00:17:35.592Z</lastmod>
+    <lastmod>2026-04-19T16:23:46.541Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.miryusupov.com/blog/index.html</loc>
+    <lastmod>2026-04-19T16:28:44.041Z</lastmod>
   </url>
   <url>
     <loc>https://www.miryusupov.com/blog/posts/first-post.html</loc>
