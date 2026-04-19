@@ -1,6 +1,8 @@
 project:
   type: website
   output-dir: docs
+  resources:
+    - CNAME
 
 website:
   title: "Shohruh Miryusupov"
@@ -16,3 +18,4 @@ format:
     link-external-newwindow: false
     anchor-sections: false
     smooth-scroll: false
+
