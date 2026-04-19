@@ -1,15 +1,15 @@
 [
   {
+    "listing": "/index.html",
+    "items": [
+      "/blog/posts/thin-shells/index.html"
+    ]
+  },
+  {
     "listing": "/blog/index.html",
     "items": [
       "/blog/posts/thin-shells/index.html",
       "/blog/posts/first-post.html"
-    ]
-  },
-  {
-    "listing": "/index.html",
-    "items": [
-      "/blog/posts/thin-shells/index.html"
     ]
   }
 ]
