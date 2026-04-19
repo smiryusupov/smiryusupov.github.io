@@ -16,5 +16,5 @@ listing:
 </style>
 
 <div class="home-intro">
-  <p>Notes on probability, geometry, and related things.</p>
+  <p>Experiments, notes, and small studies.</p>
 </div>
