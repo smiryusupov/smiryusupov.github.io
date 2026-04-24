@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2026-04-24">
+<meta name="description" content="A geometric reading of Firth’s adjustment, Jeffreys volume, and why separation breaks ordinary GLMs.">
+
+<title>Curvature, Volume, and the Boundary – Shohruh Miryusupov</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-html/tabby.min.js"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-html-640605f58ae58ee79329c070719e555b.min.css" rel="stylesheet" append-hash="true" data-mode="light">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../../styles.css">
+</head>
+
+<body>
+
+<nav class="site-nav">
+  <a class="nav-name" href="../../../">Shohruh Miryusupov</a>
+  <div class="nav-links">
+    <a href="../../../blog/">Writing</a>
+    <a href="../../../about.html">About</a>
+    <a href="https://github.com/smiryusupov">GitHub</a>
+  </div>
+</nav>
+
+<header id="title-block-header">
+<h1 class="title">Curvature, Volume, and the Boundary</h1>
+
+<p class="date">2026-04-24</p>
+</header>
+
+
+<style>
+.narrow-figure {
+  max-width: 620px;
+  margin: 1.25rem auto;
+}
+.narrow-figure figure,
+.narrow-figure .quarto-figure {
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+.narrow-figure img {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+<h2 id="preface">Preface</h2>
+<p>This note is about a coincidence that is too useful to be only a coincidence.</p>
+<p>A personal motivation sits behind it. My friend and former professor Andrew P. Mullhaupt opened my eyes to a simple but easily forgotten point: bias is not always a disease. Used carelessly, bias distorts. Used deliberately, with an understanding of the geometry, it can be a remedy.</p>
+<p>Firth’s adjustment was introduced as a frequentist bias-reduction device: modify the likelihood score so that the leading <span class="math inline">O(n^{-1})</span> bias of the maximum likelihood estimator disappears (Firth 1993). Jeffreys’ prior, on the other hand, is a geometric volume element: if Fisher information is the metric on a statistical model, then <span class="math inline">|i(\beta)|^{1/2}\,d\beta</span> is the natural volume form on that model. In canonical-link exponential-family GLMs, these two ideas meet:</p>
+<p><span class="math display">
+\partial_s\left\{\frac12\log |i(\beta)|\right\} = A_s(\beta),
+</span></p>
+<p>where <span class="math inline">A_s</span> is Firth’s adjustment to the <span class="math inline">s</span>th score component.</p>
+<p>Kosmidis and Firth’s 2009 and 2021 papers can be read as two developments of this same geometric picture (Kosmidis and Firth 2009; Kosmidis and Firth 2021). The 2009 paper extends bias reduction to exponential-family nonlinear models, where the model manifold bends because the predictor itself is nonlinear. The 2021 paper studies binomial-response GLMs, where the important geometric feature is not just curvature but the <strong>boundary</strong>: fitted probabilities can run to 0 or 1, Fisher volume collapses, and ordinary maximum likelihood can fail to exist.</p>
+<p>The slogan is:</p>
+<blockquote>
+<p>Firth’s adjustment corrects the first-order drift caused by statistical geometry, and in canonical GLMs that correction is exactly the gradient of the Jeffreys volume element. In separated binomial problems, the same volume element becomes a barrier at the boundary.</p>
+</blockquote>
+<p>There is also a philosophical point running through the note. Classical statistics often treats bias as something to be removed. Firth’s approach is subtler. It starts from bias reduction, but the adjustment can also be read as a deliberate geometric regularization: the estimator is nudged away from regions where maximum likelihood behaves badly. In separated binomial GLMs, that nudge is not a cosmetic correction; it restores existence. The lesson is not that bias is good in itself, but that insisting on unpenalized likelihood can be worse than accepting a small, principled shrinkage bias that keeps the estimator inside the finite part of the model.</p>
+<p>The note has four parts. Part I gives the geometric intuition. Part II reads the Kosmidis–Firth papers through that lens. Part III gives a small synthetic fraud example. Part IV gives the technical appendix.</p>
+<h2 id="part-i-intuition">Part I: Intuition</h2>
+<h3 id="the-space-of-distributions-as-a-landscape">The space of distributions as a landscape</h3>
+<p>Fix a sample space. Think of every probability distribution on it as a point in a large abstract space <span class="math inline">\mathcal P</span>. For Bernoulli data with three observations, <span class="math inline">\mathcal P</span> is a simplex. For richer sample spaces, it may be infinite-dimensional. The picture we need is simple: one distribution, one point.</p>
+<p>A parametric model</p>
+<p><span class="math display">
+\mathcal M = \{ f(\,\cdot\,;\beta) : \beta \in \mathbb R^p \}
+</span></p>
+<p>is a <span class="math inline">p</span>-dimensional surface inside <span class="math inline">\mathcal P</span>. As <span class="math inline">\beta</span> varies, <span class="math inline">f(\,\cdot\,;\beta)</span> traces out the model manifold.</p>
+<h3 id="fisher-information-is-the-ruler">Fisher information is the ruler</h3>
+<p>To do geometry on <span class="math inline">\mathcal M</span>, we need a local notion of distance. The Kullback–Leibler divergence supplies one. For nearby parameters <span class="math inline">\beta</span> and <span class="math inline">\beta+d\beta</span>,</p>
+<p><span class="math display">
+\mathrm{KL}\{f_\beta\,\|\,f_{\beta+d\beta}\}
+= \frac12 d\beta^\top i(\beta)d\beta + o(\|d\beta\|^2),
+</span></p>
+<p>where <span class="math inline">i(\beta)</span> is the Fisher information matrix. Thus Fisher information is the metric tensor: it tells us the squared length of an infinitesimal step on the model.</p>
+<h3 id="the-mle-as-projection">The MLE as projection</h3>
+<p>A sample <span class="math inline">y_1,\dots,y_n</span> defines an empirical distribution</p>
+<p><span class="math display">
+\hat F_n = \frac1n \sum_i \delta_{y_i},
+</span></p>
+<p>which is usually not itself on the model surface <span class="math inline">\mathcal M</span>. Maximum likelihood chooses the model point closest to <span class="math inline">\hat F_n</span> in the KL sense:</p>
+<p><span class="math display">
+\hat\beta
+= \arg\min_\beta \mathrm{KL}\{\hat F_n\,\|\,f_\beta\},
+</span></p>
+<p>up to terms not depending on <span class="math inline">\beta</span>. Geometrically, it is useful to imagine dropping a perpendicular from the empirical distribution to the model manifold.</p>
+<h3 id="why-curvature-creates-bias">Why curvature creates bias</h3>
+<p>Now take a curve in the plane, say a parabola. Put a symmetric cloud of noisy points around a target point <span class="math inline">P_0</span> on that curve. Project each noisy point perpendicularly onto the curve. If the curve were a straight line, the projected points would remain symmetric around <span class="math inline">P_0</span>. But if the curve bends, the projections are no longer symmetric along the curve: the average projected point drifts.</p>
+<p>That drift is the geometric intuition behind the <span class="math inline">O(n^{-1})</span> bias of the MLE. Cox and Snell’s expansion writes that drift in coordinates (Cox and Snell 1968). In McCullagh-style notation,</p>
+<p><span class="math display">
+b^s(\beta)
+= \kappa^{s,a}\kappa^{b,c}
+\left\{\frac12\kappa_{a,b,c}+\kappa_{ab,c}\right\}
++ O(n^{-2}),
+</span></p>
+<p>where <span class="math inline">\kappa_{r,s}=E(U_rU_s)</span> is Fisher information, <span class="math inline">\kappa_{r,s,t}=E(U_rU_sU_t)</span>, <span class="math inline">\kappa_{rs,t}=E(\partial_{rs}\ell\,U_t)</span>, raised indices denote the inverse of the information matrix, and repeated indices are summed.</p>
+<p>Efron’s statistical curvature gives one precise way to measure how much a statistical model bends inside a surrounding exponential family (Efron 1975). A model that is an affine subspace in natural-parameter space has zero Efron curvature. That does <strong>not</strong> mean that every coordinate representation of its MLE is exactly unbiased. For example, the Bernoulli mean MLE <span class="math inline">\bar Y</span> is unbiased for <span class="math inline">\pi</span>, but <span class="math inline">\operatorname{logit}(\bar Y)</span> is biased for <span class="math inline">\operatorname{logit}(\pi)</span>. The curvature statement is about the family as a geometric object; finite-sample bias can also be introduced by nonlinear coordinates and boundary effects.</p>
+<h3 id="firths-adjustment-undoes-the-drift">Firth’s adjustment undoes the drift</h3>
+<p>Firth’s idea is direct. If the MLE drifts by <span class="math inline">b(\beta)</span>, modify the score in the opposite direction:</p>
+<p><span class="math display">
+\tilde U_s(\beta) = U_s(\beta) + A_s(\beta),
+\qquad
+A_s(\beta) = -\kappa_{s,a}(\beta)b^a(\beta).
+</span></p>
+<p>The solution of <span class="math inline">\tilde U(\tilde\beta)=0</span> has bias of order <span class="math inline">O(n^{-2})</span> under standard regularity conditions (Firth 1993). In the projection picture, Firth’s estimator corrects the first-order displacement caused by the geometry of the projection.</p>
+<h3 id="jeffreys-prior-is-the-fisher-volume-element">Jeffreys’ prior is the Fisher volume element</h3>
+<p>The Jeffreys prior is</p>
+<p><span class="math display">
+\pi_J(\beta) \propto |i(\beta)|^{1/2}.
+</span></p>
+<p>Geometrically, this is not mysterious. If <span class="math inline">i(\beta)</span> is the metric tensor, then</p>
+<p><span class="math display">
+|i(\beta)|^{1/2}\,d\beta
+</span></p>
+<p>is the natural volume element on the manifold. It is the analogue of <span class="math inline">\sqrt{|g|}\,dx</span> in Riemannian geometry and is invariant under smooth reparametrization.</p>
+<h3 id="the-canonical-link-coincidence">The canonical-link coincidence</h3>
+<p>For canonical-link exponential-family GLMs, the gradient of the log-volume equals Firth’s adjustment:</p>
+<p><span class="math display">
+\partial_s\left\{\frac12\log |i(\beta)|\right\}
+= A_s(\beta).
+</span></p>
+<p>So two seemingly different prescriptions coincide:</p>
+<ol type="1">
+<li>modify the score to remove the leading bias;</li>
+<li>maximize the log-likelihood plus the Jeffreys log-volume penalty.</li>
+</ol>
+<p>This is the central identity behind the note.</p>
+<h2 id="part-ii-the-kosmidisfirth-program">Part II: The Kosmidis–Firth program</h2>
+<h3 id="nonlinear-predictors-and-extra-curvature">2009: nonlinear predictors and extra curvature</h3>
+<p>In an ordinary GLM, the predictor is linear in the regression parameters:</p>
+<p><span class="math display">
+\eta_i(\beta)=x_i^\top\beta.
+</span></p>
+<p>With a canonical link, the model is an affine subspace of the saturated natural-parameter space. With a non-canonical link, or with a nonlinear predictor, the embedding of <span class="math inline">\beta</span> into the surrounding exponential family bends.</p>
+<p>Kosmidis and Firth study exponential-family nonlinear models, where <span class="math inline">\eta_i(\beta)</span> need not be linear (Kosmidis and Firth 2009). Let</p>
+<p><span class="math display">
+F_{ir}(\beta)=\frac{\partial \eta_i}{\partial \beta_r},
+</span></p>
+<p>and let <span class="math inline">W</span> be the usual diagonal matrix of working weights. The weighted hat matrix is</p>
+<p><span class="math display">
+H(\beta)
+= W^{1/2}F(F^\top W F)^{-1}F^\top W^{1/2}.
+</span></p>
+<p>There are now two sources of geometry:</p>
+<ul>
+<li><strong>link curvature</strong>, coming from the relationship between <span class="math inline">\eta_i</span> and the distributional parameter;</li>
+<li><strong>predictor curvature</strong>, coming from second derivatives <span class="math inline">\partial^2\eta_i/\partial\beta_r\partial\beta_s</span>.</li>
+</ul>
+<p>The 2009 paper gives a compact form for the adjusted score,</p>
+<p><span class="math display">
+A(\beta) = F(\beta)^\top W(\beta)\xi(\beta),
+</span></p>
+<p>where <span class="math inline">\xi_i</span> combines the leverage term from the diagonal of <span class="math inline">H</span> with additional terms involving the second derivatives of <span class="math inline">\eta_i(\beta)</span>. When <span class="math inline">\eta_i</span> is linear in <span class="math inline">\beta</span>, the predictor-curvature term vanishes and the expression reduces to the familiar GLM adjustment.</p>
+<p>The computational point is important: the method modifies Fisher scoring with a term built from the same objects already used in GLM fitting.</p>
+<p><span class="math display">
+\beta^{(k+1)}
+= \beta^{(k)}
++ i\{\beta^{(k)}\}^{-1}
+\left[U\{\beta^{(k)}\}+A\{\beta^{(k)}\}\right].
+</span></p>
+<p>The geometric reading is: the 2009 paper provides the bookkeeping needed when the model manifold bends because the predictor map itself bends.</p>
+<h3 id="binomial-glms-finiteness-and-the-boundary">2021: binomial GLMs, finiteness, and the boundary</h3>
+<p>For binomial GLMs,</p>
+<p><span class="math display">
+Y_i\sim \mathrm{Bin}(m_i,\pi_i)/m_i,
+\qquad
+g(\pi_i)=x_i^\top\beta,
+</span></p>
+<p>the Fisher information has the form</p>
+<p><span class="math display">
+i(\beta)=X^\top W(\beta)X,
+\qquad
+w_i(\beta)
+= m_i\frac{(d\pi_i/d\eta_i)^2}{\pi_i(1-\pi_i)}.
+</span></p>
+<p>The model has a boundary. As <span class="math inline">\pi_i\to 0</span> or <span class="math inline">\pi_i\to 1</span>, the Bernoulli distribution degenerates to a point mass. For standard links, the corresponding weights collapse, so the Fisher volume collapses:</p>
+<p><span class="math display">
+|i(\beta)|^{1/2}\to 0.
+</span></p>
+<p>Under complete or quasi-complete separation, ordinary maximum likelihood tries to move toward exactly that boundary. Along a separating ray, the log-likelihood approaches a finite ceiling but does not attain it at a finite parameter value. Thus the ordinary MLE does not exist.</p>
+<p>Kosmidis and Firth’s 2021 result shows that, for standard binomial links such as logit, probit, complementary log–log, log–log, and cauchit, the Jeffreys-penalized estimator</p>
+<p><span class="math display">
+\hat\beta_J
+= \arg\max_\beta
+\left\{
+\ell(\beta)+\frac12\log\det X^\top W(\beta)X
+\right\}
+</span></p>
+<p>is finite for every realized sample (Kosmidis and Firth 2021).</p>
+<p>The proof idea is geometric. Separation lets <span class="math inline">\ell(\beta)</span> plateau as <span class="math inline">\|\beta\|\to\infty</span>. But the same motion drives <span class="math inline">|i(\beta)|^{1/2}</span> to zero. Hence</p>
+<p><span class="math display">
+\frac12\log\det i(\beta)\to -\infty,
+</span></p>
+<p>and the penalized objective turns downward. The Jeffreys term acts like an infinite wall at the boundary of the binomial manifold.</p>
+<h2 id="part-iii-a-small-synthetic-fraud-example">Part III: A small synthetic fraud example</h2>
+<p>A useful applied example is rare-event fraud classification. Imagine a binary feature</p>
+<p><span class="math display">
+z = \mathbf 1\{\text{new device and foreign IP}\}.
+</span></p>
+<p>In a small training set, this rare flag might occur only among fraudulent transactions. That does not mean the flag is truly deterministic. It only means that, in this training sample, the data are quasi-completely separated.</p>
+<p>Consider the logistic GLM</p>
+<p><span class="math display">
+\Pr(Y=1\mid x,z)
+= \operatorname{logit}^{-1}(\beta_0+\beta_1x_1+\beta_2x_2+\gamma z).
+</span></p>
+<p>If all observations with <span class="math inline">z=1</span> have <span class="math inline">Y=1</span>, the ordinary likelihood is increased by sending <span class="math inline">\gamma\to+\infty</span>. The MLE does not exist. The Firth/Kosmidis estimator keeps <span class="math inline">\gamma</span> finite because, along the same direction,</p>
+<p><span class="math display">
+I_{\gamma\gamma}(\beta)
+= \sum_i \pi_i(1-\pi_i)z_i^2
+\to 0.
+</span></p>
+<p>The information in the rare-flag direction disappears at the boundary, so the Jeffreys term penalizes the escape.</p>
+<p>To make the example concrete, I generate a small synthetic fraud dataset, define the logistic likelihood and Fisher information, and compare the ordinary Newton path with the Firth/Jeffreys path. The setup code is hidden in the rendered post; the important object is the coefficient path and the Fisher-volume barrier.</p>
+<h3 id="ordinary-logistic-escapes-firth-stays-finite">Ordinary logistic escapes; Firth stays finite</h3>
+<p>The ordinary Newton iterations are shown only to display the direction of escape. Under quasi-complete separation they should not be interpreted as converging to an MLE. They move toward the direction where the likelihood has its supremum, not toward a finite maximizer.</p>
+<p>For canonical logistic regression, the Firth adjusted score can be written as</p>
+<p><span class="math display">
+U^*(\beta)
+= X^\top\{y-p+h(1/2-p)\},
+</span></p>
+<p>where <span class="math inline">h_i</span> are the diagonal elements of the weighted hat matrix</p>
+<p><span class="math display">
+H = W^{1/2}X(X^\top W X)^{-1}X^\top W^{1/2}.
+</span></p>
+<h3 id="visualize-the-boundary-the-fisher-volume-barrier-and-the-effect-of-the-flag">Visualize the boundary, the Fisher-volume barrier, and the effect of the flag</h3>
+<p>The last two panels separate the baseline surface for unflagged transactions from the shifted surface for flagged transactions. This makes the role of the rare flag visually explicit: under the Firth fit, the flag raises fraud probability substantially, but by a finite amount.</p>
+<div id="cell-fraud-geometry" class="cell" data-fig-height="19" data-fig-width="8" data-execution_count="5">
+<div class="cell-output cell-output-display">
+<div id="fraud-geometry" class="quarto-figure quarto-figure-center">
+<figure>
+<p><img src="curvature_volume_boundary_files/figure-html/fraud-geometry-output-1.png" width="758" height="1814"></p>
+<figcaption>A rare perfect predictor in a fraud model. Ordinary logistic regression sends the rare-flag coefficient toward infinity. The Jeffreys/Firth objective stays finite because the Fisher-volume term collapses at the boundary. The last two panels show the baseline fraud surface for unflagged transactions and the upward-shifted surface for flagged transactions.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Each point is a transaction. Blue points are legitimate transactions <span class="math inline">(Y=0,z=0)</span>, orange points are fraudulent but unflagged transactions <span class="math inline">(Y=1,z=0)</span>, and green stars are fraudulent transactions with the rare flag <span class="math inline">(Y=1,z=1)</span>. The training sample contains no legitimate flagged transaction <span class="math inline">(Y=0,z=1)</span>, so the rare flag perfectly separates part of the data.</p>
+<p>Panel C is the geometric story in one picture. The likelihood likes large <span class="math inline">\gamma</span>: it wants to declare the rare flag deterministically fraudulent. But the Fisher-volume term goes to <span class="math inline">-\infty</span>, because the model is approaching a boundary point where the flagged Bernoulli distributions become point masses. The penalized objective turns over and has a finite maximum.</p>
+<p>Panels D and E show the fitted Firth probabilities under two hypothetical settings of the rare flag. Panel D sets <span class="math inline">z=0</span> everywhere, so it shows the baseline fraud surface for unflagged transactions. Panel E sets <span class="math inline">z=1</span> everywhere, so it shows how transactions at those same <span class="math inline">(x_1,x_2)</span> locations would be scored if the rare flag were present. The rare flag shifts the surface upward by the finite Firth estimate <span class="math inline">\hat\gamma</span>: it is strong evidence of fraud, but not an infinite rule.</p>
+<p>Firth does not merely find a separating line. Under separation, the ordinary logistic separating direction corresponds to an infinite coefficient and no finite MLE. Firth instead gives a finite probabilistic decision boundary: the rare flag shifts the log-odds by a large but finite amount, so the model treats it as strong evidence rather than a deterministic rule.</p>
+<p>That is the practical face of the 2021 theorem: the estimator is not merely numerically stabilized; it is prevented from leaving the finite part of the statistical manifold.</p>
+<h2 id="part-iv-technical-appendix">Part IV: Technical appendix</h2>
+<h3 id="jeffreys-score-equals-firths-adjustment-for-canonical-glms">Jeffreys’ score equals Firth’s adjustment for canonical GLMs</h3>
+<p>Consider a canonical exponential-family GLM with fixed dispersion <span class="math inline">\phi</span> and</p>
+<p><span class="math display">
+\theta_i = \eta_i = x_i^\top\beta.
+</span></p>
+<p>The density is</p>
+<p><span class="math display">
+f(y_i;\theta_i,\phi)
+= \exp\left\{
+\frac{y_i\theta_i-b(\theta_i)}{\phi}+c(y_i,\phi)
+\right\}.
+</span></p>
+<p>Then</p>
+<p><span class="math display">
+\mu_i=b'(\theta_i),
+\qquad
+\mathrm{Var}(Y_i)=\phi b''(\theta_i),
+</span></p>
+<p>and</p>
+<p><span class="math display">
+\ell(\beta)
+= \frac1\phi\sum_i\{y_i x_i^\top\beta-b(x_i^\top\beta)\}+\text{const},
+</span></p>
+<p>with score component</p>
+<p><span class="math display">
+U_r(\beta)
+= \frac1\phi\sum_i(y_i-\mu_i)x_{ir}.
+</span></p>
+<p>The information matrix is</p>
+<p><span class="math display">
+i_{rs}(\beta)
+= \frac1\phi\sum_i b''(\theta_i)x_{ir}x_{is}.
+</span></p>
+<p>The third score cumulant is</p>
+<p><span class="math display">
+\kappa_{r,s,t}
+= E(U_rU_sU_t)
+= \frac1\phi\sum_i b'''(\theta_i)x_{ir}x_{is}x_{it}.
+</span></p>
+<p>Differentiating the information gives</p>
+<p><span class="math display">
+\partial_t i_{rs}(\beta)
+= \frac1\phi\sum_i b'''(\theta_i)x_{it}x_{ir}x_{is}
+= \kappa_{t,r,s}(\beta).
+\tag{1}
+</span></p>
+<p>This is the canonical-link identity: the derivative of the metric is the third cumulant of the score.</p>
+<p>For canonical GLMs, the relevant Cox–Snell term reduces, under the sign convention used here, to</p>
+<p><span class="math display">
+b^s(\beta)
+= -\frac12 i^{sa}i^{bc}\kappa_{a,b,c}(\beta).
+</span></p>
+<p>Firth’s adjustment is therefore</p>
+<p><span class="math display">
+A_s(\beta)
+= -i_{sa}b^a(\beta)
+= \frac12 i^{cd}\kappa_{s,c,d}(\beta).
+</span></p>
+<p>Now consider the Jeffreys penalty</p>
+<p><span class="math display">
+P(\beta)=\frac12\log\det i(\beta).
+</span></p>
+<p>By Jacobi’s formula,</p>
+<p><span class="math display">
+\partial_s P(\beta)
+= \frac12\mathrm{tr}\{i(\beta)^{-1}\partial_s i(\beta)\}
+= \frac12 i^{cd}\partial_s i_{cd}.
+</span></p>
+<p>Using (1),</p>
+<p><span class="math display">
+\partial_s P(\beta)
+= \frac12 i^{cd}\kappa_{s,c,d}(\beta)
+= A_s(\beta).
+</span></p>
+<p>Thus</p>
+<p><span class="math display">
+\boxed{
+\partial_s\left\{\frac12\log\det i(\beta)\right\}
+= A_s(\beta)
+= -i_{sa}(\beta)b^a(\beta).
+}
+</span></p>
+<p>Adding the Jeffreys score is exactly Firth’s first-order bias correction in canonical-link GLMs.</p>
+<h3 id="intercept-only-bernoulli-check">Intercept-only Bernoulli check</h3>
+<p>Let <span class="math inline">Y_i\sim\mathrm{Bernoulli}(\pi)</span> and <span class="math inline">\beta=\operatorname{logit}(\pi)</span>. Then</p>
+<p><span class="math display">
+i(\beta)=n\pi(1-\pi),
+\qquad
+\kappa_{\beta,\beta,\beta}=n\pi(1-\pi)(1-2\pi).
+</span></p>
+<p>The Cox–Snell bias is</p>
+<p><span class="math display">
+b^\beta
+= -\frac{\kappa_{\beta,\beta,\beta}}{2i(\beta)^2}
+= \frac{2\pi-1}{2n\pi(1-\pi)}.
+</span></p>
+<p>The same result follows from the delta method applied to <span class="math inline">\hat\beta=\operatorname{logit}(\bar Y)</span>:</p>
+<p><span class="math display">
+E(\hat\beta-\beta)
+\approx
+\frac12 g''(\pi)\mathrm{Var}(\bar Y)
+= \frac{2\pi-1}{2n\pi(1-\pi)}.
+</span></p>
+<p>The Jeffreys adjustment is</p>
+<p><span class="math display">
+\partial_\beta\left\{\frac12\log i(\beta)\right\}
+= \frac12(1-2\pi),
+</span></p>
+<p>so the adjusted score equation is</p>
+<p><span class="math display">
+\sum_i y_i - n\pi + \frac12(1-2\pi)=0.
+</span></p>
+<p>Writing <span class="math inline">S=\sum_i y_i</span>, this gives</p>
+<p><span class="math display">
+\tilde\pi = \frac{S+1/2}{n+1},
+</span></p>
+<p>the familiar “add half a success and half a failure” form.</p>
+<h3 id="efrons-statistical-curvature-logistic-versus-probit">Efron’s statistical curvature: logistic versus probit</h3>
+<p>For a one-parameter curved exponential family embedded in an <span class="math inline">n</span>-dimensional Bernoulli natural-parameter space, write</p>
+<p><span class="math display">
+\theta(\beta)=(\theta_1(\beta),\dots,\theta_n(\beta)),
+</span></p>
+<p>and let <span class="math inline">\dot\theta=\partial\theta/\partial\beta</span> and <span class="math inline">\ddot\theta=\partial^2\theta/\partial\beta^2</span>. With</p>
+<p><span class="math display">
+W=\mathrm{diag}\{\pi_i(1-\pi_i)\},
+</span></p>
+<p>the scalar Fisher information is</p>
+<p><span class="math display">
+i(\beta)=\dot\theta^\top W\dot\theta.
+</span></p>
+<p>Efron’s curvature is</p>
+<p><span class="math display">
+\gamma^2(\beta)
+= \frac{
+(\ddot\theta^\top W\ddot\theta)(\dot\theta^\top W\dot\theta)
+-(\dot\theta^\top W\ddot\theta)^2
+}{(\dot\theta^\top W\dot\theta)^3}.
+</span></p>
+<p>For scalar logistic regression with canonical link,</p>
+<p><span class="math display">
+\pi_i=\operatorname{expit}(\beta x_i),
+\qquad
+\theta_i=\beta x_i.
+</span></p>
+<p>Hence <span class="math inline">\dot\theta_i=x_i</span> and <span class="math inline">\ddot\theta_i=0</span>, so</p>
+<p><span class="math display">
+\gamma^2(\beta)=0.
+</span></p>
+<p>The image of the model in natural-parameter space is a straight line.</p>
+<p>For scalar probit regression,</p>
+<p><span class="math display">
+\pi_i=\Phi(\beta x_i),
+\qquad
+\theta_i=\log\frac{\Phi(\beta x_i)}{1-\Phi(\beta x_i)}.
+</span></p>
+<p>Now <span class="math inline">\theta_i(\beta)</span> is nonlinear. In general <span class="math inline">\ddot\theta</span> is not proportional to <span class="math inline">\dot\theta</span>, and the curvature is positive. The probit model is a curved submodel of the Bernoulli natural-parameter space.</p>
+<p>The takeaway is that different pathologies in likelihood estimation have different geometric signatures:</p>
+<ul>
+<li>nonlinear links and nonlinear predictors bend the model manifold;</li>
+<li>separation sends the estimator toward the boundary;</li>
+<li>Firth/Kosmidis adjustments correct the first-order drift and, in binomial GLMs, use Fisher volume to keep estimates finite.</li>
+</ul>
+<h2 id="references">References</h2>
+<p>D. R. Cox and E. J. Snell. “A general definition of residuals.” <em>Journal of the Royal Statistical Society: Series B</em> 30(2), 1968.</p>
+<p>Bradley Efron. “Defining the curvature of a statistical problem, with applications to second order efficiency.” <em>The Annals of Statistics</em> 3(6), 1975.</p>
+<p>David Firth. “Bias reduction of maximum likelihood estimates.” <em>Biometrika</em> 80(1), 1993.</p>
+<p>Harold Jeffreys. <em>Theory of Probability</em>. Oxford University Press, 3rd edition, 1961.</p>
+<p>Ioannis Kosmidis and David Firth. “Bias reduction in exponential family nonlinear models.” <em>Biometrika</em> 96(4), 2009.</p>
+<p>Ioannis Kosmidis and David Firth. “Jeffreys-prior penalty, finiteness and shrinkage in binomial-response generalized linear models.” <em>Biometrika</em> 108(1), 2021.</p>
+<p>Peter McCullagh. <em>Tensor Methods in Statistics</em>. Chapman and Hall, 1987.</p>
+
+
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+    tabsets.forEach(function(tabset) {
+      const tabby = new Tabby('#' + tabset.id);
+    });
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/www\.miryusupov\.com");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'light-border',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+
+
+
+
+</body></html>
