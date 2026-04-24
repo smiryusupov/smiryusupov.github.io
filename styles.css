@@ -357,11 +357,24 @@ footer.footer,
     padding-right: 1.25rem;
   }
 
-  #quarto-content { padding: 2rem 1.5rem 5rem; }
+  #quarto-content {
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
+    padding-top: 2rem;
+    padding-bottom: 5rem;
+  }
+
+  .quarto-listing-container-default,
+  #listing-listing {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
 
   .quarto-post {
-    padding-left: 0.25rem !important;
-    padding-right: 0.25rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
 
   h1 { font-size: 2rem; }
