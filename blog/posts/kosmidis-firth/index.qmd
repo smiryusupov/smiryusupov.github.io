@@ -33,9 +33,7 @@ execute:
 
 ## Preface
 
-This note is about a coincidence that is too useful to be only a coincidence.
-
-A personal motivation sits behind it. My friend and former professor Andrew P. Mullhaupt opened my eyes to a simple but easily forgotten point: bias is not always a disease. Used carelessly, bias distorts. Used deliberately, with an understanding of the geometry, it can be a remedy.
+A personal motivation sits behind this note. My friend and former professor Andrew P. Mullhaupt opened my eyes to a simple but easily forgotten point: bias is not always a disease. Used carelessly, bias distorts. Used deliberately, with an understanding of the geometry, it can be a remedy.
 
 Firth's adjustment was introduced as a frequentist bias-reduction device: modify the likelihood score so that the leading $O(n^{-1})$ bias of the maximum likelihood estimator disappears (Firth 1993). Jeffreys' prior, on the other hand, is a geometric volume element: if Fisher information is the metric on a statistical model, then $|i(\beta)|^{1/2}\,d\beta$ is the natural volume form on that model. In canonical-link exponential-family GLMs, these two ideas meet:
 
