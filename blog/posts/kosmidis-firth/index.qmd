@@ -1,5 +1,5 @@
 ---
-title: "Curvature, Volume, and the Boundary"
+title: "Curvature, volume, and the boundary"
 date: 2026-04-24
 description: "A geometric reading of Firth's adjustment, Jeffreys volume, and why separation breaks ordinary GLMs."
 categories: [notes, statistics, machine-learning]
