@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/blog/posts/superefficiency/index.html",
       "/blog/posts/kosmidis-firth/index.html",
       "/blog/posts/thin-shells/index.html"
     ]
@@ -9,6 +10,7 @@
   {
     "listing": "/blog/index.html",
     "items": [
+      "/blog/posts/superefficiency/index.html",
       "/blog/posts/kosmidis-firth/index.html",
       "/blog/posts/thin-shells/index.html",
       "/blog/posts/first-post.html"
