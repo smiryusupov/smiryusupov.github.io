@@ -123,8 +123,12 @@ window.Quarto = {
 </style>
 <h2 id="preface">Preface</h2>
 <p>This note continues the same theme as the note on Firth’s adjustment: bias is not always a disease.</p>
+<blockquote>
 <p>Used carelessly, bias distorts.</p>
+</blockquote>
+<blockquote>
 <p>Used deliberately, with an understanding of the geometry, it can be a remedy.</p>
+</blockquote>
 <p>The setting is the Gaussian normal-means problem</p>
 <p><span class="math display">
 X \sim N_d(\theta,I_d),
@@ -187,8 +191,10 @@ R(\theta,\delta_a)
 a^2d\sigma^2+(1-a)^2\|\theta\|^2.
 </span></p>
 <p>This formula is the whole bias–variance bargain.</p>
-<p>The first term is variance. It decreases when <span class="math inline">a</span> decreases.</p>
-<p>The second term is squared bias. It increases when <span class="math inline">a</span> moves away from one.</p>
+<ul>
+<li>The first term is variance. It decreases when <span class="math inline">a</span> decreases.</li>
+<li>The second term is squared bias. It increases when <span class="math inline">a</span> moves away from one.</li>
+</ul>
 <p>So shrinkage is not magic. It wins only when the variance reduction is larger than the squared bias it creates.</p>
 <p>The oracle choice is</p>
 <p><span class="math display">

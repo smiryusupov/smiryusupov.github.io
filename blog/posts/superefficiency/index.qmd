@@ -35,9 +35,9 @@ execute:
 
 This note continues the same theme as the note on Firth's adjustment: bias is not always a disease.
 
-Used carelessly, bias distorts.
+> Used carelessly, bias distorts.
 
-Used deliberately, with an understanding of the geometry, it can be a remedy.
+> Used deliberately, with an understanding of the geometry, it can be a remedy.
 
 The setting is the Gaussian normal-means problem
 
@@ -179,9 +179,8 @@ $$
 
 This formula is the whole bias--variance bargain.
 
-The first term is variance. It decreases when $a$ decreases.
-
-The second term is squared bias. It increases when $a$ moves away from one.
+* The first term is variance. It decreases when $a$ decreases.
+* The second term is squared bias. It increases when $a$ moves away from one.
 
 So shrinkage is not magic. It wins only when the variance reduction is larger than the squared bias it creates.
 
