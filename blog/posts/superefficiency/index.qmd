@@ -1,5 +1,5 @@
 ---
-title: "Shrinkage, Noise Length, and Inadmissibility"
+title: "Shrinkage, noise length, and inadmissibility"
 date: 2026-04-28
 description: "A geometric reading of James--Stein estimation, bias, and high-dimensional risk."
 categories: [notes, statistics, machine-learning]
@@ -177,10 +177,7 @@ R(\theta,\delta_a)
 a^2d\sigma^2+(1-a)^2\|\theta\|^2.
 $$
 
-This formula is the whole bias--variance bargain.
-
-* The first term is variance. It decreases when $a$ decreases.
-* The second term is squared bias. It increases when $a$ moves away from one.
+This formula is the whole bias--variance bargain. The first term is variance. It decreases when $a$ decreases. The second term is squared bias. It increases when $a$ moves away from one.
 
 So shrinkage is not magic. It wins only when the variance reduction is larger than the squared bias it creates.
 

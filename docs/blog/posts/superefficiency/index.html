@@ -9,7 +9,7 @@
 <meta name="dcterms.date" content="2026-04-28">
 <meta name="description" content="A geometric reading of James–Stein estimation, bias, and high-dimensional risk.">
 
-<title>Shrinkage, Noise Length, and Inadmissibility – Shohruh Miryusupov</title>
+<title>Shrinkage, noise length, and inadmissibility – Shohruh Miryusupov</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -96,7 +96,7 @@ window.Quarto = {
 </nav>
 
 <header id="title-block-header">
-<h1 class="title">Shrinkage, Noise Length, and Inadmissibility</h1>
+<h1 class="title">Shrinkage, noise length, and inadmissibility</h1>
 
 <p class="date">2026-04-28</p>
 </header>
@@ -190,11 +190,7 @@ R(\theta,\delta_a)
 =
 a^2d\sigma^2+(1-a)^2\|\theta\|^2.
 </span></p>
-<p>This formula is the whole bias–variance bargain.</p>
-<ul>
-<li>The first term is variance. It decreases when <span class="math inline">a</span> decreases.</li>
-<li>The second term is squared bias. It increases when <span class="math inline">a</span> moves away from one.</li>
-</ul>
+<p>This formula is the whole bias–variance bargain. The first term is variance. It decreases when <span class="math inline">a</span> decreases. The second term is squared bias. It increases when <span class="math inline">a</span> moves away from one.</p>
 <p>So shrinkage is not magic. It wins only when the variance reduction is larger than the squared bias it creates.</p>
 <p>The oracle choice is</p>
 <p><span class="math display">
