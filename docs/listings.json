@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/blog/posts/nearest_neighbors_noisy_features_retrieval_rewritten/index.html",
       "/blog/posts/superefficiency/index.html",
       "/blog/posts/kosmidis-firth/index.html",
       "/blog/posts/thin-shells/index.html"
@@ -10,6 +11,7 @@
   {
     "listing": "/blog/index.html",
     "items": [
+      "/blog/posts/nearest_neighbors_noisy_features_retrieval_rewritten/index.html",
       "/blog/posts/superefficiency/index.html",
       "/blog/posts/kosmidis-firth/index.html",
       "/blog/posts/thin-shells/index.html",

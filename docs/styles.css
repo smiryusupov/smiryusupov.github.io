@@ -408,6 +408,42 @@ li .math.inline {
   overflow-y: hidden;
 }
 
+/* ─── tables ─────────────────────────────────────────── */
+table,
+.table {
+  width: auto !important;
+  max-width: var(--reading);
+  margin: 1.25rem auto 1.5rem !important;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+table th,
+table td,
+.table th,
+.table td {
+  padding: 0.35rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+table th,
+.table th {
+  font-weight: 600;
+}
+
+/* Quarto sometimes wraps tables */
+.table-responsive,
+.quarto-table,
+.cell-output-display:has(table) {
+  max-width: var(--reading);
+  margin-left: auto;
+  margin-right: auto;
+  overflow-x: auto;
+}
+
 /* ─── code ───────────────────────────────────────────── */
 code {
   font-family: var(--mono);
