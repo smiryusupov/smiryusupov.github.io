@@ -1,5 +1,5 @@
 ---
-title: "Nearest Neighbors, Noisy Features, and Retrieval"
+title: "Nearest neighbors, noisy features, and retrieval"
 date: 2026-05-01
 description: "A note on when Euclidean distance stops meaning relevance."
 categories: [notes, machine-learning, retrieval]
