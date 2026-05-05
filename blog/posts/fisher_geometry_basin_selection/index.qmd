@@ -1,5 +1,5 @@
 ---
-title: "Fisher Geometry and Basin Selection"
+title: "Fisher geometry and basin selection"
 date: 2026-05-05
 description: "A small edge-case experiment for natural gradient, Fisher preconditioning, and non-convex basin selection."
 categories: [notes, optimization, machine-learning, information-geometry]
@@ -404,7 +404,7 @@ Damping is not a cosmetic implementation detail. Near singular regions, the Fish
 
 ### Alignment diagnostics
 
-For a trajectory \(\theta_t\), one can compare the update direction \(\Delta_t\) with the direction from \(\theta_t\) to the best validation grid point \(\theta^\star_{\mathrm{grid}}\):
+For a trajectory $\theta_t$, one can compare the update direction $\Delta_t$ with the direction from $\theta_t$ to the best validation grid point $\theta^\star_{\mathrm{grid}}$:
 
 $$
 \operatorname{align}_t

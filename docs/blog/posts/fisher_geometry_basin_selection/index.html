@@ -9,7 +9,7 @@
 <meta name="dcterms.date" content="2026-05-05">
 <meta name="description" content="A small edge-case experiment for natural gradient, Fisher preconditioning, and non-convex basin selection.">
 
-<title>Fisher Geometry and Basin Selection – Shohruh Miryusupov</title>
+<title>Fisher geometry and basin selection – Shohruh Miryusupov</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -96,7 +96,7 @@ window.Quarto = {
 </nav>
 
 <header id="title-block-header">
-<h1 class="title">Fisher Geometry and Basin Selection</h1>
+<h1 class="title">Fisher geometry and basin selection</h1>
 
 <p class="date">2026-05-05</p>
 </header>
@@ -402,7 +402,7 @@ J_i(\theta)J_i(\theta)^\top.
 </span></p>
 <p>Damping is not a cosmetic implementation detail. Near singular regions, the Fisher matrix can be poorly conditioned, and the undamped inverse can produce unstable steps. Damping interpolates between natural gradient and ordinary gradient descent. It is therefore part of the optimizer, not merely numerical hygiene.</p>
 <h3 id="alignment-diagnostics">Alignment diagnostics</h3>
-<p>For a trajectory (_t), one can compare the update direction (_t) with the direction from (<em>t) to the best validation grid point (^</em>{}):</p>
+<p>For a trajectory <span class="math inline">\theta_t</span>, one can compare the update direction <span class="math inline">\Delta_t</span> with the direction from <span class="math inline">\theta_t</span> to the best validation grid point <span class="math inline">\theta^\star_{\mathrm{grid}}</span>:</p>
 <p><span class="math display">
 \operatorname{align}_t
 =
