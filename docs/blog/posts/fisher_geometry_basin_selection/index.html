@@ -6,10 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2026-05-01">
-<meta name="description" content="A note on when Euclidean distance stops meaning relevance.">
+<meta name="dcterms.date" content="2026-05-05">
+<meta name="description" content="A small edge-case experiment for natural gradient, Fisher preconditioning, and non-convex basin selection.">
 
-<title>Nearest neighbors, noisy features, and retrieval – Shohruh Miryusupov</title>
+<title>Fisher Geometry and Basin Selection – Shohruh Miryusupov</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -96,331 +96,328 @@ window.Quarto = {
 </nav>
 
 <header id="title-block-header">
-<h1 class="title">Nearest neighbors, noisy features, and retrieval</h1>
+<h1 class="title">Fisher Geometry and Basin Selection</h1>
 
-<p class="date">2026-05-01</p>
+<p class="date">2026-05-05</p>
 </header>
 
 
 <style>
-.narrow-figure {
-  max-width: 620px;
-  margin: 1.25rem auto;
+.article-figure {
+  max-width: 760px;
+  margin: 1.35rem auto 1.75rem auto;
 }
-.narrow-figure figure,
-.narrow-figure .quarto-figure {
-  max-width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-}
-.narrow-figure img {
+.article-figure img {
   width: 100%;
   height: auto;
   display: block;
   margin-left: auto;
   margin-right: auto;
+  border-radius: 4px;
+}
+.article-figure figcaption {
+  margin-top: 0.55rem;
+  font-size: 0.92rem;
+  line-height: 1.35;
+  color: var(--bs-secondary-color, #666);
+  text-align: left;
 }
 </style>
 <h2 id="preface">Preface</h2>
-<p>Nearest-neighbor methods are attractive because the rule is almost embarrassingly simple: find points close to the query, and let those points decide. The weakness is hidden in the word <em>close</em>. A nearest-neighbor method is only as good as the geometry induced by its representation and metric.</p>
-<p>This note studies a deliberately small example. There is one informative coordinate and many nuisance coordinates. The Bayes rule does not change as dimension grows, because it only needs the informative coordinate. Euclidean <span class="math inline">k</span>NN, however, uses all coordinates equally. As nuisance coordinates accumulate, distance rankings become less related to the label.</p>
-<p>The same issue appears in retrieval systems. A retrieval-augmented generation system embeds a query and a collection of document chunks, then retrieves nearby chunks. If the representation makes the right passages close, the language model receives useful context. If irrelevant variation shapes the neighborhood, the model receives plausible but unhelpful context.</p>
-<p>The goal is not to prove a theorem about RAG. The goal is to make a diagnostic picture: nearest-neighbor retrieval works only when distance means relevance.</p>
-<p>I will call this the <strong>relevance gap</strong>: the gap between being close under the retrieval metric and being useful for the task. In the toy model, the gap appears because Euclidean distance listens to nuisance coordinates. In retrieval systems, it appears when embedding similarity retrieves passages that are topically plausible but not actually answer-bearing.</p>
-<h2 id="part-i-a-one-signal-coordinate-model">Part I: A one-signal-coordinate model</h2>
-<p>Let</p>
+<p>Natural gradient descent has a beautiful geometric story. Ordinary gradient descent measures a step in the coordinates in which the parameters happen to be written. Natural gradient descent instead measures a step by the change it induces in the model distribution.</p>
+<p>The local ruler is the Fisher information matrix. For a parametric predictive model <span class="math inline">p_\theta(y \mid x)</span>,</p>
 <p><span class="math display">
-Y\sim \mathrm{Bernoulli}(1/2),
-\qquad
-Y\in\{0,1\}.
-</span></p>
-<p>Conditional on the label, generate</p>
-<p><span class="math display">
-X\mid Y=y
-\sim
-N_d\big((2y-1)\mu e_1,I_d\big),
-</span></p>
-<p>where</p>
-<p><span class="math display">
-e_1=(1,0,\ldots,0)\in\mathbb{R}^d.
-</span></p>
-<p>Only the first coordinate is informative. The remaining <span class="math inline">d-1</span> coordinates are independent noise. With equal priors and common covariance, the Bayes classifier is</p>
-<p><span class="math display">
-h^*(x)=\mathbf{1}\{x_1\ge0\}.
-</span></p>
-<p>Its accuracy is</p>
-<p><span class="math display">
-\mathbb{P}\{h^*(X)=Y\}=\Phi(\mu),
-</span></p>
-<p>which is independent of <span class="math inline">d</span>. So the classification problem itself does not become harder as dimension grows. The signal is still there, in the same coordinate, with the same strength.</p>
-<p>Euclidean <span class="math inline">k</span>NN uses a different geometry. It compares a query <span class="math inline">x</span> with a training point <span class="math inline">x'</span> using</p>
-<p><span class="math display">
-\|x-x'\|_2^2
+F(\theta)
 =
-(x_1-x_1')^2+\sum_{j=2}^d (x_j-x_j')^2.
+\mathbb{E}_x\,\mathbb{E}_{y\sim p_\theta(\cdot\mid x)}
+\left[
+\nabla_\theta \log p_\theta(y\mid x)
+\nabla_\theta \log p_\theta(y\mid x)^\top
+\right].
 </span></p>
-<p>The informative coordinate contributes one term. The nuisance coordinates contribute <span class="math inline">d-1</span> terms. As <span class="math inline">d</span> grows, most of the distance comes from coordinates that contain no label information.</p>
-<h2 id="part-ii-why-distance-loses-the-signal">Part II: Why distance loses the signal</h2>
-<p>A compact way to see the problem is to compare two candidate neighbors for a query point: one from the same class and one from the opposite class. Define</p>
+<p>The damped natural-gradient step is</p>
 <p><span class="math display">
-Z
+\theta_{t+1}
 =
-\|x-X^{(o)}\|_2^2
+\theta_t
 -
-\|x-X^{(s)}\|_2^2,
+\eta\left(F(\theta_t)+\lambda I\right)^{-1}
+\nabla_\theta L(\theta_t).
 </span></p>
-<p>where <span class="math inline">X^{(s)}</span> is a same-class candidate and <span class="math inline">X^{(o)}</span> is an opposite-class candidate. If <span class="math inline">Z&gt;0</span>, the same-class point is closer.</p>
-<p>In this Gaussian model,</p>
+<p>This is the right object to study if the question is information geometry rather than merely curvature. A Hessian-preconditioned method may be useful, but it is not natural gradient unless the Fisher metric is actually computed or approximated.</p>
+<p>The point of this note is narrow:</p>
+<blockquote>
+<p>A correct local Fisher metric does not guarantee selection of the globally desirable basin in a multimodal non-convex likelihood.</p>
+</blockquote>
+<p>This is not an argument that natural gradient or K-FAC is bad. It is an argument about what local geometry can and cannot promise. Fisher information gives a local geometry on a statistical model. It is not, by itself, a global map of the validation landscape.</p>
+<h2 id="part-i-the-information-geometric-view">Part I: The information-geometric view</h2>
+<p>Let <span class="math inline">P_\theta</span> denote the probability law induced by the model. If <span class="math inline">\theta</span> and <span class="math inline">\theta+d\theta</span> are close, then</p>
 <p><span class="math display">
-\mathbb{E}[Z]=4\mu^2,
-\qquad
-\operatorname{Var}(Z)=12d+32\mu^2.
-</span></p>
-<p>The mean advantage of the same-class point is fixed. The variance of the distance comparison grows linearly with dimension. A normal approximation therefore gives</p>
-<p><span class="math display">
-\mathbb{P}(Z&gt;0)
-\approx
-\Phi\left(
-\frac{4\mu^2}{\sqrt{12d+32\mu^2}}
-\right)
+\operatorname{KL}\left(P_\theta\,\|\,P_{\theta+d\theta}\right)
 =
-\Phi\left(
-\frac{2\mu^2}{\sqrt{3d+8\mu^2}}
-\right).
+\frac{1}{2}\,d\theta^\top F(\theta)d\theta
++
+o\!\left(\|d\theta\|^2\right).
 </span></p>
-<p>As <span class="math inline">d\to\infty</span>, this probability tends to <span class="math inline">1/2</span>. Pairwise distance ordering becomes nearly label-agnostic, even though the Bayes rule is unchanged.</p>
-<p>This is the mathematical core of the toy example: the signal in the distance comparison stays fixed, but the nuisance fluctuation grows.</p>
-<h2 id="part-iii-accuracy-as-nuisance-dimension-grows">Part III: Accuracy as nuisance dimension grows</h2>
-<p>We now simulate exact Euclidean <span class="math inline">k</span>NN. The Bayes classifier uses only <span class="math inline">x_1</span>. The kNN classifier uses all coordinates.</p>
-<div id="cell-fig-dimension-sweep" class="cell" data-fig-height="8" data-fig-width="7" data-execution_count="3">
-<div class="cell-output cell-output-display">
-<div id="fig-dimension-sweep" class="quarto-float quarto-figure quarto-figure-center">
-<figure class="quarto-float quarto-float-fig">
-<div aria-describedby="fig-dimension-sweep-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-dimension-sweep-output-1.png" width="662" height="754">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-dimension-sweep-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: As nuisance dimension grows, Bayes accuracy stays stable while Euclidean kNN degrades. The lower panel shows a simple distance-concentration proxy.
-</figcaption>
-</figure>
-</div>
-</div>
-</div>
-<p>The upper panel separates the statistical problem from the metric problem. The Bayes accuracy stays stable because the decision boundary is still <span class="math inline">x_1=0</span>. Euclidean kNN degrades because it uses a distance in which many irrelevant coordinates contribute.</p>
-<p>The lower panel shows a crude distance-concentration diagnostic. As the nearest and farthest distances become less contrasted, the neighborhood becomes less meaningful. This ratio is not a theorem about kNN accuracy, but it tracks the geometry that is causing the failure.</p>
-<h2 id="part-iv-nobody-intentionally-adds-noise">Part IV: Nobody intentionally adds noise</h2>
-<p>A natural objection is that nobody intentionally adds independent Gaussian noise features. But nuisance variation enters real datasets in less obvious ways: irrelevant engineered features, broad metadata, repeated boilerplate, weak proxies, and representation dimensions that are not useful for the specific task.</p>
-<p>To isolate the effect, start with the same one-dimensional signal and append <span class="math inline">m</span> useless coordinates. We compare three rules:</p>
-<ol type="1">
-<li>kNN using all coordinates;</li>
-<li>kNN using only the informative coordinate, an oracle metric;</li>
-<li>the Bayes rule, which also uses only the informative coordinate.</li>
-</ol>
-<div id="cell-fig-added-noise" class="cell" data-fig-height="4.5" data-fig-width="7" data-execution_count="5">
-<div class="cell-output cell-output-display">
-<div id="fig-added-noise" class="quarto-float quarto-figure quarto-figure-center">
-<figure class="quarto-float quarto-float-fig">
-<div aria-describedby="fig-added-noise-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-added-noise-output-1.png" width="662" height="418">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-added-noise-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2: Appending useless features hurts kNN using all coordinates, while the oracle one-dimensional metric remains stable.
-</figcaption>
-</figure>
-</div>
-</div>
-</div>
-<p>The oracle one-dimensional kNN is the important comparison. It shows that the deterioration is not caused by a harder classification boundary. The boundary is unchanged. What changes is the geometry used by the nearest-neighbor rule.</p>
-<p>The signal is still present. The metric is simply listening to too many irrelevant directions.</p>
-<h2 id="part-v-one-hot-nuisance-is-different">Part V: One-hot nuisance is different</h2>
-<p>The independent Gaussian nuisance model is useful because the algebra is clean. But it is not the only way nuisance features appear. In tabular data, nuisance often enters through one-hot encoded categorical variables.</p>
-<p>One-hot encoding has different geometry. A categorical field with <span class="math inline">m</span> levels becomes <span class="math inline">m</span> coordinates, but those coordinates are dependent: exactly one entry is equal to one. So the raw one-hot dimension is not the right effective nuisance dimension.</p>
-<p>Suppose we append <span class="math inline">C</span> independent categorical fields. Each field has level probabilities</p>
+<p>Thus <span class="math inline">F(\theta)</span> is the metric tensor associated with infinitesimal KL distance. A displacement <span class="math inline">v</span> in parameter space has squared statistical length</p>
 <p><span class="math display">
-p=(p_1,\ldots,p_m).
+\|v\|_{F(\theta)}^2
+=
+v^\top F(\theta)v.
 </span></p>
+<p>Natural gradient is the steepest descent direction under this Fisher geometry. Equivalently, it is the solution of the local trust-region problem</p>
+<p><span class="math display">
+\min_{\Delta}
+\left\{
+\nabla L(\theta)^\top \Delta
++
+\frac{1}{2\eta}\Delta^\top F(\theta)\Delta
+\right\}.
+</span></p>
+<p>When <span class="math inline">F(\theta)</span> is nonsingular, the solution is</p>
+<p><span class="math display">
+\Delta_{\mathrm{NG}}
+=
+-\eta F(\theta)^{-1}\nabla L(\theta).
+</span></p>
+<p>This form makes both the promise and the limitation visible. The Fisher matrix tells us which infinitesimal steps are large or small in distribution space. It does not tell us which faraway basin has better validation loss.</p>
+<h3 id="an-information-geometric-view">An information-geometric view</h3>
+<p>There is also a useful Hilbert-space way to read the same formula. For a dominated model with density <span class="math inline">p_\theta(z)</span>, write the score as</p>
+<p><span class="math display">
+s_\theta(z)
+=
+\nabla_\theta \log p_\theta(z).
+</span></p>
+<p>Under regularity conditions,</p>
+<p><span class="math display">
+\mathbb{E}_{P_\theta}\left[s_\theta(Z)\right]=0,
+</span></p>
+<p>so each score component is an element of the mean-zero space <span class="math inline">L^2_0(P_\theta)</span>. The Fisher matrix is the Gram matrix of these score functions:</p>
+<p><span class="math display">
+F_{rs}(\theta)
+=
+\left\langle
+\partial_r\log p_\theta,
+\partial_s\log p_\theta
+\right\rangle_{L^2(P_\theta)}.
+</span></p>
+<p>A parameter velocity <span class="math inline">v\in\mathbb{R}^p</span> maps to the tangent random variable</p>
+<p><span class="math display">
+z\mapsto v^\top s_\theta(z),
+</span></p>
+<p>and its squared norm is</p>
+<p><span class="math display">
+\mathbb{E}_{P_\theta}
+\left[\left\{v^\top s_\theta(Z)\right\}^2\right]
+=
+v^\top F(\theta)v.
+</span></p>
+<p>So natural gradient is not just “rescaling by a matrix.” It is steepest descent after measuring parameter motion by the <span class="math inline">L^2(P_\theta)</span> norm of the induced score perturbation.</p>
+<p>But the inner product is taken under the current model <span class="math inline">P_\theta</span>. It describes infinitesimal motion around the current distribution, not the global topology of the loss surface. The experiment below is designed to make that local/global distinction visible.</p>
+<h2 id="part-ii-the-experiment">Part II: The experiment</h2>
+<p>The experiment uses a two-parameter Bernoulli model</p>
+<p><span class="math display">
+p_\theta(y\mid x)
+=
+\operatorname{Bernoulli}\!\left(\sigma(f_\theta(x))\right),
+\qquad
+\theta\in\mathbb{R}^2.
+</span></p>
+<p>The logit <span class="math inline">f_\theta(x)</span> is nonlinear in <span class="math inline">\theta</span>, so the validation surface over <span class="math inline">(\theta_1,\theta_2)</span> can have multiple basins. The model is intentionally small: small enough to draw the surface and compute the exact Fisher matrix.</p>
+<p>For a Bernoulli logit model, let</p>
+<p><span class="math display">
+p_i(\theta)=\sigma(f_\theta(x_i)),
+\qquad
+J_i(\theta)=\nabla_\theta f_\theta(x_i).
+</span></p>
+<p>The exact model Fisher on the training inputs is</p>
+<p><span class="math display">
+F(\theta)
+=
+\frac{1}{n}\sum_{i=1}^n
+p_i(\theta)\left\{1-p_i(\theta)\right\}
+J_i(\theta)J_i(\theta)^\top.
+</span></p>
+<p>This is not a Hessian proxy. It is the Fisher matrix of the predictive Bernoulli model.</p>
+<p>I compare five optimizers:</p>
+<ol type="1">
+<li>AdamW;</li>
+<li>SGD with momentum;</li>
+<li>exact Fisher natural gradient;</li>
+<li>empirical Fisher natural gradient;</li>
+<li>diagonal exact Fisher.</li>
+</ol>
+<p>The initializations are separated into three regimes:</p>
+<ul>
+<li><strong>Easy</strong> starts are positive controls. The good validation basin is nearby, and all methods should have a fair chance.</li>
+<li><strong>Medium</strong> starts are ambiguous. The good basin is reachable, but the trajectories can differ.</li>
+<li><strong>Hard</strong> starts are adversarial. They are included to expose failure modes, not to suggest that every start is equally reasonable.</li>
+</ul>
+<p>This split matters. Without positive controls, the experiment would only say that the surface is hard. With easy, medium, and hard starts separated, the question becomes sharper: when the good basin is reachable, does Fisher geometry reliably select it?</p>
+<h3 id="endpoint-classification">Endpoint classification</h3>
+<p>The endpoint labels are defined on the validation landscape. A run is counted as successful only if its final point lands in the good validation basin: the basin containing the best validation grid point. Endpoints that converge to other stable regions, or to stationary regions outside the good basin, are not counted as successes.</p>
+<p>This is an empirical basin classification, not a theorem. It is deliberately stricter than reporting final training loss. The question is not whether the optimizer made progress. The question is whether it selected the basin we wanted.</p>
+<h2 id="part-iii-success-rates-by-regime">Part III: Success rates by regime</h2>
+<p>The first figure summarizes the endpoint classification.</p>
+<figure class="article-figure">
+<img src="figures/exact_fisher_2d_success_rate_by_regime.png" alt="Good-basin hit rate by initialization regime.">
+<figcaption>
+Good-basin hit rate by initialization regime. Easy starts are positive controls; medium starts are the informative regime; hard starts expose failure modes.
+</figcaption>
+</figure>
+<p>The easy starts show that the task is not broken. Natural gradient, AdamW, SGD, and the diagonal Fisher method can all reach the good basin when the start is favorable.</p>
+<p>The medium starts are more informative. The good basin is reachable, but not all methods select it from every ambiguous start. This is where the slogan is tested: a locally correct Fisher metric need not encode the global basin structure.</p>
+<p>The hard starts are stress tests. They should not dominate the interpretation, but they show that local preconditioning can still be pulled into an undesirable attractor.</p>
+<p>Aggregating over all starts gives a compact comparison, but it should be read only after the regime split.</p>
+<figure class="article-figure">
+<img src="figures/exact_fisher_2d_success_rate_by_optimizer.png" alt="Good-basin hit rate by optimizer.">
+<figcaption>
+Good-basin hit rate by optimizer, pooled over the balanced easy, medium, and hard starts.
+</figcaption>
+</figure>
+<p>The pooled number is secondary. The more important observation is regime dependence: no optimizer here turns local geometry into a global basin-selection guarantee.</p>
+<h2 id="part-iv-the-trajectories">Part IV: The trajectories</h2>
+<p>The level-set plots make the basin story more concrete. Line color and line style identify the optimizer. The final marker identifies the endpoint class.</p>
+<p>The easy case is the sanity check.</p>
+<figure class="article-figure">
+<img src="figures/exact_fisher_2d_landscape_easy_init0.png" alt="Easy initialization trajectory plot.">
+<figcaption>
+Easy initialization. All methods reach the good validation basin.
+</figcaption>
+</figure>
+<p>This plot prevents the experiment from becoming an anti-natural-gradient caricature. Exact Fisher NGD can work. The geometry can be helpful.</p>
+<p>The medium cases are the real diagnostic.</p>
+<figure class="article-figure">
+<img src="figures/exact_fisher_2d_landscape_medium_init2.png" alt="Medium initialization trajectory plot.">
+<figcaption>
+Medium initialization. The good basin is reachable, but the selected basin depends on the optimizer and the induced trajectory.
+</figcaption>
+</figure>
+<figure class="article-figure">
+<img src="figures/exact_fisher_2d_landscape_medium_init3.png" alt="Second medium initialization trajectory plot.">
+<figcaption>
+Another medium initialization. The local direction field can agree with the geometry and still not imply universal dominance.
+</figcaption>
+</figure>
+<p>In these plots, Fisher information is not “wrong.” It is locally correct by construction. The question is whether local correctness determines the global attractor. In these cases, it does not.</p>
+<p>The hard case is included as an edge case.</p>
+<figure class="article-figure">
+<img src="figures/exact_fisher_2d_landscape_hard_init4.png" alt="Hard initialization trajectory plot.">
+<figcaption>
+Hard initialization. Most methods are pulled toward bad or stationary basins.
+</figcaption>
+</figure>
+<p>If every plot looked like this, the experiment would only show that the initialization was too adversarial. Here, its role is narrower: it demonstrates that the local metric does not prevent bad-basin capture.</p>
+<h2 id="part-v-alignment-is-only-a-diagnostic">Part V: Alignment is only a diagnostic</h2>
+<p>A tempting diagnostic is to compare each update direction with the direction to the best validation grid point. This can be useful, but it should not be mistaken for the conclusion. A single step can point locally away from the final target while still following a sensible curved path; conversely, a locally well-aligned step does not guarantee that the trajectory will enter the desired basin.</p>
+<p>For this reason, I treat alignment as secondary and prefer a simpler trajectory summary: distance to the best validation grid point.</p>
+<figure class="article-figure">
+<img src="figures/exact_fisher_2d_distance_medium_init2.png" alt="Distance to the best validation grid point for one medium initialization.">
+<figcaption>
+Distance to the best validation grid point for one medium initialization. This is often easier to read than raw alignment.
+</figcaption>
+</figure>
+<p>This plot is not meant to prove a theorem. It is a way to read the trajectory. The main evidence remains the endpoint classification and the basin plots.</p>
+<h2 id="part-vi-where-k-fac-enters">Part VI: Where K-FAC enters</h2>
+<p>K-FAC is the neural-network analogue of the same idea: replace an expensive Fisher matrix by a structured local approximation. For a linear layer with input activations (a) and preactivation score gradients (), K-FAC approximates the Fisher block by</p>
+<p><span class="math display">
+F_l
+\approx
+A_l\otimes G_l,
+\qquad
+A_l=\mathbb{E}[aa^\top],
+\qquad
+G_l=\mathbb{E}[\delta\delta^\top].
+</span></p>
+<p>This gives a preconditioned weight update of the form</p>
+<p><span class="math display">
+\Delta W_l
+\propto
+-
+G_l^{-1}(\nabla_{W_l}L)A_l^{-1},
+</span></p>
+<p>with damping in practice.</p>
+<p>The point here is not to benchmark K-FAC. It is to locate it conceptually. K-FAC is a Fisher-based local metric method: it can improve scaling by approximating the geometry of each layer, but its Kronecker factors do not decide which distant basin should be selected.</p>
+<p>So the lesson from the two-dimensional experiment transfers only at this level of abstraction. Fisher-based preconditioning can be locally principled and still globally noncommittal.</p>
+<h2 id="takeaway">Takeaway</h2>
+<p>This experiment is not a no-free-lunch theorem. It is not a claim that AdamW is generally better than natural gradient, and it is not a claim that K-FAC is only useful in easy cases.</p>
+<p>The claim is smaller:</p>
+<blockquote>
+<p>Natural gradient and K-FAC are local metric-based methods. The Fisher metric may be the correct local geometry and still be globally uninformative about which basin is desirable.</p>
+</blockquote>
+<p>This is why endpoint classification matters. A low loss, a short Fisher step, or a locally natural direction is not the same thing as reaching the basin one wanted. In non-convex problems, the optimizer is not only solving a local quadratic problem. It is generating a trajectory.</p>
+<p>The practical question is therefore:</p>
+<blockquote>
+<p>Does the local geometry point toward the basin that matters for the task?</p>
+</blockquote>
+<p>When the answer is yes, Fisher methods can be excellent. When the answer is no, there is no general reason to expect them to dominate AdamW.</p>
+<h2 id="technical-appendix">Technical appendix</h2>
+<h3 id="exact-fisher-for-the-bernoulli-model">Exact Fisher for the Bernoulli model</h3>
 <p>Let</p>
 <p><span class="math display">
-q
+p_\theta(x)=\sigma(f_\theta(x)).
+</span></p>
+<p>For one observation, the log-likelihood score is</p>
+<p><span class="math display">
+\nabla_\theta \log p_\theta(y\mid x)
 =
-\mathbb{P}\{Z\ne Z'\}
+\left(y-p_\theta(x)\right)\nabla_\theta f_\theta(x).
+</span></p>
+<p>Taking expectation over</p>
+<p><span class="math display">
+y\sim\operatorname{Bernoulli}\left(p_\theta(x)\right)
+</span></p>
+<p>gives</p>
+<p><span class="math display">
+\mathbb{E}_y\left[\left(y-p_\theta(x)\right)^2\right]
 =
-1-\sum_{\ell=1}^m p_\ell^2
-</span></p>
-<p>be the mismatch probability between two independent draws from one categorical field. If the one-hot block is scaled by <span class="math inline">\alpha</span>, then one categorical field contributes either <span class="math inline">0</span> or <span class="math inline">2\alpha^2</span> to squared Euclidean distance.</p>
-<p>In the same pairwise diagnostic as before, the one-hot nuisance contributes mean zero and variance</p>
-<p><span class="math display">
-\operatorname{Var}(Z_{\text{one-hot}})
-=
-8\alpha^4 Cq(1-q).
-</span></p>
-<p>Including the signal coordinate gives</p>
-<p><span class="math display">
-\operatorname{Var}(Z)
-=
-12+32\mu^2+8\alpha^4 Cq(1-q),
-\qquad
-\mathbb{E}[Z]=4\mu^2.
-</span></p>
-<p>This is the useful caveat. One-hot nuisance does not behave like <span class="math inline">Cm</span> independent Gaussian noise coordinates. The danger is controlled more by the number of categorical fields <span class="math inline">C</span>, the scaling <span class="math inline">\alpha</span>, and the mismatch variance <span class="math inline">q(1-q)</span>.</p>
-<div id="cell-fig-onehot-diagnostic" class="cell" data-fig-height="4.5" data-fig-width="7" data-execution_count="6">
-<div class="cell-output cell-output-display">
-<div id="fig-onehot-diagnostic" class="quarto-float quarto-figure quarto-figure-center">
-<figure class="quarto-float quarto-float-fig">
-<div aria-describedby="fig-onehot-diagnostic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-onehot-diagnostic-output-1.png" width="660" height="420">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-onehot-diagnostic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3: One-hot nuisance is controlled by fields, scaling, and mismatch variance, not raw ambient dimension alone.
-</figcaption>
-</figure>
-</div>
-</div>
-</div>
-<p>The message is more nuanced than “high dimension is bad.” A single high-cardinality one-hot column need not act like thousands of independent noise coordinates. But many categorical fields, poor scaling, skewed levels, or missingness patterns can still make Euclidean neighborhoods noisy.</p>
-<p>This distinction is useful in practice. If kNN or retrieval fails, the issue may not be ambient dimension itself. It may be the effective geometry induced by preprocessing and feature weighting.</p>
-<h2 id="part-vi-connection-to-retrieval">Part VI: Connection to retrieval</h2>
-<p>A retrieval-augmented generation system usually begins with nearest-neighbor search. A query is embedded into a vector space, document chunks are embedded into the same space, and the system retrieves chunks that are close to the query under cosine similarity, inner product, or another score.</p>
-<p>Cosine similarity does not change the point of the note. If embeddings are normalized, cosine similarity and Euclidean distance induce the same nearest-neighbor ranking, since</p>
-<p><span class="math display">
-\|u-v\|^2 = 2 - 2\langle u,v\rangle
-</span></p>
-<p>whenever <span class="math inline">\|u\|=\|v\|=1</span>. If embeddings are not normalized, cosine removes variation in vector length, but it still depends on the direction of the vector. Irrelevant directional variation can still dominate the neighborhood. Thus the relevance gap is not specifically a Euclidean problem; it is a metric-alignment problem.</p>
-<p>The analogy is:</p>
-<table class="caption-top">
-<thead>
-<tr class="header">
-<th>kNN experiment</th>
-<th>Retrieval system</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>query point</td>
-<td>user query embedding</td>
-</tr>
-<tr class="even">
-<td>training points</td>
-<td>document chunk embeddings</td>
-</tr>
-<tr class="odd">
-<td>class label</td>
-<td>answer relevance</td>
-</tr>
-<tr class="even">
-<td>informative coordinate</td>
-<td>semantic feature needed for the question</td>
-</tr>
-<tr class="odd">
-<td>nuisance coordinates</td>
-<td>irrelevant representational variation</td>
-</tr>
-<tr class="even">
-<td>nearest neighbors</td>
-<td>retrieved chunks</td>
-</tr>
-<tr class="odd">
-<td>wrong-class neighbors</td>
-<td>irrelevant or misleading context</td>
-</tr>
-</tbody>
-</table>
-<p>This gives a useful picture of a common retrieval failure. The correct passage may exist in the corpus, but if the retriever’s geometry is shaped by irrelevant variation, that passage may not be ranked highly. The generation model then receives a local neighborhood that is topically plausible but not answer-bearing.</p>
-<p>The oracle one-dimensional kNN in the toy experiment corresponds to a better retrieval metric: one that ignores nuisance variation and emphasizes the feature that matters for the question. In practical RAG systems, the analogues are better chunking, metadata filters, query rewriting, hybrid lexical–dense retrieval, domain-specific embeddings, and rerankers.</p>
-<p>The claim is not that dense embeddings are bad because they are high-dimensional. Learned embeddings are useful precisely because they try to organize semantic structure. The narrower lesson is that retrieval quality depends on alignment between the representation, the similarity measure, and the user’s query.</p>
-<p>This is the retrieval version of the same relevance gap. The correct passage may exist in the corpus, but the metric may rank nearby passages according to the wrong kind of similarity. The retrieved chunks are close in embedding space, but not relevant in the sense needed by the query.</p>
-<h2 id="technical-appendix">Technical appendix</h2>
-<h3 id="pairwise-gaussian-calculation">Pairwise Gaussian calculation</h3>
-<p>Write</p>
-<p><span class="math display">
-Z=\sum_{j=1}^d Z_j,
-\qquad
-Z_j=(x_j-X_j^{(o)})^2-(x_j-X_j^{(s)})^2.
-</span></p>
-<p>The coordinates are independent, so means and variances add. For <span class="math inline">j\ge2</span>, the query coordinate, same-class coordinate, and opposite-class coordinate are all independent <span class="math inline">N(0,1)</span>. Direct expansion gives</p>
-<p><span class="math display">
-\mathbb{E}[Z_j]=0,
-\qquad
-\operatorname{Var}(Z_j)=12.
-</span></p>
-<p>For the first coordinate, conditional on the query class,</p>
-<p><span class="math display">
-x_1,X_1^{(s)}\sim N(\mu,1),
-\qquad
-X_1^{(o)}\sim N(-\mu,1),
-</span></p>
-<p>up to the symmetric case with signs reversed. Direct expansion gives</p>
-<p><span class="math display">
-\mathbb{E}[Z_1]=4\mu^2,
-\qquad
-\operatorname{Var}(Z_1)=12+32\mu^2.
+p_\theta(x)\left\{1-p_\theta(x)\right\}.
 </span></p>
 <p>Therefore</p>
 <p><span class="math display">
-\mathbb{E}[Z]=4\mu^2,
-\qquad
-\operatorname{Var}(Z)
+F(\theta)
 =
-(d-1)\cdot12+(12+32\mu^2)
+\mathbb{E}_x
+\left[
+p_\theta(x)\left\{1-p_\theta(x)\right\}
+\nabla_\theta f_\theta(x)
+\nabla_\theta f_\theta(x)^\top
+\right].
+</span></p>
+<p>This is the matrix used by exact Fisher NGD in the two-parameter experiment.</p>
+<h3 id="model-fisher-versus-empirical-fisher">Model Fisher versus empirical Fisher</h3>
+<p>The model Fisher takes the inner expectation over labels drawn from the model itself. The empirical Fisher replaces that expectation with the observed labels. For the Bernoulli case, this gives</p>
+<p><span class="math display">
+\widehat{F}_{\mathrm{emp}}(\theta)
 =
-12d+32\mu^2.
+\frac{1}{n}\sum_i
+\left(y_i-p_\theta(x_i)\right)^2
+J_i(\theta)J_i(\theta)^\top.
 </span></p>
-<p>This is the source of the diagnostic in Part II.</p>
-<h3 id="one-hot-calculation">One-hot calculation</h3>
-<p>For one categorical field, let</p>
+<p>The two matrices can behave differently away from a well-specified optimum. That is why the experiment includes both exact Fisher NGD and empirical Fisher NGD.</p>
+<h3 id="damping-and-step-size">Damping and step size</h3>
+<p>All Fisher inverses in the experiment are damped:</p>
 <p><span class="math display">
-M=\mathbf{1}\{Z\ne Z'\}
+\left(F(\theta)+\lambda I\right)^{-1}.
 </span></p>
-<p>be the mismatch indicator between two independent draws. Then</p>
+<p>Damping is not a cosmetic implementation detail. Near singular regions, the Fisher matrix can be poorly conditioned, and the undamped inverse can produce unstable steps. Damping interpolates between natural gradient and ordinary gradient descent. It is therefore part of the optimizer, not merely numerical hygiene.</p>
+<h3 id="alignment-diagnostics">Alignment diagnostics</h3>
+<p>For a trajectory (_t), one can compare the update direction (_t) with the direction from (<em>t) to the best validation grid point (^</em>{}):</p>
 <p><span class="math display">
-\mathbb{P}(M=1)=q,
-\qquad
-\operatorname{Var}(M)=q(1-q).
-</span></p>
-<p>With scaling <span class="math inline">\alpha</span>, the squared-distance contribution of one field is</p>
-<p><span class="math display">
-2\alpha^2M.
-</span></p>
-<p>In the pairwise diagnostic, one field contributes</p>
-<p><span class="math display">
-2\alpha^2(M_o-M_s),
-</span></p>
-<p>where <span class="math inline">M_o</span> and <span class="math inline">M_s</span> are independent Bernoulli<span class="math inline">(q)</span> variables. Hence</p>
-<p><span class="math display">
-\operatorname{Var}(M_o-M_s)
+\operatorname{align}_t
 =
-2q(1-q),
+\frac{
+\langle \Delta_t,\theta^\star_{\mathrm{grid}}-\theta_t\rangle
+}{
+\|\Delta_t\|\,\|\theta^\star_{\mathrm{grid}}-\theta_t\|
+}.
 </span></p>
-<p>and the variance contribution per field is</p>
-<p><span class="math display">
-(2\alpha^2)^2\cdot 2q(1-q)
-=
-8\alpha^4q(1-q).
-</span></p>
-<p>Summing over <span class="math inline">C</span> independent categorical fields gives</p>
-<p><span class="math display">
-\operatorname{Var}(Z_{\text{one-hot}})
-=
-8\alpha^4Cq(1-q).
-</span></p>
-<h2 id="takeaway">Takeaway</h2>
-<p>Nearest-neighbor methods fail when closeness stops meaning relevance. In the toy model, closeness is corrupted by independent nuisance coordinates. In one-hot tabular data, the story is more subtle: raw ambient dimension is not the whole issue, but fields, scaling, and mismatch variance can still distort Euclidean neighborhoods. In retrieval systems, analogous nuisance variation can make the top-ranked chunks plausible but not answer-bearing.</p>
-<p>The practical question is the same in all three settings:</p>
-<blockquote>
-<p>Does the retrieval geometry make the right objects close?</p>
-</blockquote>
-<p>More precisely: does closeness track relevance? When those two notions separate, a relevance gap opens. The local neighborhood may look plausible, but it is no longer the right neighborhood for the task.</p>
-<p>If the answer is no, increasing the sophistication of the downstream model may not fix the problem. The error has already entered through the retrieved neighborhood.</p>
+<p>This is the diagnostic referred to in Part V. It is useful for reading trajectories, but the main classification is endpoint-based.</p>
 <h2 id="references">References</h2>
-<p>Richard Bellman. <em>Dynamic Programming</em>. Princeton University Press, 1957.</p>
-<p>Evelyn Fix and Joseph L. Hodges Jr.&nbsp;<em>Discriminatory Analysis. Nonparametric Discrimination: Consistency Properties</em>. USAF School of Aviation Medicine, 1951.</p>
-<p>Thomas M. Cover and Peter E. Hart. “Nearest neighbor pattern classification.” <em>IEEE Transactions on Information Theory</em> 13(1), 1967.</p>
-<p>Kevin Beyer, Jonathan Goldstein, Raghu Ramakrishnan, and Uri Shaft. “When is nearest neighbor meaningful?” <em>Database Theory — ICDT ’99</em>, 1999.</p>
-<p>Charu C. Aggarwal, Alexander Hinneburg, and Daniel A. Keim. “On the surprising behavior of distance metrics in high dimensional space.” <em>Database Theory — ICDT 2001</em>, 2001.</p>
-<p>Charles J. Stone. “Consistent nonparametric regression.” <em>The Annals of Statistics</em> 5(4), 1977.</p>
-<p>Luc Devroye, László Györfi, and Gábor Lugosi. <em>A Probabilistic Theory of Pattern Recognition</em>. Springer, 1996.</p>
-<p>Trevor Hastie, Robert Tibshirani, and Jerome Friedman. <em>The Elements of Statistical Learning</em>. Springer, 2nd edition, 2009.</p>
-<p>Gérard Biau and Luc Devroye. <em>Lectures on the Nearest Neighbor Method</em>. Springer, 2015.</p>
+<p>Shun-ichi Amari. “Natural gradient works efficiently in learning.” <em>Neural Computation</em> 10(2), 1998.</p>
+<p>James Martens and Roger Grosse. “Optimizing neural networks with Kronecker-factored approximate curvature.” <em>International Conference on Machine Learning</em>, 2015.</p>
+<p>James Martens. “New insights and perspectives on the natural gradient method.” <em>Journal of Machine Learning Research</em> 21, 2020.</p>
+<p>Thomas Minka. “A family of algorithms for approximate Bayesian inference.” PhD thesis, MIT, 2001.</p>
 
 
 <script id="quarto-html-after-body" type="application/javascript">

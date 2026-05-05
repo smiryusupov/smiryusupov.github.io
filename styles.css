@@ -481,6 +481,13 @@ footer.footer,
   display: none !important;
 }
 
+/* Hide leftover Quarto listing empty-state text */
+.listing-no-matching,
+.quarto-listing .listing-no-matching,
+#listing-listing .listing-no-matching {
+  display: none !important;
+}
+
 /* ─── responsive ─────────────────────────────────────── */
 @media (max-width: 640px) {
   .site-nav {

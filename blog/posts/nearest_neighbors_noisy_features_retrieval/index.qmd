@@ -530,6 +530,21 @@ The claim is not that dense embeddings are bad because they are high-dimensional
 
 This is the retrieval version of the same relevance gap. The correct passage may exist in the corpus, but the metric may rank nearby passages according to the wrong kind of similarity. The retrieved chunks are close in embedding space, but not relevant in the sense needed by the query.
 
+
+## Takeaway
+
+Nearest-neighbor methods fail when closeness stops meaning relevance. In the toy model, closeness is corrupted by independent nuisance coordinates. In one-hot tabular data, the story is more subtle: raw ambient dimension is not the whole issue, but fields, scaling, and mismatch variance can still distort Euclidean neighborhoods. In retrieval systems, analogous nuisance variation can make the top-ranked chunks plausible but not answer-bearing.
+
+The practical question is the same in all three settings:
+
+> Does the retrieval geometry make the right objects close?
+
+More precisely: does closeness track relevance? When those two notions separate, a relevance gap opens. The local neighborhood may look plausible, but it is no longer the right neighborhood for the task.
+
+If the answer is no, increasing the sophistication of the downstream model may not fix the problem. The error has already entered through the retrieved neighborhood.
+
+
+
 ## Technical appendix
 
 ### Pairwise Gaussian calculation
@@ -632,17 +647,6 @@ $$
 8\alpha^4Cq(1-q).
 $$
 
-## Takeaway
-
-Nearest-neighbor methods fail when closeness stops meaning relevance. In the toy model, closeness is corrupted by independent nuisance coordinates. In one-hot tabular data, the story is more subtle: raw ambient dimension is not the whole issue, but fields, scaling, and mismatch variance can still distort Euclidean neighborhoods. In retrieval systems, analogous nuisance variation can make the top-ranked chunks plausible but not answer-bearing.
-
-The practical question is the same in all three settings:
-
-> Does the retrieval geometry make the right objects close?
-
-More precisely: does closeness track relevance? When those two notions separate, a relevance gap opens. The local neighborhood may look plausible, but it is no longer the right neighborhood for the task.
-
-If the answer is no, increasing the sophistication of the downstream model may not fix the problem. The error has already entered through the retrieved neighborhood.
 
 ## References
 

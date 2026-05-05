@@ -18,4 +18,5 @@ format:
     link-external-newwindow: false
     anchor-sections: false
     smooth-scroll: false
+    date-format: iso
 
