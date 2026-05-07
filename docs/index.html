@@ -118,7 +118,7 @@ window.Quarto = {
 <nav class="site-nav">
   <a class="nav-name" href="./">Shohruh Miryusupov</a>
   <div class="nav-links">
-    <a href="./blog/">Writing</a>
+    <a href="./blog/">Writings</a>
     <a href="./about.html">About</a>
     <a href="https://github.com/smiryusupov">GitHub</a>
   </div>
@@ -143,11 +143,20 @@ Experiments, notes, and small studies.
 
 
 
-<footer class="site-footer">
+<footer id="site-footer" class="site-footer">
   <span class="site-disclaimer">
     Personal academic site. Independent work, using personal equipment and public sources; does not represent my employer.
   </span>
 </footer>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const footer = document.getElementById("site-footer");
+    if (footer) {
+      document.body.appendChild(footer);
+    }
+  });
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
