@@ -594,7 +594,7 @@ footer.footer,
 
 .site-footer {
   max-width: var(--reading);
-  margin: 3rem auto 0;
+  margin: 4rem auto 1.25rem;
   padding: 1rem 1.25rem 1.25rem;
   border-top: 1px solid var(--border);
   text-align: center;
@@ -602,20 +602,20 @@ footer.footer,
 
 .site-disclaimer {
   display: block;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   line-height: 1.35;
   color: var(--muted);
+  font-weight: 400;
 }
 
 @media (max-width: 700px) {
   .site-footer {
-    margin-top: 2.5rem;
+    margin-top: 3rem;
     padding-left: 1.75rem;
     padding-right: 1.75rem;
   }
 
   .site-disclaimer {
-    font-size: 0.74rem;
+    font-size: 0.72rem;
   }
 }
-
