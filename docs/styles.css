@@ -444,6 +444,28 @@ table th,
   overflow-x: auto;
 }
 
+/* ─── wider technical tables ─────────────────────────── */
+
+.wide-table {
+  max-width: min(100vw - 2rem, 980px);
+  margin-left: 50%;
+  transform: translateX(-50%);
+  overflow-x: auto;
+}
+
+.wide-table table,
+.wide-table .table {
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.wide-table th,
+.wide-table td {
+  white-space: nowrap;
+}
+
 /* ─── code ───────────────────────────────────────────── */
 code {
   font-family: var(--mono);
@@ -567,3 +589,33 @@ footer.footer,
     font-size: 1.08rem;
   }
 }
+
+/* ─── quiet site disclaimer footer ───────────────────────── */
+
+.site-footer {
+  max-width: var(--reading);
+  margin: 3rem auto 0;
+  padding: 1rem 1.25rem 1.25rem;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+.site-disclaimer {
+  display: block;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--muted);
+}
+
+@media (max-width: 700px) {
+  .site-footer {
+    margin-top: 2.5rem;
+    padding-left: 1.75rem;
+    padding-right: 1.75rem;
+  }
+
+  .site-disclaimer {
+    font-size: 0.74rem;
+  }
+}
+

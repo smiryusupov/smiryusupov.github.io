@@ -667,3 +667,13 @@ Luc Devroye, László Györfi, and Gábor Lugosi. *A Probabilistic Theory of Pat
 Trevor Hastie, Robert Tibshirani, and Jerome Friedman. *The Elements of Statistical Learning*. Springer, 2nd edition, 2009.
 
 Gérard Biau and Luc Devroye. *Lectures on the Nearest Neighbor Method*. Springer, 2015.
+
+```bibtex
+@misc{miryusupov2026nearestneighbors,
+  author       = {Miryusupov, Shohruh},
+  title        = {Nearest Neighbors, Noisy Features, and Retrieval},
+  year         = {2026},
+  howpublished = {Research note},
+  url          = {https://www.miryusupov.com/blog/posts/nearest_neighbors_noisy_features_retrieval/index.html}
+}
+```

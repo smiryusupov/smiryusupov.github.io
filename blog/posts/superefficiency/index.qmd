@@ -941,3 +941,13 @@ Bradley Efron and Carl Morris. “Stein's estimation rule and its competitors—
 Soumendu Sundar Mukherjee. *Lecture 26: Stein's Phenomenon and Super-efficiency*. Advanced Nonparametric Inference, 2020.
 
 Roman Vershynin. *High-Dimensional Probability: An Introduction with Applications in Data Science*. Cambridge University Press, 2018.
+
+```bibtex
+@misc{miryusupov2026shrinkage,
+  author       = {Miryusupov, Shohruh},
+  title        = {Shrinkage, Noise Length, and Inadmissibility},
+  year         = {2026},
+  howpublished = {Research note},
+  url          = {https://www.miryusupov.com/blog/posts/superefficiency/index.html}
+}
+```

@@ -813,3 +813,13 @@ Ioannis Kosmidis and David Firth. “Bias reduction in exponential family nonlin
 Ioannis Kosmidis and David Firth. “Jeffreys-prior penalty, finiteness and shrinkage in binomial-response generalized linear models.” *Biometrika* 108(1), 2021.
 
 Peter McCullagh. *Tensor Methods in Statistics*. Chapman and Hall, 1987.
+
+```bibtex
+@misc{miryusupov2026curvaturevolume,
+  author       = {Miryusupov, Shohruh},
+  title        = {Curvature, Volume, and the Boundary},
+  year         = {2026},
+  howpublished = {Research note},
+  url          = {https://www.miryusupov.com/blog/posts/kosmidis-firth/index.html}
+}
+```

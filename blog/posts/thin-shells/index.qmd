@@ -526,3 +526,14 @@ Persi Diaconis and David Freedman. “Asymptotics of Graphical Projection Pursui
 Elizabeth S. Meckes. “Quantitative asymptotics of graphical projection pursuit.” *Electronic Communications in Probability* 14, 2009.
 
 Iain M. Johnstone and Debashis Paul. “PCA in High Dimensions: An Orientation.” *Proceedings of the IEEE* 106(8), 2018.
+
+
+```bibtex
+@misc{miryusupov2026thinshells,
+  author       = {Miryusupov, Shohruh},
+  title        = {Thin Shells and Misleading Projections},
+  year         = {2026},
+  howpublished = {Research note},
+  url          = {https://www.miryusupov.com/blog/posts/thin-shells/index.html}
+}
+```

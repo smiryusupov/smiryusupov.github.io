@@ -11,3 +11,7 @@ body-classes: section-page
 Working on statistics, applied mathematics, and machine learning.
 
 This site is for notes and experiments — things worth writing down.
+
+## Independence
+
+This site contains personal academic notes and experiments. They are written independently, outside my employment, using personal equipment and public sources only. They do not contain confidential information, client data, employer materials, or employer know-how.

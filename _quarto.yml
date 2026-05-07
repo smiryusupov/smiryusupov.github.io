@@ -15,6 +15,7 @@ format:
     html-math-method: katex
     toc: false
     include-before-body: _nav.html
+    include-after-body: _footer.html
     link-external-newwindow: false
     anchor-sections: false
     smooth-scroll: false

@@ -427,3 +427,13 @@ James Martens and Roger Grosse. “Optimizing neural networks with Kronecker-fac
 James Martens. “New insights and perspectives on the natural gradient method.” *Journal of Machine Learning Research* 21, 2020.
 
 Thomas Minka. “A family of algorithms for approximate Bayesian inference.” PhD thesis, MIT, 2001.
+
+```bibtex
+@misc{miryusupov2026fishergeometry,
+  author       = {Miryusupov, Shohruh},
+  title        = {Fisher Geometry and Basin Selection},
+  year         = {2026},
+  howpublished = {Research note},
+  url          = {https://www.miryusupov.com/blog/posts/fisher_geometry_basin_selection/index.html}
+}
+```
