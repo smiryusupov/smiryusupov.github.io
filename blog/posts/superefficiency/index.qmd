@@ -31,6 +31,8 @@ execute:
 }
 </style>
 
+*Status: research note; not peer reviewed. The James--Stein risk facts are classical; the simulations and discussion are meant to give a geometric reading of shrinkage and high-dimensional noise.*
+
 ## Preface
 
 This note continues the same theme as the note on Firth's adjustment: bias is not always a disease.

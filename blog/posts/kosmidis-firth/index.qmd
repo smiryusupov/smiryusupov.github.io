@@ -31,6 +31,8 @@ execute:
 }
 </style>
 
+*Status: research note; not peer reviewed. The mathematical facts about Firth adjustment and Jeffreys-volume penalization are standard; the examples are meant to give a geometric reading of why the adjustment behaves well near separation.*
+
 ## Preface
 
 A personal motivation sits behind this note. My friend and former professor Andrew P. Mullhaupt opened my eyes to a simple but easily forgotten point: bias is not always a disease. Used carelessly, bias distorts. Used deliberately, with an understanding of the geometry, it can be a remedy.

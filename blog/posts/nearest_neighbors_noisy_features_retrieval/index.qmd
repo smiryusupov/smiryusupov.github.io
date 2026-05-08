@@ -31,6 +31,8 @@ execute:
 }
 </style>
 
+*Status: research note; not peer reviewed. The examples are synthetic diagnostics meant to illustrate how irrelevant coordinates can distort nearest-neighbor geometry and retrieval.*
+
 ## Preface
 
 Nearest-neighbor methods are attractive because the rule is almost embarrassingly simple: find points close to the query, and let those points decide. The weakness is hidden in the word *close*. A nearest-neighbor method is only as good as the geometry induced by its representation and metric.

@@ -1,5 +1,5 @@
 ---
-title: "Conformal Scores and the Geometry of Efficiency"
+title: "Conformal scores and the geometry of efficiency"
 date: 2026-05-06
 description: "A note on conformal validity, score geometry, and efficient prediction sets."
 categories: [notes, statistics, machine-learning]

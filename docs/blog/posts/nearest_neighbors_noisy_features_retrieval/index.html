@@ -156,6 +156,7 @@ window.Quarto = {
   margin-right: auto;
 }
 </style>
+<p><em>Status: research note; not peer reviewed. The examples are synthetic diagnostics meant to illustrate how irrelevant coordinates can distort nearest-neighbor geometry and retrieval.</em></p>
 <h2 id="preface">Preface</h2>
 <p>Nearest-neighbor methods are attractive because the rule is almost embarrassingly simple: find points close to the query, and let those points decide. The weakness is hidden in the word <em>close</em>. A nearest-neighbor method is only as good as the geometry induced by its representation and metric.</p>
 <p>This note studies a deliberately small example. There is one informative coordinate and many nuisance coordinates. The Bayes rule does not change as dimension grows, because it only needs the informative coordinate. Euclidean <span class="math inline">k</span>NN, however, uses all coordinates equally. As nuisance coordinates accumulate, distance rankings become less related to the label.</p>

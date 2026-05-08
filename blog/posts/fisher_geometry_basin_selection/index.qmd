@@ -32,6 +32,8 @@ execute:
 }
 </style>
 
+*Status: research note; not peer reviewed. The Fisher-geometry facts are standard; the experiments are small edge cases about local preconditioning and non-convex basin selection.*
+
 ## Preface
 
 Natural gradient descent has a beautiful geometric story. Ordinary gradient descent measures a step in the coordinates in which the parameters happen to be written. Natural gradient descent instead measures a step by the change it induces in the model distribution.
