@@ -933,10 +933,15 @@ This is the same broad idea that appears in random effects, ridge regression, em
 
 
 ## References
+
 William James and Charles Stein. “Estimation with quadratic loss.” *Proceedings of the Fourth Berkeley Symposium on Mathematical Statistics and Probability*, 1961.
+
 Charles Stein. “Estimation of the mean of a multivariate normal distribution.” *The Annals of Statistics* 9(6), 1981.
+
 Bradley Efron and Carl Morris. “Stein's estimation rule and its competitors—an empirical Bayes approach.” *Journal of the American Statistical Association* 68(341), 1973.
+
 Soumendu Sundar Mukherjee. *Lecture 26: Stein's Phenomenon and Super-efficiency*. Advanced Nonparametric Inference, 2020.
+
 Roman Vershynin. *High-Dimensional Probability: An Introduction with Applications in Data Science*. Cambridge University Press, 2018.
 
 ```bibtex
