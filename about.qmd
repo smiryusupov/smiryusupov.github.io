@@ -10,7 +10,9 @@ body-classes: section-page
 
 Working on statistics, applied mathematics, and machine learning.
 
-This site is for notes and experiments — things worth writing down.
+I use this site to think through statistical geometry, uncertainty, high-dimensional effects, and small empirical diagnostics.
+
+These are notes and experiments — things worth writing down.
 
 ## Independence
 

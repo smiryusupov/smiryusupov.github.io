@@ -31,6 +31,8 @@ execute:
 }
 </style>
 
+Status: research note; not peer reviewed. The thin-shell and projection facts are standard; the experiments are small visual diagnostics about why high-dimensional structure can be hidden by low-dimensional views.
+
 A recurring trap in high-dimensional exploratory data analysis is that a dataset can have strong geometric structure in the ambient space and still look ordinary in a low-dimensional plot.
 
 We use two examples.
@@ -307,7 +309,7 @@ shows the same effect quantitatively.
 
 ```{python}
 #| label: fig-gaussian-radius-check
-#| fig-cap: 'The normalized Gaussian radius $\|X\|/d$ concentrates near $1$ as the ambient dimension grows.'
+#| fig-cap: 'The normalized Gaussian radius $\|X\|/\sqrt{d}$ concentrates near $1$ as the ambient dimension grows.'
 
 fig, axes = plt.subplots(1, 2, figsize=(5.7, 2.9), constrained_layout=True)
 

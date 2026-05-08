@@ -287,7 +287,7 @@ This plot is not meant to prove a theorem. It is a way to read the trajectory. T
 
 ## Part VI: Where K-FAC enters
 
-K-FAC is the neural-network analogue of the same idea: replace an expensive Fisher matrix by a structured local approximation. For a linear layer with input activations \(a\) and preactivation score gradients \(\delta\), K-FAC approximates the Fisher block by
+K-FAC is the neural-network analogue of the same idea: replace an expensive Fisher matrix by a structured local approximation. For a linear layer with input activations $a$ and preactivation score gradients $\delta$, K-FAC approximates the Fisher block by
 
 $$
 F_l
