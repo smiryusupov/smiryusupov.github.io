@@ -16,5 +16,5 @@ listing:
 </style>
 
 <div class="home-intro">
-  <p>Experiments, notes, and small studies.</p>
+  <p>Experiments, notes, and small studies on statistical learning, geometry, optimization, and the gap between formal guarantees and practical interpretation.</p>
 </div>
