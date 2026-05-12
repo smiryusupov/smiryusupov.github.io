@@ -529,6 +529,14 @@ footer.footer,
     padding: 0.9rem 1.25rem;
   }
 
+  .home-intro,
+  .home-posts,
+  #listing-listing,
+  .quarto-listing-container-default {
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+  }
+
   body > p,
   body > h1, body > h2, body > h3,
   body > h4, body > h5, body > h6,
@@ -552,8 +560,8 @@ footer.footer,
 
   .quarto-listing-container-default,
   #listing-listing {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
   }
 
   .quarto-post {
