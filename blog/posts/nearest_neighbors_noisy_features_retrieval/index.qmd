@@ -670,6 +670,8 @@ Trevor Hastie, Robert Tibshirani, and Jerome Friedman. *The Elements of Statisti
 
 Gérard Biau and Luc Devroye. *Lectures on the Nearest Neighbor Method*. Springer, 2015.
 
+## Suggested citation
+
 ```bibtex
 @misc{miryusupov2026nearestneighbors,
   author       = {Miryusupov, Shohruh},

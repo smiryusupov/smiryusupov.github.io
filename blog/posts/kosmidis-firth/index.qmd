@@ -816,6 +816,8 @@ Ioannis Kosmidis and David Firth. “Jeffreys-prior penalty, finiteness and shri
 
 Peter McCullagh. *Tensor Methods in Statistics*. Chapman and Hall, 1987.
 
+## Suggested citation
+
 ```bibtex
 @misc{miryusupov2026curvaturevolume,
   author       = {Miryusupov, Shohruh},

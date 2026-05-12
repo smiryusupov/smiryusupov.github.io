@@ -437,6 +437,8 @@ James Martens. “New insights and perspectives on the natural gradient method.�
 
 Thomas Minka. “A family of algorithms for approximate Bayesian inference.” PhD thesis, MIT, 2001.
 
+## Suggested citation
+
 ```bibtex
 @misc{miryusupov2026fishergeometry,
   author       = {Miryusupov, Shohruh},

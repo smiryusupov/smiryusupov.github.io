@@ -529,6 +529,7 @@ Elizabeth S. Meckes. “Quantitative asymptotics of graphical projection pursuit
 
 Iain M. Johnstone and Debashis Paul. “PCA in High Dimensions: An Orientation.” *Proceedings of the IEEE* 106(8), 2018.
 
+## Suggested citation
 
 ```bibtex
 @misc{miryusupov2026thinshells,
