@@ -12,3 +12,34 @@
     }
   });
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const tocLinks = [...document.querySelectorAll("#TOC a[href^='#']")];
+  const sections = tocLinks
+    .map(link => document.querySelector(decodeURIComponent(link.getAttribute("href"))))
+    .filter(Boolean);
+
+  if (!tocLinks.length || !sections.length) return;
+
+  const setActive = () => {
+    let active = sections[0];
+
+    for (const section of sections) {
+      if (section.getBoundingClientRect().top <= 120) {
+        active = section;
+      }
+    }
+
+    tocLinks.forEach(link => {
+      link.classList.toggle(
+        "active",
+        link.getAttribute("href") === "#" + CSS.escape(active.id)
+      );
+    });
+  };
+
+  setActive();
+  window.addEventListener("scroll", setActive, { passive: true });
+});
+</script>

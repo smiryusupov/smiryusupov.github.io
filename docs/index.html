@@ -157,6 +157,37 @@ Experiments, notes, and small studies on statistical learning, geometry, optimiz
     }
   });
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const tocLinks = [...document.querySelectorAll("#TOC a[href^='#']")];
+  const sections = tocLinks
+    .map(link => document.querySelector(decodeURIComponent(link.getAttribute("href"))))
+    .filter(Boolean);
+
+  if (!tocLinks.length || !sections.length) return;
+
+  const setActive = () => {
+    let active = sections[0];
+
+    for (const section of sections) {
+      if (section.getBoundingClientRect().top <= 120) {
+        active = section;
+      }
+    }
+
+    tocLinks.forEach(link => {
+      link.classList.toggle(
+        "active",
+        link.getAttribute("href") === "#" + CSS.escape(active.id)
+      );
+    });
+  };
+
+  setActive();
+  window.addEventListener("scroll", setActive, { passive: true });
+});
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
@@ -560,7 +591,7 @@ Experiments, notes, and small studies on statistical learning, geometry, optimiz
 
 <div class="quarto-listing quarto-listing-container-default" id="listing-listing">
 <div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="bm90ZXMlMkNzdGF0aXN0aWNzJTJDbWFjaGluZS1sZWFybmluZw==" data-listing-date-sort="1778450400000" data-listing-file-modified-sort="1778536257263" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="14" data-listing-word-count-sort="2662">
+<div class="quarto-post image-right" data-index="0" data-categories="bm90ZXMlMkNzdGF0aXN0aWNzJTJDbWFjaGluZS1sZWFybmluZw==" data-listing-date-sort="1778450400000" data-listing-file-modified-sort="1778584921344" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="14" data-listing-word-count-sort="2662">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./blog/posts/when_exact_matching_is_the_wrong_comfort/index.html" class="no-external">When exact matching is the wrong comfort</a>
@@ -577,7 +608,7 @@ Experiments, notes, and small studies on statistical learning, geometry, optimiz
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="1" data-categories="bm90ZXMlMkNzdGF0aXN0aWNzJTJDbWFjaGluZS1sZWFybmluZw==" data-listing-date-sort="1778018400000" data-listing-file-modified-sort="1778251413308" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2107">
+<div class="quarto-post image-right" data-index="1" data-categories="bm90ZXMlMkNzdGF0aXN0aWNzJTJDbWFjaGluZS1sZWFybmluZw==" data-listing-date-sort="1778018400000" data-listing-file-modified-sort="1778584916280" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2107">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./blog/posts/geometry_conformal_scores/index.html" class="no-external">Conformal scores and the geometry of efficiency</a>
@@ -594,7 +625,7 @@ Experiments, notes, and small studies on statistical learning, geometry, optimiz
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="2" data-categories="bm90ZXMlMkNvcHRpbWl6YXRpb24lMkNtYWNoaW5lLWxlYXJuaW5nJTJDaW5mb3JtYXRpb24tZ2VvbWV0cnk=" data-listing-date-sort="1777932000000" data-listing-file-modified-sort="1778252614424" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1935">
+<div class="quarto-post image-right" data-index="2" data-categories="bm90ZXMlMkNvcHRpbWl6YXRpb24lMkNtYWNoaW5lLWxlYXJuaW5nJTJDaW5mb3JtYXRpb24tZ2VvbWV0cnk=" data-listing-date-sort="1777932000000" data-listing-file-modified-sort="1778584902711" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1935">
 <div class="body">
 <h3 class="no-anchor listing-title">
 <a href="./blog/posts/fisher_geometry_basin_selection/index.html" class="no-external">Fisher geometry and basin selection</a>

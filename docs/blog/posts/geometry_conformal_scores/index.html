@@ -67,10 +67,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../../site_libs/quarto-html/tabby.min.js"></script>
 <script src="../../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="../../../site_libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="../../../site_libs/quarto-html/quarto-html-640605f58ae58ee79329c070719e555b.min.css" rel="stylesheet" append-hash="true" data-mode="light">
 <link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<style>html{ scroll-behavior: smooth; }</style>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
   <script>document.addEventListener("DOMContentLoaded", function () {
@@ -136,7 +138,35 @@ window.Quarto = {
 <p class="date">2026-05-06</p>
 </header>
 
-
+<nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#preface" id="toc-preface">Preface</a></li>
+  <li><a href="#part-i-validity-comes-from-exchangeability" id="toc-part-i-validity-comes-from-exchangeability">Part I: Validity comes from exchangeability</a></li>
+  <li><a href="#part-ii-the-score-defines-the-geometry" id="toc-part-ii-the-score-defines-the-geometry">Part II: The score defines the geometry</a></li>
+  <li><a href="#part-iii-geometry-has-to-be-estimated" id="toc-part-iii-geometry-has-to-be-estimated">Part III: Geometry has to be estimated</a></li>
+  <li><a href="#part-iv-the-experiment" id="toc-part-iv-the-experiment">Part IV: The experiment</a></li>
+  <li><a href="#part-v-what-happened" id="toc-part-v-what-happened">Part V: What happened</a>
+  <ul>
+  <li><a href="#heteroskedastic-data" id="toc-heteroskedastic-data">Heteroskedastic data</a></li>
+  <li><a href="#homoskedastic-heavy-tailed-and-skewed-data" id="toc-homoskedastic-heavy-tailed-and-skewed-data">Homoskedastic, heavy-tailed, and skewed data</a></li>
+  </ul></li>
+  <li><a href="#part-vi-the-multimodal-case" id="toc-part-vi-the-multimodal-case">Part VI: The multimodal case</a></li>
+  <li><a href="#part-vii-diagnostics-should-match-the-geometry" id="toc-part-vii-diagnostics-should-match-the-geometry">Part VII: Diagnostics should match the geometry</a></li>
+  <li><a href="#takeaway" id="toc-takeaway">Takeaway</a></li>
+  <li><a href="#technical-appendix" id="toc-technical-appendix">Technical appendix</a>
+  <ul>
+  <li><a href="#why-monotone-score-transforms-did-not-matter" id="toc-why-monotone-score-transforms-did-not-matter">Why monotone score transforms did not matter</a></li>
+  <li><a href="#what-density-set-length-means" id="toc-what-density-set-length-means">What density-set length means</a></li>
+  <li><a href="#a-classification-analogue" id="toc-a-classification-analogue">A classification analogue</a></li>
+  <li><a href="#why-this-is-not-a-validity-theorem" id="toc-why-this-is-not-a-validity-theorem">Why this is not a validity theorem</a></li>
+  <li><a href="#reproducing-the-benchmark" id="toc-reproducing-the-benchmark">Reproducing the benchmark</a></li>
+  </ul></li>
+  <li><a href="#references" id="toc-references">References</a></li>
+  <li><a href="#suggested-citation" id="toc-suggested-citation">Suggested citation</a></li>
+  </ul>
+</nav>
 <style>
 /* Wider result tables for this post. Normal site tables stay unchanged. */
 .wide-table {
@@ -166,7 +196,7 @@ window.Quarto = {
 }
 </style>
 <p><em>Status: research note; not peer reviewed. The conformal validity claims are standard; the experiments study how score choice changes efficiency and local behavior.</em></p>
-<h2 id="preface">Preface</h2>
+<h2 id="preface" class="anchored">Preface</h2>
 <p>Conformal prediction has a clean promise. If the calibration and test examples are exchangeable, then a split conformal prediction set has finite-sample marginal coverage. The model used to build the score can be wrong. The likelihood can be misspecified. The geometry can be only approximate.</p>
 <p>That is the part I do not want to disturb. The question in this note is different:</p>
 <blockquote>
@@ -181,7 +211,7 @@ window.Quarto = {
 \boxed{\text{exchangeability gives validity; score geometry affects efficiency.}}
 </span></p>
 <p>This note is a small experiment around that slogan. The goal is not to introduce a new conformal method, but to separate two things that are easy to mix together: the validity mechanism and the shape induced by the score. Conformal calibration gives the first. The score gives the second.</p>
-<h2 id="part-i-validity-comes-from-exchangeability">Part I: Validity comes from exchangeability</h2>
+<h2 id="part-i-validity-comes-from-exchangeability" class="anchored">Part I: Validity comes from exchangeability</h2>
 <p>Let</p>
 <p><span class="math display">
 Z_i=(X_i,Y_i), \qquad i=1,\ldots,n+1,
@@ -210,7 +240,7 @@ C_\alpha(x)=\{y:S(x,y)\le \widehat q\}.
 </span></p>
 <p>The important word is <em>any</em>. The score can come from a random forest, a kernel method, a neural network, a quantile model, or a density model. If the calibration and test scores are exchangeable, the marginal guarantee remains.</p>
 <p>This is why I do not view information geometry as a new validity proof for conformal prediction. The validity proof is already there. The role of geometry is narrower: a geometric score may rank candidate labels better. Better ranking can mean shorter intervals, smaller sets, or better conditional behavior. But it is not what makes the method valid.</p>
-<h2 id="part-ii-the-score-defines-the-geometry">Part II: The score defines the geometry</h2>
+<h2 id="part-ii-the-score-defines-the-geometry" class="anchored">Part II: The score defines the geometry</h2>
 <p>The simplest regression score is</p>
 <p><span class="math display">
 S_{\mathrm{abs}}(x,y)=|y-\widehat\mu(x)|.
@@ -269,7 +299,7 @@ S_{\mathrm{dens}}(x,y)=-\log \widehat p(y\mid x),
 C_\alpha(x)=\{y:\widehat p(y\mid x)\ge e^{-\widehat q}\},
 </span></p>
 <p>which can be disconnected. That is the right geometry for multimodal conditional laws.</p>
-<h2 id="part-iii-geometry-has-to-be-estimated">Part III: Geometry has to be estimated</h2>
+<h2 id="part-iii-geometry-has-to-be-estimated" class="anchored">Part III: Geometry has to be estimated</h2>
 <p>A local metric can help only if it is estimated stably. If <span class="math inline">\widehat\sigma(x)</span> is too small on some calibration points, then</p>
 <p><span class="math display">
 \frac{|y-\widehat\mu(x)|}{\widehat\sigma(x)}
@@ -290,7 +320,7 @@ C_\alpha(x)=\{y:\widehat p(y\mid x)\ge e^{-\widehat q}\},
 \gamma\widetilde\sigma_{\mathrm{global}}.
 </span></p>
 <p>Here <span class="math inline">\gamma=0</span> is fully local geometry, while <span class="math inline">\gamma=1</span> is mostly global residual geometry. The practical question is not whether local geometry is elegant. It is how much local geometry we can trust.</p>
-<h2 id="part-iv-the-experiment">Part IV: The experiment</h2>
+<h2 id="part-iv-the-experiment" class="anchored">Part IV: The experiment</h2>
 <p>I use synthetic regression data with mean</p>
 <p><span class="math display">
 \mu(x)=\sin(2\pi x_1)+\frac12 x_1.
@@ -342,9 +372,9 @@ C_\alpha(x)=\{y:\widehat p(y\mid x)\ge e^{-\widehat q}\},
 <p>The experiment is ordinary split conformal: split the data into train, calibration, and test sets; fit a model on the training set; build one or more scores; compute the conformal quantile on calibration scores; and evaluate coverage and set length on the test set.</p>
 <p>The score changes. The calibration logic does not.</p>
 <p>The code lives in <code>ig_conformal.py</code>. I ran the full benchmark separately and report the saved summaries below. The benchmark uses four model families: random forests, kernel ridge regression, MLPs, and GBRT-based conformalized quantile regression.</p>
-<h2 id="part-v-what-happened">Part V: What happened</h2>
+<h2 id="part-v-what-happened" class="anchored">Part V: What happened</h2>
 <p>The results match the small claim. Coverage stays near <span class="math inline">90\%</span> for most methods. That is the conformal part. The average length changes a lot. That is the score-geometry part.</p>
-<h3 id="heteroskedastic-data">Heteroskedastic data</h3>
+<h3 id="heteroskedastic-data" class="anchored">Heteroskedastic data</h3>
 <p>This is the clearest positive case for local geometry.</p>
 <div class="wide-table">
 <table class="caption-top">
@@ -414,10 +444,10 @@ C_\alpha(x)=\{y:\widehat p(y\mid x)\ge e^{-\widehat q}\},
 <blockquote>
 <p>use only as much geometry as you can estimate stably.</p>
 </blockquote>
-<h3 id="homoskedastic-heavy-tailed-and-skewed-data">Homoskedastic, heavy-tailed, and skewed data</h3>
+<h3 id="homoskedastic-heavy-tailed-and-skewed-data" class="anchored">Homoskedastic, heavy-tailed, and skewed data</h3>
 <p>The homoskedastic case is a useful sanity check. The simple residual score is hard to beat; for random forests, the absolute residual interval has average length about <span class="math inline">0.856</span>, and the oracle local normalization gives essentially the same number. Local geometry has nothing useful to learn.</p>
 <p>The heavy-tailed and skewed cases are mixed but informative. Blended local-scale scores give modest gains for RF and MLP in the heavy-tailed setting and often improve conditional balance. In the skewed setting, RF and MLP blended scores work well, while CQR improves conditional balance but is not uniformly shorter in this particular run. More flexible geometry is not automatically better. It helps only when the fitted score ranks labels well.</p>
-<h2 id="part-vi-the-multimodal-case">Part VI: The multimodal case</h2>
+<h2 id="part-vi-the-multimodal-case" class="anchored">Part VI: The multimodal case</h2>
 <p>The multimodal setting is the cleanest example. Interval methods have the wrong shape: they must cover the space between modes even when the middle is not very plausible.</p>
 <p>The conditional density score uses</p>
 <p><span class="math display">
@@ -480,7 +510,7 @@ S(x,y)=-\log \widehat p(y\mid x).
 <blockquote>
 <p>once the score geometry matches the conditional law, conformal sets become much more efficient.</p>
 </blockquote>
-<h2 id="part-vii-diagnostics-should-match-the-geometry">Part VII: Diagnostics should match the geometry</h2>
+<h2 id="part-vii-diagnostics-should-match-the-geometry" class="anchored">Part VII: Diagnostics should match the geometry</h2>
 <p>At first, the density method looked less locally balanced when I binned by <span class="math inline">\sigma(x)</span>. The mean conditional error was about <span class="math inline">0.0757</span>. But <span class="math inline">\sigma(x)</span> is not the right diagnostic for a mixture score. The score models mode structure.</p>
 <p>So I also bin by mixture-specific quantities: the estimated upper-mode probability <span class="math inline">\widehat\pi(x)</span>, its entropy <span class="math inline">H(\widehat\pi(x))</span>, the mode margin <span class="math inline">|\widehat\pi(x)-0.5|</span>, and the mode separation <span class="math inline">|\widehat\mu_+(x)-\widehat\mu_-(x)|</span>.</p>
 <div class="wide-table">
@@ -516,7 +546,7 @@ S(x,y)=-\log \widehat p(y\mid x).
 </table>
 </div>
 <p>The earlier diagnostic was partly asking the wrong question. If the score models local scale, bin by local scale. If the score models mixture uncertainty, bin by mixture uncertainty.</p>
-<h2 id="takeaway">Takeaway</h2>
+<h2 id="takeaway" class="anchored">Takeaway</h2>
 <p>This experiment is not a theorem about optimal conformal prediction. The claim is smaller:</p>
 <blockquote>
 <p>conformal calibration gives marginal validity, while the score determines the geometry of the set.</p>
@@ -540,14 +570,14 @@ S(x,y)=-\log \widehat p(y\mid x).
 \boxed{\text{multimodality} \Rightarrow \text{density-level-set score}.}
 </span></p>
 <p>The conformal layer is the safety net. It turns model-dependent scores into marginally valid prediction sets. But it does not make all scores equally good.</p>
-<h2 id="technical-appendix">Technical appendix</h2>
-<h3 id="why-monotone-score-transforms-did-not-matter">Why monotone score transforms did not matter</h3>
+<h2 id="technical-appendix" class="anchored">Technical appendix</h2>
+<h3 id="why-monotone-score-transforms-did-not-matter" class="anchored">Why monotone score transforms did not matter</h3>
 <p>I initially tried Student-<span class="math inline">t</span> and Huber versions of normalized residual scores. In scalar symmetric regression, these are mostly rank-equivalent to normalized absolute residuals. For example,</p>
 <p><span class="math display">
 \log\left(1+\frac{r^2}{\nu}\right)
 </span></p>
 <p>is monotone in <span class="math inline">|r|</span>, and the Huber loss is also monotone in <span class="math inline">|r|</span>. Since conformal prediction is rank-based, these transformations do not change the prediction set if they use the same scale. They may be useful diagnostics, but they do not create a new scalar interval geometry.</p>
-<h3 id="what-density-set-length-means">What density-set length means</h3>
+<h3 id="what-density-set-length-means" class="anchored">What density-set length means</h3>
 <p>For density-level-set conformal prediction in one-dimensional regression, I approximate</p>
 <p><span class="math display">
 |C_\alpha(x)|
@@ -557,7 +587,7 @@ S(x,y)=-\log \widehat p(y\mid x).
 -\log \widehat p(y\mid x)\le \widehat q.
 </span></p>
 <p>If the density has two separated modes, the accepted grid points can form two disconnected intervals. The reported length is the total grid length of the accepted region.</p>
-<h3 id="a-classification-analogue">A classification analogue</h3>
+<h3 id="a-classification-analogue" class="anchored">A classification analogue</h3>
 <p>The same idea has a classification analogue. For a neural classifier, ordinary conformal scores use softmax probabilities,</p>
 <p><span class="math display">
 S(x,y)=1-\widehat p_\theta(y\mid x),
@@ -571,14 +601,14 @@ S(x,y)
 (\phi_\theta(x)-m_y).
 </span></p>
 <p>This is the classification analogue of local metric scores in regression. The network supplies the geometry. Conformal calibration supplies the validity.</p>
-<h3 id="why-this-is-not-a-validity-theorem">Why this is not a validity theorem</h3>
+<h3 id="why-this-is-not-a-validity-theorem" class="anchored">Why this is not a validity theorem</h3>
 <p>All validity statements here are ordinary split conformal validity statements. The new part is empirical and conceptual: different score geometries induce different set shapes and efficiencies.</p>
 <p>A formal theorem would need to control excess set size, for example</p>
 <p><span class="math display">
 \mathbb E|C_\alpha(X)|-\mathbb E|C_\alpha^*(X)|,
 </span></p>
 <p>in terms of score-ranking error, density-estimation error, or metric-estimation error. That is not proved here.</p>
-<h3 id="reproducing-the-benchmark">Reproducing the benchmark</h3>
+<h3 id="reproducing-the-benchmark" class="anchored">Reproducing the benchmark</h3>
 <p>The full benchmark can be regenerated from <code>ig_conformal.py</code>:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>raw, summary <span class="op">=</span> ig.run_grid(</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    settings<span class="op">=</span>[</span>
@@ -605,7 +635,7 @@ S(x,y)
 <span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="st">"ig_conformal_multimodal_density_diagnostics.csv"</span>,</span>
 <span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span><span class="va">False</span>,</span>
 <span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<h2 id="references">References</h2>
+<h2 id="references" class="anchored">References</h2>
 <p>Vladimir Vovk, Alexander Gammerman, and Glenn Shafer. <em>Algorithmic Learning in a Random World</em>. Springer, 2005.</p>
 <p>Glenn Shafer and Vladimir Vovk. “A Tutorial on Conformal Prediction.” <em>Journal of Machine Learning Research</em> 9, 371–421, 2008.</p>
 <p>Jing Lei, Max G’Sell, Alessandro Rinaldo, Ryan J. Tibshirani, and Larry Wasserman. “Distribution-Free Predictive Inference for Regression.” <em>Journal of the American Statistical Association</em> 113(523), 1094–1111, 2018.</p>
@@ -614,7 +644,7 @@ S(x,y)
 <p>Rob Hyndman. “Computing and Graphing Highest Density Regions.” <em>The American Statistician</em> 50(2), 120–126, 1996.</p>
 <p>Rafael Izbicki, Gilson Shimizu, and Rafael Stern. “Flexible Distribution-Free Conditional Predictive Bands using Density Estimators.” <em>AISTATS</em>, 2020.</p>
 <p>Shun-ichi Amari. <em>Information Geometry and Its Applications</em>. Springer, 2016.</p>
-<h2 id="suggested-citation">Suggested citation</h2>
+<h2 id="suggested-citation" class="anchored">Suggested citation</h2>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bibtex code-with-copy"><code class="sourceCode bibtex"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="va">@misc</span>{<span class="ot">miryusupov2026conformalgeometry</span>,</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">author</span>       = {Miryusupov, Shohruh},</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">title</span>        = {Conformal Scores and the Geometry of Efficiency},</span>
@@ -638,12 +668,50 @@ S(x,y)
     }
   });
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const tocLinks = [...document.querySelectorAll("#TOC a[href^='#']")];
+  const sections = tocLinks
+    .map(link => document.querySelector(decodeURIComponent(link.getAttribute("href"))))
+    .filter(Boolean);
+
+  if (!tocLinks.length || !sections.length) return;
+
+  const setActive = () => {
+    let active = sections[0];
+
+    for (const section of sections) {
+      if (section.getBoundingClientRect().top <= 120) {
+        active = section;
+      }
+    }
+
+    tocLinks.forEach(link => {
+      link.classList.toggle(
+        "active",
+        link.getAttribute("href") === "#" + CSS.escape(active.id)
+      );
+    });
+  };
+
+  setActive();
+  window.addEventListener("scroll", setActive, { passive: true });
+});
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
     tabsets.forEach(function(tabset) {
       const tabby = new Tabby('#' + tabset.id);
     });
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
     const isCodeAnnotation = (el) => {
       for (const clz of el.classList) {
         if (clz.startsWith('code-annotation-')) {                     
@@ -1039,4 +1107,5 @@ S(x,y)
 
 
 
+<script src="../../../site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>

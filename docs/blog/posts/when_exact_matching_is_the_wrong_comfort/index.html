@@ -67,10 +67,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../../site_libs/quarto-html/tabby.min.js"></script>
 <script src="../../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="../../../site_libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="../../../site_libs/quarto-html/quarto-html-640605f58ae58ee79329c070719e555b.min.css" rel="stylesheet" append-hash="true" data-mode="light">
 <link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<style>html{ scroll-behavior: smooth; }</style>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
   <script>document.addEventListener("DOMContentLoaded", function () {
@@ -136,7 +138,30 @@ window.Quarto = {
 <p class="date">2026-05-11</p>
 </header>
 
-
+<nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#preface" id="toc-preface">Preface</a></li>
+  <li><a href="#part-i-the-finite-theorem" id="toc-part-i-the-finite-theorem">Part I: The finite theorem</a></li>
+  <li><a href="#part-ii-the-empirical-identity" id="toc-part-ii-the-empirical-identity">Part II: The empirical identity</a></li>
+  <li><a href="#part-iii-the-population-gap" id="toc-part-iii-the-population-gap">Part III: The population gap</a></li>
+  <li><a href="#part-iv-the-tail-can-be-absent" id="toc-part-iv-the-tail-can-be-absent">Part IV: The tail can be absent</a></li>
+  <li><a href="#part-v-exact-matching-is-not-an-out-of-sample-map" id="toc-part-v-exact-matching-is-not-an-out-of-sample-map">Part V: Exact matching is not an out-of-sample map</a></li>
+  <li><a href="#part-vi-empirical-ot-is-an-estimator" id="toc-part-vi-empirical-ot-is-an-estimator">Part VI: Empirical OT is an estimator</a></li>
+  <li><a href="#takeaway" id="toc-takeaway">Takeaway</a></li>
+  <li><a href="#technical-appendix" id="toc-technical-appendix">Technical appendix</a>
+  <ul>
+  <li><a href="#solver-exactness-is-not-population-validity" id="toc-solver-exactness-is-not-population-validity">Solver exactness is not population validity</a></li>
+  <li><a href="#non-uniqueness-and-instability" id="toc-non-uniqueness-and-instability">Non-uniqueness and instability</a></li>
+  <li><a href="#equal-weights-are-doing-work" id="toc-equal-weights-are-doing-work">Equal weights are doing work</a></li>
+  <li><a href="#empirical-geodesics" id="toc-empirical-geodesics">Empirical geodesics</a></li>
+  <li><a href="#reproducibility-notes" id="toc-reproducibility-notes">Reproducibility notes</a></li>
+  </ul></li>
+  <li><a href="#references" id="toc-references">References</a></li>
+  <li><a href="#suggested-citation" id="toc-suggested-citation">Suggested citation</a></li>
+  </ul>
+</nav>
 <style>
 .article-figure {
   max-width: 760px;
@@ -159,7 +184,7 @@ window.Quarto = {
 }
 </style>
 <p><em>Status: research note; not peer reviewed. The finite assignment facts are standard. The examples are synthetic diagnostics meant to illustrate when exact empirical matching should not be interpreted as population transport.</em></p>
-<h2 id="preface">Preface</h2>
+<h2 id="preface" class="anchored">Preface</h2>
 <p>The linear sum assignment problem has a clean promise. Given two point clouds of the same size, it matches every source point to one target point and minimizes the total cost.</p>
 <p>At the finite level, there is no ambiguity. If</p>
 <p><span class="math display">
@@ -183,7 +208,7 @@ x_i\mapsto y_{\sigma(i)}
 <p><span class="math display">
 \boxed{\text{exact empirical matching is not population transport.}}
 </span></p>
-<h2 id="part-i-the-finite-theorem">Part I: The finite theorem</h2>
+<h2 id="part-i-the-finite-theorem" class="anchored">Part I: The finite theorem</h2>
 <p>In the finite equal-mass setting, there are two point sets</p>
 <p><span class="math display">
 X=\{P_1,\ldots,P_m\},
@@ -218,7 +243,7 @@ M=K=D.
 </blockquote>
 <p>The theorem is finite. It does not say that a permutation learned from two random samples is a population OT map. It does not define what happens to a new point. It does not add missing tail mass.</p>
 <p>The finite statement is true. The population interpretation is the extra step.</p>
-<h2 id="part-ii-the-empirical-identity">Part II: The empirical identity</h2>
+<h2 id="part-ii-the-empirical-identity" class="anchored">Part II: The empirical identity</h2>
 <p>Let</p>
 <p><span class="math display">
 \hat\mu_n=\frac1n\sum_{i=1}^n\delta_{x_i},
@@ -255,7 +280,7 @@ T_{n\#}\hat\mu_n(A)
 \hat\nu_n(A).
 </span></p>
 <p>So <span class="math inline">T_{n\#}\hat\mu_n=\hat\nu_n</span>. This is what LSAP gets exactly right.</p>
-<h2 id="part-iii-the-population-gap">Part III: The population gap</h2>
+<h2 id="part-iii-the-population-gap" class="anchored">Part III: The population gap</h2>
 <p>A population transport map is a measurable function</p>
 <p><span class="math display">
 T:\mathcal X\to\mathcal Y
@@ -287,7 +312,7 @@ X_n=\{x_1,\ldots,x_n\}.
 <p>a table of assignments is not yet a transport function.</p>
 </blockquote>
 <p>Any out-of-sample map comes from an additional choice: nearest-neighbor extension, interpolation, kernel regression, a neural network, a parametric model, or something else. That choice may be useful. But it is no longer LSAP alone.</p>
-<h2 id="part-iv-the-tail-can-be-absent">Part IV: The tail can be absent</h2>
+<h2 id="part-iv-the-tail-can-be-absent" class="anchored">Part IV: The tail can be absent</h2>
 <p>Now consider a target distribution with a rare region <span class="math inline">A</span>:</p>
 <p><span class="math display">
 \nu(A)=\varepsilon.
@@ -331,7 +356,7 @@ C_A(1-\varepsilon)^n.
 </blockquote>
 <div id="cell-fig-missing-tail" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
-<div id="fig-missing-tail" class="quarto-float quarto-figure quarto-figure-center">
+<div id="fig-missing-tail" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig">
 <div aria-describedby="fig-missing-tail-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="index_files/figure-html/fig-missing-tail-output-1.png" width="777" height="393">
@@ -344,11 +369,11 @@ Figure&nbsp;1: A finite target sample may miss a rare but consequential target r
 </div>
 </div>
 <p>The plot is not a solver benchmark. It only shows the sampling issue. If the target sample contains no rare atom, the assignment cannot invent one. If it contains one or two, the finite assignment sends exactly that many source atoms into the rare region.</p>
-<h2 id="part-v-exact-matching-is-not-an-out-of-sample-map">Part V: Exact matching is not an out-of-sample map</h2>
+<h2 id="part-v-exact-matching-is-not-an-out-of-sample-map" class="anchored">Part V: Exact matching is not an out-of-sample map</h2>
 <p>LSAP assigns values only at the observed source atoms. Different extensions can agree on the assigned pairs and disagree elsewhere.</p>
 <div id="cell-fig-extensions" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
-<div id="fig-extensions" class="quarto-float quarto-figure quarto-figure-center">
+<div id="fig-extensions" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig">
 <div aria-describedby="fig-extensions-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="index_files/figure-html/fig-extensions-output-1.png" width="758" height="432">
@@ -361,7 +386,7 @@ Figure&nbsp;2: The LSAP output is a finite table of pairs. Nearest-neighbor exte
 </div>
 </div>
 <p>The three curves are not three versions of LSAP. They are three choices made after the assignment.</p>
-<h2 id="part-vi-empirical-ot-is-an-estimator">Part VI: Empirical OT is an estimator</h2>
+<h2 id="part-vi-empirical-ot-is-an-estimator" class="anchored">Part VI: Empirical OT is an estimator</h2>
 <p>There is a simple case where the population OT map is known. Let</p>
 <p><span class="math display">
 \mu=N(0,I_d),
@@ -397,7 +422,7 @@ Y_{\sigma_n(i)}=X_i+a
 <p>This measures how far the empirical LSAP displacement is from the known population displacement.</p>
 <div id="cell-fig-empirical-ot-estimator" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
-<div id="fig-empirical-ot-estimator" class="quarto-float quarto-figure quarto-figure-center">
+<div id="fig-empirical-ot-estimator" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig">
 <div aria-describedby="fig-empirical-ot-estimator-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="index_files/figure-html/fig-empirical-ot-estimator-output-1.png" width="662" height="451">
@@ -413,7 +438,7 @@ Figure&nbsp;3: Empirical LSAP displacement compared with the known population OT
 <blockquote>
 <p>empirical OT is an estimator; exact optimization does not remove sampling error.</p>
 </blockquote>
-<h2 id="takeaway">Takeaway</h2>
+<h2 id="takeaway" class="anchored">Takeaway</h2>
 <p>LSAP is not the problem. The interpretation is the problem.</p>
 <p>The correct statement is:</p>
 <blockquote>
@@ -437,8 +462,8 @@ Figure&nbsp;3: Empirical LSAP displacement compared with the known population OT
 <p>does the empirical assignment contain enough information to define the population transport needed for the task?</p>
 </blockquote>
 <p>When the answer is no, exact matching is the wrong comfort.</p>
-<h2 id="technical-appendix">Technical appendix</h2>
-<h3 id="solver-exactness-is-not-population-validity">Solver exactness is not population validity</h3>
+<h2 id="technical-appendix" class="anchored">Technical appendix</h2>
+<h3 id="solver-exactness-is-not-population-validity" class="anchored">Solver exactness is not population validity</h3>
 <p>The linear assignment problem is classical. Kuhn’s Hungarian method is the canonical reference point. Munkres gave a standard polynomial-time treatment of assignment and transportation algorithms. Later exact methods include shortest augmenting path and Jonker–Volgenant-type algorithms. Bertsekas’ auction algorithm is another important family.</p>
 <p>This note is not a comparison of solvers. It is not a critique of the Hungarian algorithm, Jonker–Volgenant methods, auction algorithms, or exact assignment algorithms in general.</p>
 <p>The point is simpler:</p>
@@ -448,7 +473,7 @@ Figure&nbsp;3: Empirical LSAP displacement compared with the known population OT
 \text{population validity}.
 </span></p>
 <p>An exact solver can solve the sampled problem exactly while the sampled problem still omits a rare but important part of the target distribution.</p>
-<h3 id="non-uniqueness-and-instability">Non-uniqueness and instability</h3>
+<h3 id="non-uniqueness-and-instability" class="anchored">Non-uniqueness and instability</h3>
 <p>The LSAP objective returns an optimal permutation. The optimal value can be well-defined even when the selected permutation is not.</p>
 <p>Take</p>
 <p><span class="math display">
@@ -485,7 +510,7 @@ Y_\delta=
 <blockquote>
 <p>LSAP can be stable as a value while unstable as a map.</p>
 </blockquote>
-<h3 id="equal-weights-are-doing-work">Equal weights are doing work</h3>
+<h3 id="equal-weights-are-doing-work" class="anchored">Equal weights are doing work</h3>
 <p>The LSAP formulation above assumes two finite point clouds of the same size with equal atom weights:</p>
 <p><span class="math display">
 \hat\mu_n=\frac1n\sum_{i=1}^n\delta_{x_i},
@@ -526,7 +551,7 @@ a_i\ge 0,\qquad b_j\ge 0,\qquad
 \pi(0,1)=\frac12.
 </span></p>
 <p>So equal weights are not a cosmetic assumption. They are what make the finite OT problem reduce to LSAP. Without them, exact finite OT may require a transportation plan rather than a one-to-one assignment.</p>
-<h3 id="empirical-geodesics">Empirical geodesics</h3>
+<h3 id="empirical-geodesics" class="anchored">Empirical geodesics</h3>
 <p>Under squared Euclidean cost, the empirical LSAP solution defines the coupling</p>
 <p><span class="math display">
 \pi_n
@@ -562,9 +587,9 @@ a_i\ge 0,\qquad b_j\ge 0,\qquad
 <p>LSAP can induce an empirical Wasserstein geodesic under the right geometry, but it is not itself a population geodesic.</p>
 </blockquote>
 <p>The assignment is a coupling. The geodesic is a curve of measures built from that coupling.</p>
-<h3 id="reproducibility-notes">Reproducibility notes</h3>
+<h3 id="reproducibility-notes" class="anchored">Reproducibility notes</h3>
 <p>The diagnostic code above is intentionally small. It uses SciPy’s <code>linear_sum_assignment</code> to solve the finite assignment problem with squared Euclidean costs. The experiments are not solver benchmarks; they are small illustrations of the gap between exact empirical matching and population transport.</p>
-<h2 id="references">References</h2>
+<h2 id="references" class="anchored">References</h2>
 <p>Dimitri P. Bertsekas. “The auction algorithm: A distributed relaxation method for the assignment problem.” <em>Annals of Operations Research</em> 14, 1988.</p>
 <p>Haim Brezis. “Remarks on the Monge–Kantorovich problem in the discrete setting.” <em>Comptes Rendus Mathématique</em> 356(2), 2018.</p>
 <p>Roy Jonker and Anton Volgenant. “A shortest augmenting path algorithm for dense and sparse linear assignment problems.” <em>Computing</em> 38, 1987.</p>
@@ -572,7 +597,7 @@ a_i\ge 0,\qquad b_j\ge 0,\qquad
 <p>James Munkres. “Algorithms for the assignment and transportation problems.” <em>Journal of the Society for Industrial and Applied Mathematics</em> 5(1), 1957.</p>
 <p>Gabriel Peyré and Marco Cuturi. “Computational Optimal Transport.” <em>Foundations and Trends in Machine Learning</em> 11(5–6), 2019.</p>
 <p>Cédric Villani. <em>Optimal Transport: Old and New</em>. Springer, 2009.</p>
-<h2 id="suggested-citation">Suggested citation</h2>
+<h2 id="suggested-citation" class="anchored">Suggested citation</h2>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bibtex code-with-copy"><code class="sourceCode bibtex"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="va">@misc</span>{<span class="ot">miryusupov2026exactmatching</span>,</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">author</span>       = {Miryusupov, Shohruh},</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">title</span>        = {When exact matching is the wrong comfort},</span>
@@ -596,12 +621,50 @@ a_i\ge 0,\qquad b_j\ge 0,\qquad
     }
   });
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const tocLinks = [...document.querySelectorAll("#TOC a[href^='#']")];
+  const sections = tocLinks
+    .map(link => document.querySelector(decodeURIComponent(link.getAttribute("href"))))
+    .filter(Boolean);
+
+  if (!tocLinks.length || !sections.length) return;
+
+  const setActive = () => {
+    let active = sections[0];
+
+    for (const section of sections) {
+      if (section.getBoundingClientRect().top <= 120) {
+        active = section;
+      }
+    }
+
+    tocLinks.forEach(link => {
+      link.classList.toggle(
+        "active",
+        link.getAttribute("href") === "#" + CSS.escape(active.id)
+      );
+    });
+  };
+
+  setActive();
+  window.addEventListener("scroll", setActive, { passive: true });
+});
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
     tabsets.forEach(function(tabset) {
       const tabby = new Tabby('#' + tabset.id);
     });
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
     const isCodeAnnotation = (el) => {
       for (const clz of el.classList) {
         if (clz.startsWith('code-annotation-')) {                     
@@ -997,4 +1060,5 @@ a_i\ge 0,\qquad b_j\ge 0,\qquad
 
 
 
+<script src="../../../site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>

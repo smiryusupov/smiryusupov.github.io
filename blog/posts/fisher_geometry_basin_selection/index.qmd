@@ -8,6 +8,13 @@ resources:
 image: figures/exact_fisher_2d_success_rate_by_regime.png
 execute:
   freeze: auto
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-depth: 3
+    anchor-sections: true
+    smooth-scroll: true
 ---
 
 <style>

@@ -3,7 +3,7 @@
   --bg:      #ffffff;
   --fg:      #111111;
   --muted:   #666666;
-  --border:  #d0d0d0;
+  --border:  #dddddd;
   --reading: 660px;
   --wide:    860px;
   --font:    -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
@@ -179,13 +179,25 @@ li {
 }
 
 /* ─── homepage ───────────────────────────────────────── */
+
+.home-intro,
+.home-posts {
+  max-width: var(--reading) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
 .home-intro {
-  padding-top: 2rem !important;
+  padding-top: 2.25rem !important;
   margin-bottom: 0 !important;
 }
 
 .home-intro > p {
+  max-width: none;
   font-size: 0.96rem;
+  line-height: 1.55;
   color: var(--muted);
   margin: 0;
 }
@@ -197,9 +209,9 @@ li {
 }
 
 .post-row {
-  padding: 1rem 0.25rem;
+  max-width: none;
+  padding: 0.95rem 0;
   border-bottom: 1px solid var(--border);
-  max-width: var(--reading);
 }
 
 .post-row > p {
@@ -207,6 +219,7 @@ li {
   align-items: baseline;
   justify-content: space-between;
   gap: 2rem;
+  max-width: none;
   margin: 0;
 }
 
@@ -265,7 +278,7 @@ blockquote p {
   gap: 2rem !important;
 
   /* More space between border lines and post title */
-  padding: 1rem 0.35rem !important;
+  padding: 1rem 0 !important;
 
   border-bottom: 1px solid var(--border) !important;
   border-top: none !important;
@@ -618,4 +631,96 @@ footer.footer,
   .site-disclaimer {
     font-size: 0.72rem;
   }
+}
+
+/* ─── elegant left article table of contents ─────────── */
+
+/* Desktop-only left rail TOC */
+@media (min-width: 1180px) {
+  #TOC {
+    position: fixed;
+    top: 5.25rem;
+    left: max(1.5rem, calc((100vw - var(--wide)) / 2 - 245px));
+    width: 215px;
+    max-height: calc(100vh - 6.5rem);
+    overflow-y: auto;
+
+    margin: 0;
+    padding: 0 1rem 0 0;
+    border: 0;
+
+    font-size: 0.76rem;
+    line-height: 1.28;
+    color: var(--muted);
+    z-index: 50;
+  }
+
+  #TOC #toc-title {
+    display: none;
+  }
+
+  #TOC ul {
+    list-style: none;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  #TOC li {
+    margin: 0;
+    padding: 0;
+  }
+
+  #TOC a {
+    display: block;
+    padding: 0.18rem 0;
+    color: #8a8a8a;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+    transition: color 0.12s, transform 0.12s;
+  }
+
+  #TOC a:hover {
+    color: #222;
+    transform: translateX(2px);
+  }
+
+  /* Nested h3 entries, if toc-depth: 3 */
+  #TOC ul ul {
+    margin: 0.12rem 0 0.24rem 0.75rem;
+    padding-left: 0.65rem;
+    border-left: 1px solid #e6e6e6;
+  }
+
+  #TOC ul ul a {
+    font-size: 0.72rem;
+    color: #8a8a8a;
+  }
+
+  /* Active state; works if JS below adds .active */
+  #TOC a.active {
+    color: #222;
+    font-weight: 600;
+  }
+}
+
+/* Hide TOC on smaller screens */
+@media (max-width: 1179px) {
+  #TOC {
+    display: none;
+  }
+}
+
+/* Center Quarto listing rows to match homepage intro */
+#listing-listing,
+.quarto-listing-container-default {
+  max-width: var(--reading) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.quarto-post {
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
 }

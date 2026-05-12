@@ -67,10 +67,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../../site_libs/quarto-html/tabby.min.js"></script>
 <script src="../../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="../../../site_libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="../../../site_libs/quarto-html/quarto-html-640605f58ae58ee79329c070719e555b.min.css" rel="stylesheet" append-hash="true" data-mode="light">
 <link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<style>html{ scroll-behavior: smooth; }</style>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
   <script>document.addEventListener("DOMContentLoaded", function () {
@@ -136,7 +138,34 @@ window.Quarto = {
 <p class="date">2026-05-05</p>
 </header>
 
-
+<nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#preface" id="toc-preface">Preface</a></li>
+  <li><a href="#part-i-the-information-geometric-view" id="toc-part-i-the-information-geometric-view">Part I: The information-geometric view</a>
+  <ul>
+  <li><a href="#an-information-geometric-view" id="toc-an-information-geometric-view">An information-geometric view</a></li>
+  </ul></li>
+  <li><a href="#part-ii-the-experiment" id="toc-part-ii-the-experiment">Part II: The experiment</a>
+  <ul>
+  <li><a href="#endpoint-classification" id="toc-endpoint-classification">Endpoint classification</a></li>
+  </ul></li>
+  <li><a href="#part-iii-success-rates-by-regime" id="toc-part-iii-success-rates-by-regime">Part III: Success rates by regime</a></li>
+  <li><a href="#part-iv-the-trajectories" id="toc-part-iv-the-trajectories">Part IV: The trajectories</a></li>
+  <li><a href="#part-v-alignment-is-only-a-diagnostic" id="toc-part-v-alignment-is-only-a-diagnostic">Part V: Alignment is only a diagnostic</a></li>
+  <li><a href="#part-vi-where-k-fac-enters" id="toc-part-vi-where-k-fac-enters">Part VI: Where K-FAC enters</a></li>
+  <li><a href="#takeaway" id="toc-takeaway">Takeaway</a></li>
+  <li><a href="#technical-appendix" id="toc-technical-appendix">Technical appendix</a>
+  <ul>
+  <li><a href="#exact-fisher-for-the-bernoulli-model" id="toc-exact-fisher-for-the-bernoulli-model">Exact Fisher for the Bernoulli model</a></li>
+  <li><a href="#model-fisher-versus-empirical-fisher" id="toc-model-fisher-versus-empirical-fisher">Model Fisher versus empirical Fisher</a></li>
+  <li><a href="#damping-and-step-size" id="toc-damping-and-step-size">Damping and step size</a></li>
+  <li><a href="#alignment-diagnostics" id="toc-alignment-diagnostics">Alignment diagnostics</a></li>
+  </ul></li>
+  <li><a href="#references" id="toc-references">References</a></li>
+  </ul>
+</nav>
 <style>
 .article-figure {
   max-width: 760px;
@@ -159,7 +188,7 @@ window.Quarto = {
 }
 </style>
 <p><em>Status: research note; not peer reviewed. The Fisher-geometry facts are standard; the experiments are small edge cases about local preconditioning and non-convex basin selection.</em></p>
-<h2 id="preface">Preface</h2>
+<h2 id="preface" class="anchored">Preface</h2>
 <p>Natural gradient descent has a beautiful geometric story. Ordinary gradient descent measures a step in the coordinates in which the parameters happen to be written. Natural gradient descent instead measures a step by the change it induces in the model distribution.</p>
 <p>The local ruler is the Fisher information matrix. For a parametric predictive model <span class="math inline">p_\theta(y \mid x)</span>,</p>
 <p><span class="math display">
@@ -186,7 +215,7 @@ F(\theta)
 <p>A correct local Fisher metric does not guarantee selection of the globally desirable basin in a multimodal non-convex likelihood.</p>
 </blockquote>
 <p>This is not an argument that natural gradient or K-FAC is bad. It is an argument about what local geometry can and cannot promise. Fisher information gives a local geometry on a statistical model. It is not, by itself, a global map of the validation landscape.</p>
-<h2 id="part-i-the-information-geometric-view">Part I: The information-geometric view</h2>
+<h2 id="part-i-the-information-geometric-view" class="anchored">Part I: The information-geometric view</h2>
 <p>Let <span class="math inline">P_\theta</span> denote the probability law induced by the model. If <span class="math inline">\theta</span> and <span class="math inline">\theta+d\theta</span> are close, then</p>
 <p><span class="math display">
 \operatorname{KL}\left(P_\theta\,\|\,P_{\theta+d\theta}\right)
@@ -217,7 +246,7 @@ v^\top F(\theta)v.
 -\eta F(\theta)^{-1}\nabla L(\theta).
 </span></p>
 <p>This form makes both the promise and the limitation visible. The Fisher matrix tells us which infinitesimal steps are large or small in distribution space. It does not tell us which faraway basin has better validation loss.</p>
-<h3 id="an-information-geometric-view">An information-geometric view</h3>
+<h3 id="an-information-geometric-view" class="anchored">An information-geometric view</h3>
 <p>There is also a useful Hilbert-space way to read the same formula. For a dominated model with density <span class="math inline">p_\theta(z)</span>, write the score as</p>
 <p><span class="math display">
 s_\theta(z)
@@ -250,7 +279,7 @@ v^\top F(\theta)v.
 </span></p>
 <p>So natural gradient is not just “rescaling by a matrix.” It is steepest descent after measuring parameter motion by the <span class="math inline">L^2(P_\theta)</span> norm of the induced score perturbation.</p>
 <p>But the inner product is taken under the current model <span class="math inline">P_\theta</span>. It describes infinitesimal motion around the current distribution, not the global topology of the loss surface. The experiment below is designed to make that local/global distinction visible.</p>
-<h2 id="part-ii-the-experiment">Part II: The experiment</h2>
+<h2 id="part-ii-the-experiment" class="anchored">Part II: The experiment</h2>
 <p>The experiment uses a two-parameter Bernoulli model</p>
 <p><span class="math display">
 p_\theta(y\mid x)
@@ -290,10 +319,10 @@ J_i(\theta)J_i(\theta)^\top.
 <li><strong>Hard</strong> starts are adversarial. They are included to expose failure modes, not to suggest that every start is equally reasonable.</li>
 </ul>
 <p>This split matters. Without positive controls, the experiment would only say that the surface is hard. With easy, medium, and hard starts separated, the question becomes sharper: when the good basin is reachable, does Fisher geometry reliably select it?</p>
-<h3 id="endpoint-classification">Endpoint classification</h3>
+<h3 id="endpoint-classification" class="anchored">Endpoint classification</h3>
 <p>The endpoint labels are defined on the validation landscape. A run is counted as successful only if its final point lands in the good validation basin: the basin containing the best validation grid point. Endpoints that converge to other stable regions, or to stationary regions outside the good basin, are not counted as successes.</p>
 <p>This is an empirical basin classification, not a theorem. It is deliberately stricter than reporting final training loss. The question is not whether the optimizer made progress. The question is whether it selected the basin we wanted.</p>
-<h2 id="part-iii-success-rates-by-regime">Part III: Success rates by regime</h2>
+<h2 id="part-iii-success-rates-by-regime" class="anchored">Part III: Success rates by regime</h2>
 <p>The first figure summarizes the endpoint classification.</p>
 <figure class="article-figure">
 <img src="figures/exact_fisher_2d_success_rate_by_regime.png" alt="Good-basin hit rate by initialization regime.">
@@ -312,7 +341,7 @@ Good-basin hit rate by optimizer, pooled over the balanced easy, medium, and har
 </figcaption>
 </figure>
 <p>The pooled number is secondary. The more important observation is regime dependence: no optimizer here turns local geometry into a global basin-selection guarantee.</p>
-<h2 id="part-iv-the-trajectories">Part IV: The trajectories</h2>
+<h2 id="part-iv-the-trajectories" class="anchored">Part IV: The trajectories</h2>
 <p>The level-set plots make the basin story more concrete. Line color and line style identify the optimizer. The final marker identifies the endpoint class.</p>
 <p>The easy case is the sanity check.</p>
 <figure class="article-figure">
@@ -344,7 +373,7 @@ Hard initialization. Most methods are pulled toward bad or stationary basins.
 </figcaption>
 </figure>
 <p>If every plot looked like this, the experiment would only show that the initialization was too adversarial. Here, its role is narrower: it demonstrates that the local metric does not prevent bad-basin capture.</p>
-<h2 id="part-v-alignment-is-only-a-diagnostic">Part V: Alignment is only a diagnostic</h2>
+<h2 id="part-v-alignment-is-only-a-diagnostic" class="anchored">Part V: Alignment is only a diagnostic</h2>
 <p>A tempting diagnostic is to compare each update direction with the direction to the best validation grid point. This can be useful, but it should not be mistaken for the conclusion. A single step can point locally away from the final target while still following a sensible curved path; conversely, a locally well-aligned step does not guarantee that the trajectory will enter the desired basin.</p>
 <p>For this reason, I treat alignment as secondary and prefer a simpler trajectory summary: distance to the best validation grid point.</p>
 <figure class="article-figure">
@@ -354,7 +383,7 @@ Distance to the best validation grid point for one medium initialization. This i
 </figcaption>
 </figure>
 <p>This plot is not meant to prove a theorem. It is a way to read the trajectory. The main evidence remains the endpoint classification and the basin plots.</p>
-<h2 id="part-vi-where-k-fac-enters">Part VI: Where K-FAC enters</h2>
+<h2 id="part-vi-where-k-fac-enters" class="anchored">Part VI: Where K-FAC enters</h2>
 <p>K-FAC is the neural-network analogue of the same idea: replace an expensive Fisher matrix by a structured local approximation. For a linear layer with input activations <span class="math inline">a</span> and preactivation score gradients <span class="math inline">\delta</span>, K-FAC approximates the Fisher block by</p>
 <p><span class="math display">
 F_l
@@ -375,7 +404,7 @@ G_l^{-1}(\nabla_{W_l}L)A_l^{-1},
 <p>with damping in practice.</p>
 <p>The point here is not to benchmark K-FAC. It is to locate it conceptually. K-FAC is a Fisher-based local metric method: it can improve scaling by approximating the geometry of each layer, but its Kronecker factors do not decide which distant basin should be selected.</p>
 <p>So the lesson from the two-dimensional experiment transfers only at this level of abstraction. Fisher-based preconditioning can be locally principled and still globally noncommittal.</p>
-<h2 id="takeaway">Takeaway</h2>
+<h2 id="takeaway" class="anchored">Takeaway</h2>
 <p>This experiment is not a no-free-lunch theorem. It is not a claim that AdamW is generally better than natural gradient, and it is not a claim that K-FAC is only useful in easy cases.</p>
 <p>The claim is smaller:</p>
 <blockquote>
@@ -387,8 +416,8 @@ G_l^{-1}(\nabla_{W_l}L)A_l^{-1},
 <p>Does the local geometry point toward the basin that matters for the task?</p>
 </blockquote>
 <p>When the answer is yes, Fisher methods can be excellent. When the answer is no, there is no general reason to expect them to dominate AdamW.</p>
-<h2 id="technical-appendix">Technical appendix</h2>
-<h3 id="exact-fisher-for-the-bernoulli-model">Exact Fisher for the Bernoulli model</h3>
+<h2 id="technical-appendix" class="anchored">Technical appendix</h2>
+<h3 id="exact-fisher-for-the-bernoulli-model" class="anchored">Exact Fisher for the Bernoulli model</h3>
 <p>Let</p>
 <p><span class="math display">
 p_\theta(x)=\sigma(f_\theta(x)).
@@ -421,7 +450,7 @@ p_\theta(x)\left\{1-p_\theta(x)\right\}
 \right].
 </span></p>
 <p>This is the matrix used by exact Fisher NGD in the two-parameter experiment.</p>
-<h3 id="model-fisher-versus-empirical-fisher">Model Fisher versus empirical Fisher</h3>
+<h3 id="model-fisher-versus-empirical-fisher" class="anchored">Model Fisher versus empirical Fisher</h3>
 <p>The model Fisher takes the inner expectation over labels drawn from the model itself. The empirical Fisher replaces that expectation with the observed labels. For the Bernoulli case, this gives</p>
 <p><span class="math display">
 \widehat{F}_{\mathrm{emp}}(\theta)
@@ -431,13 +460,13 @@ p_\theta(x)\left\{1-p_\theta(x)\right\}
 J_i(\theta)J_i(\theta)^\top.
 </span></p>
 <p>The two matrices can behave differently away from a well-specified optimum. That is why the experiment includes both exact Fisher NGD and empirical Fisher NGD.</p>
-<h3 id="damping-and-step-size">Damping and step size</h3>
+<h3 id="damping-and-step-size" class="anchored">Damping and step size</h3>
 <p>All Fisher inverses in the experiment are damped:</p>
 <p><span class="math display">
 \left(F(\theta)+\lambda I\right)^{-1}.
 </span></p>
 <p>Damping is not a cosmetic implementation detail. Near singular regions, the Fisher matrix can be poorly conditioned, and the undamped inverse can produce unstable steps. Damping interpolates between natural gradient and ordinary gradient descent. It is therefore part of the optimizer, not merely numerical hygiene.</p>
-<h3 id="alignment-diagnostics">Alignment diagnostics</h3>
+<h3 id="alignment-diagnostics" class="anchored">Alignment diagnostics</h3>
 <p>For a trajectory <span class="math inline">\theta_t</span>, one can compare the update direction <span class="math inline">\Delta_t</span> with the direction from <span class="math inline">\theta_t</span> to the best validation grid point <span class="math inline">\theta^\star_{\mathrm{grid}}</span>:</p>
 <p><span class="math display">
 \operatorname{align}_t
@@ -449,7 +478,7 @@ J_i(\theta)J_i(\theta)^\top.
 }.
 </span></p>
 <p>This is the diagnostic referred to in Part V. It is useful for reading trajectories, but the main classification is endpoint-based.</p>
-<h2 id="references">References</h2>
+<h2 id="references" class="anchored">References</h2>
 <p>Shun-ichi Amari. “Natural gradient works efficiently in learning.” <em>Neural Computation</em> 10(2), 1998.</p>
 <p>James Martens and Roger Grosse. “Optimizing neural networks with Kronecker-factored approximate curvature.” <em>International Conference on Machine Learning</em>, 2015.</p>
 <p>James Martens. “New insights and perspectives on the natural gradient method.” <em>Journal of Machine Learning Research</em> 21, 2020.</p>
@@ -477,12 +506,50 @@ J_i(\theta)J_i(\theta)^\top.
     }
   });
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const tocLinks = [...document.querySelectorAll("#TOC a[href^='#']")];
+  const sections = tocLinks
+    .map(link => document.querySelector(decodeURIComponent(link.getAttribute("href"))))
+    .filter(Boolean);
+
+  if (!tocLinks.length || !sections.length) return;
+
+  const setActive = () => {
+    let active = sections[0];
+
+    for (const section of sections) {
+      if (section.getBoundingClientRect().top <= 120) {
+        active = section;
+      }
+    }
+
+    tocLinks.forEach(link => {
+      link.classList.toggle(
+        "active",
+        link.getAttribute("href") === "#" + CSS.escape(active.id)
+      );
+    });
+  };
+
+  setActive();
+  window.addEventListener("scroll", setActive, { passive: true });
+});
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
     tabsets.forEach(function(tabset) {
       const tabby = new Tabby('#' + tabset.id);
     });
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
     const isCodeAnnotation = (el) => {
       for (const clz of el.classList) {
         if (clz.startsWith('code-annotation-')) {                     
@@ -878,4 +945,5 @@ J_i(\theta)J_i(\theta)^\top.
 
 
 
+<script src="../../../site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>
