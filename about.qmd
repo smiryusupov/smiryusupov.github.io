@@ -16,4 +16,4 @@ These are notes and experiments — things worth writing down.
 
 ## Independence
 
-This site contains personal academic notes and experiments. They are written independently, outside my employment, using personal equipment and public sources only. They do not contain confidential information, client data, employer materials, or employer know-how.
+This is a personal academic site. The views, writing, examples, code, and experiments published here are my own and do not represent my employer. Material is produced independently, outside work duties, using public sources, publicly available software, and personal resources. It does not contain confidential information, client data, internal materials, or non-public employer know-how.

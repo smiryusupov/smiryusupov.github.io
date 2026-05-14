@@ -6,10 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2026-04-18">
-<meta name="description" content="A note on why high-dimensional structure can disappear in 2D.">
+<meta name="dcterms.date" content="2026-05-14">
+<meta name="description" content="A note on why kernel power functions do not become pointwise error estimates without a meaningful RKHS norm bound.">
 
-<title>Thin shells and misleading projections – Shohruh Miryusupov</title>
+<title>When the power function is not an error bar – Shohruh Miryusupov</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -63,7 +63,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../../../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../../../site_libs/quarto-html/tabby.min.js"></script>
 <script src="../../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -71,6 +71,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../../site_libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="../../../site_libs/quarto-html/quarto-html-640605f58ae58ee79329c070719e555b.min.css" rel="stylesheet" append-hash="true" data-mode="light">
 <link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
   <script>document.addEventListener("DOMContentLoaded", function () {
@@ -131,12 +134,28 @@ window.Quarto = {
 </nav>
 
 <header id="title-block-header">
-<h1 class="title">Thin shells and misleading projections</h1>
+<h1 class="title">When the power function is not an error bar</h1>
 
-<p class="date">2026-04-18</p>
+<p class="date">2026-05-14</p>
 </header>
 
-
+<nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#the-formal-statement" id="toc-the-formal-statement">The formal statement</a></li>
+  <li><a href="#setup" id="toc-setup">Setup</a></li>
+  <li><a href="#same-power-function-different-errors" id="toc-same-power-function-different-errors">Same power function, different errors</a></li>
+  <li><a href="#the-hidden-norm-can-become-the-whole-problem" id="toc-the-hidden-norm-can-become-the-whole-problem">The hidden norm can become the whole problem</a></li>
+  <li><a href="#a-noisy-ml-style-example" id="toc-a-noisy-ml-style-example">A noisy ML-style example</a></li>
+  <li><a href="#vacuity-ratios" id="toc-vacuity-ratios">Vacuity ratios</a></li>
+  <li><a href="#what-the-power-function-sees" id="toc-what-the-power-function-sees">What the power function sees</a></li>
+  <li><a href="#the-misleading-substitution" id="toc-the-misleading-substitution">The misleading substitution</a></li>
+  <li><a href="#takeaway" id="toc-takeaway">Takeaway</a></li>
+  <li><a href="#references" id="toc-references">References</a></li>
+  <li><a href="#suggested-citation" id="toc-suggested-citation">Suggested citation</a></li>
+  </ul>
+</nav>
 <style>
 .narrow-figure {
   max-width: 620px;
@@ -155,217 +174,412 @@ window.Quarto = {
   margin-left: auto;
   margin-right: auto;
 }
+table.dataframe {
+  width: auto;
+  margin: 1rem auto;
+  font-size: 0.9rem;
+  border-collapse: collapse;
+}
+table.dataframe th,
+table.dataframe td {
+  padding: 0.28rem 0.55rem;
+  border-bottom: 1px solid #ddd;
+  text-align: right;
+}
+table.dataframe th:first-child,
+table.dataframe td:first-child {
+  text-align: left;
+}
 </style>
-<p><em>Status: research note; not peer reviewed. The thin-shell and projection facts are standard; the experiments are small visual diagnostics about why high-dimensional structure can be hidden by low-dimensional views.</em></p>
-<p>A recurring trap in high-dimensional exploratory data analysis is that a dataset can have strong geometric structure in the ambient space and still look ordinary in a low-dimensional plot.</p>
-<p>We use two examples.</p>
+<p><em>Status: research note; not peer reviewed. The power-function bound is a standard fact from kernel approximation theory; the experiments below are small diagnostics about why its direct interpretation as a pointwise machine-learning error bar can become vacuous.</em></p>
+<p>A recurring trap in kernel methods is that a computable geometric quantity can look like an uncertainty estimate.</p>
+<p>The power function is such a quantity. It is mathematically meaningful. It measures how well the design points constrain evaluation at a new point, relative to a chosen kernel.</p>
+<p>But the usual pointwise error bound is not a power-function-only statement. It has a hidden constant:</p>
+<p><span class="math display">
+|f(x)-s_X f(x)| \leq P_X(x)\,\|f\|_{\mathcal H}.
+</span></p>
+<p>The computable part is <span class="math inline">P_X(x)</span>. The difficult part is <span class="math inline">\|f\|_{\mathcal H}</span>.</p>
+<p>In classical approximation theory this is natural: one assumes that the target belongs to the native space and has controlled norm. In machine learning, the target is unknown, noisy observations are common, the kernel is a modeling choice, and the RKHS norm may be enormous, infinite, or simply not connected to the prediction problem.</p>
+<p>I use four small diagnostics.</p>
 <ul>
-<li>For a standard Gaussian, the full cloud concentrates near a thin shell, even though every fixed 2D projection is again an ordinary Gaussian cloud.</li>
-<li>For a symmetric Gaussian mixture, shell concentration still occurs, but the bimodality is directional rather than radial. A random 2D projection may hide it, while PCA can recover it.</li>
+<li>The same power function can accompany very different pointwise errors.</li>
+<li>Smooth-looking targets can have very different native-space costs under the same kernel.</li>
+<li>The fitted interpolation norm can mostly measure the cost of fitting noise.</li>
+<li>The resulting bound can be much larger than the output scale.</li>
 </ul>
-<h2 id="two-models">Two models</h2>
-<p>First, the isotropic Gaussian <span class="math inline">X \sim \mathcal{N}(0, I_d)</span>.</p>
-<p>Second, the symmetric Gaussian mixture <span class="math inline">X = S \Delta e_1 + Z</span>, where <span class="math inline">S \in \{-1,+1\}</span> is a Rademacher sign with equal probability and <span class="math inline">Z \sim \mathcal{N}(0, I_d)</span>.</p>
-<p>Here <span class="math inline">\Delta &gt; 0</span> is the separation parameter: the two mixture components are centered at <span class="math inline">\pm \Delta e_1</span>. In the simulations below, we fix <span class="math inline">\Delta = 4</span>.</p>
-<p>Equivalently, <span class="math display">
-X \sim \frac{1}{2}\mathcal{N}(+\Delta e_1, I_d)
-  + \frac{1}{2}\mathcal{N}(-\Delta e_1, I_d).
-</span></p>
-<h2 id="gaussian-warm-up-shell-in-the-full-space-gaussian-in-every-fixed-2d-view">Gaussian warm-up: shell in the full space, Gaussian in every fixed 2D view</h2>
-<p>If <span class="math inline">X \sim \mathcal{N}(0, I_d)</span>, then <span class="math inline">\|X\|^2 \sim \chi_d^2</span>, so <span class="math display">
-\mathbb{E}\|X\|^2 = d,
+<h2 id="the-formal-statement">The formal statement</h2>
+<p>Let <span class="math inline">X=\{x_1,\ldots,x_n\}</span> be interpolation sites, and let <span class="math inline">k</span> be a positive definite kernel with RKHS <span class="math inline">\mathcal H</span>.</p>
+<p>The kernel interpolant has the form</p>
+<p><span class="math display">
+s_X f(x)=\sum_{i=1}^n \alpha_i k(x,x_i),
 \qquad
-\operatorname{Var}(\|X\|^2) = 2d.
+K_X\alpha=f_X,
 </span></p>
-<p>Hence the typical radius is about <span class="math inline">\sqrt d</span>, while the relative shell thickness shrinks with dimension.</p>
-<p>At the same time, if <span class="math inline">U \in \mathbb{R}^{d \times 2}</span> has orthonormal columns, then <span class="math inline">Y = U^\top X \sim \mathcal{N}(0, I_2)</span>.</p>
-<p>So the shell is a property of the full ambient-space norm, not of any single 2D projection.</p>
-<p>In the shell panels below, each point is placed at radius <span class="math inline">\|X\|/\sqrt d</span> with a random angle. This is not a true projection; it is only a visualization of radial concentration.</p>
+<p>where <span class="math inline">(K_X)_{ij}=k(x_i,x_j)</span> and <span class="math inline">f_X=(f(x_1),\ldots,f(x_n))^\top</span>.</p>
+<p>The power function is</p>
+<p><span class="math display">
+P_X^2(x)
+=
+k(x,x)-k_X(x)^\top K_X^{-1}k_X(x),
+</span></p>
+<p>where</p>
+<p><span class="math display">
+k_X(x)=(k(x,x_1),\ldots,k(x,x_n))^\top.
+</span></p>
+<p>It depends on the kernel, the design, and the evaluation point. It does not depend on the observed values of the target.</p>
+<p>The standard deterministic estimate is</p>
+<p><span class="math display">
+|f(x)-s_X f(x)| \leq P_X(x)\,\|f\|_{\mathcal H}.
+</span></p>
+<p>This is a useful theorem. But the theorem is not the applied statement that <span class="math inline">P_X(x)</span> is an error bar.</p>
+<p>A better separation is</p>
+<p><span class="math display">
+P_X(x) = \text{design geometry under the kernel},
+</span></p>
+<p>while</p>
+<p><span class="math display">
+\|f\|_{\mathcal H} = \text{unknown target complexity under the kernel}.
+</span></p>
+<p>The second term is usually where the statistical difficulty lives.</p>
+<h2 id="setup">Setup</h2>
+<p>The examples use a one-dimensional Gaussian kernel. This is only for visualization. The point is not specific to this implementation.</p>
+<h2 id="same-power-function-different-errors">Same power function, different errors</h2>
+<p>Fix the training sites and the kernel. Then the power function is fixed.</p>
+<p>Now change only the target.</p>
 <div class="narrow-figure">
-<div id="cell-fig-gaussian-shell-small" class="cell" data-execution_count="2">
+<div id="cell-fig-same-power-different-errors" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
-<div id="fig-gaussian-shell-small" class="quarto-float quarto-figure quarto-figure-center">
+<div id="fig-same-power-different-errors" class="quarto-float quarto-figure quarto-figure-center">
 <figure class="quarto-float quarto-float-fig">
-<div aria-describedby="fig-gaussian-shell-small-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-gaussian-shell-small-output-1.png" width="677" height="397">
+<div aria-describedby="fig-same-power-different-errors-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-same-power-different-errors-output-1.png" width="650" height="364">
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-gaussian-shell-small-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: Gaussian warm-up for dimensions 2, 5, and 20.
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-same-power-different-errors-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Same design and same kernel. The power function is unchanged, but the actual interpolation error depends strongly on the target.
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
 </div>
-<div class="narrow-figure">
-<div id="cell-fig-gaussian-shell-large" class="cell" data-execution_count="3">
+<p>The design has not changed. The kernel has not changed. The power function has not changed.</p>
+<p>Only the target changed.</p>
+<p>That is enough to rule out the interpretation of <span class="math inline">P_X(x)</span> alone as a pointwise error estimate. At most, it is the computable geometric factor in a bound whose missing factor is the target norm.</p>
+<p>Table 1 reports the numerical version of Figure 1. Since the design and kernel are fixed, max power is identical for every target. The changing columns show that the actual error depends on the target and on the relevant norm scale, not on the power function alone.</p>
+<p>Here, the fitted norm is the computable interpolation norm <span class="math inline">\|s_X\|_{\mathcal H}</span>, and bound scale means <span class="math inline">\max_x P_X(x)\,\|s_X\|_{\mathcal H}</span>. This is a diagnostic scale, not the theorem’s true bound with the unknown <span class="math inline">\|f\|_{\mathcal H}</span>. Therefore it can be smaller than the actual error.</p>
+<div class="cell" data-execution_count="3">
+<div id="tbl-same-power" class="cell quarto-float quarto-figure quarto-figure-center" data-execution_count="3">
+<figure class="quarto-float quarto-float-tbl">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-same-power-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Same power function, different target errors. With the same design and kernel, max power is unchanged, while actual interpolation error and fitted norm vary strongly across targets.
+</figcaption>
+<div aria-describedby="tbl-same-power-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output cell-output-display">
-<div id="fig-gaussian-shell-large" class="quarto-float quarto-figure quarto-figure-center">
-<figure class="quarto-float quarto-float-fig">
-<div aria-describedby="fig-gaussian-shell-large-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-gaussian-shell-large-output-1.png" width="446" height="397">
+<table class="dataframe cell caption-top">
+<thead>
+<tr class="header" style="text-align: right;">
+<th data-quarto-table-cell-role="th">target</th>
+<th data-quarto-table-cell-role="th">max power</th>
+<th data-quarto-table-cell-role="th">max error</th>
+<th data-quarto-table-cell-role="th">fit norm</th>
+<th data-quarto-table-cell-role="th">bound scale</th>
+<th data-quarto-table-cell-role="th">vacuity ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>smooth</td>
+<td>0.000301</td>
+<td>4.82e-05</td>
+<td>1.8</td>
+<td>0.000541</td>
+<td>0.00027</td>
+</tr>
+<tr class="even">
+<td>oscillatory</td>
+<td>0.000301</td>
+<td>3.78</td>
+<td>4.95e+04</td>
+<td>14.9</td>
+<td>7.46</td>
+</tr>
+<tr class="odd">
+<td>kink</td>
+<td>0.000301</td>
+<td>0.032</td>
+<td>1.57</td>
+<td>0.000474</td>
+<td>0.000948</td>
+</tr>
+<tr class="even">
+<td>jump</td>
+<td>0.000301</td>
+<td>0.494</td>
+<td>152</td>
+<td>0.0458</td>
+<td>0.0458</td>
+</tr>
+</tbody>
+</table>
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-gaussian-shell-large-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2: Gaussian warm-up for dimensions 2, 5, and 20. The top row is a radius-only shell proxy; the bottom row is a genuine random 2D projection. As dimension grows, the shell becomes clearer in radius, while the 2D projection remains an ordinary Gaussian cloud.
+</div>
+</figure>
+</div>
+</div>
+<h2 id="the-hidden-norm-can-become-the-whole-problem">The hidden norm can become the whole problem</h2>
+<p>Suppose we accept the chosen kernel and ask how expensive different targets are under it.</p>
+<p>We use a finite-dimensional proxy:</p>
+<p><span class="math display">
+\|f\|_{\mathcal H,m}^{2}
+=
+f(Z)^\top K_Z^{-1}f(Z),
+</span></p>
+<p>where <span class="math inline">Z</span> is a fine grid. This is the RKHS norm of the minimum-norm interpolant through the values of <span class="math inline">f</span> on <span class="math inline">Z</span>.</p>
+<p>It is not the true continuous RKHS norm of <span class="math inline">f</span>. It is only a diagnostic. But it is useful: if this proxy grows rapidly as the grid is refined, then the native-space assumption is not giving a stable scale for the target.</p>
+<div class="narrow-figure">
+<div id="cell-fig-norm-proxy-resolution" class="cell" data-execution_count="4">
+<div class="cell-output cell-output-display">
+<div id="fig-norm-proxy-resolution" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-norm-proxy-resolution-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-norm-proxy-resolution-output-1.png" width="639" height="353">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-norm-proxy-resolution-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Finite-dimensional native-space norm proxy as the grid is refined. The same smooth Gaussian kernel makes oscillatory or nonsmooth targets expensive.
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
 </div>
-<p>A direct check of the normalized radius <span class="math display">
-R_d = \frac{\|X\|}{\sqrt d}
-</span> shows the same effect quantitatively.</p>
-<div class="narrow-figure">
-<div id="cell-fig-gaussian-radius-check" class="cell" data-execution_count="4">
+<p>For compatible smooth targets, the scale can remain moderate. For rough, oscillatory, or discontinuous targets, the native-space cost can become very large.</p>
+<p>The point is not that the theorem fails. The point is that the theorem asks for a target-complexity constant that the machine-learning problem usually does not provide.</p>
+<div class="cell" data-execution_count="5">
+<div id="tbl-norm-proxy" class="cell quarto-float quarto-figure quarto-figure-center" data-execution_count="5">
+<figure class="quarto-float quarto-float-tbl">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-norm-proxy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Finite-grid RKHS norm proxy versus grid resolution. The smooth target remains stable, while oscillatory, kinked, and discontinuous targets become increasingly expensive under the same Gaussian kernel.
+</figcaption>
+<div aria-describedby="tbl-norm-proxy-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output cell-output-display">
-<div id="fig-gaussian-radius-check" class="quarto-float quarto-figure quarto-figure-center">
-<figure class="quarto-float quarto-float-fig">
-<div aria-describedby="fig-gaussian-radius-check-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-gaussian-radius-check-output-1.png" width="639" height="331">
+<table class="dataframe cell caption-top">
+<thead>
+<tr class="header" style="text-align: right;">
+<th data-quarto-table-cell-role="th">grid size</th>
+<th data-quarto-table-cell-role="th">jump</th>
+<th data-quarto-table-cell-role="th">kink</th>
+<th data-quarto-table-cell-role="th">oscillatory</th>
+<th data-quarto-table-cell-role="th">smooth</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>30</td>
+<td>3452.72</td>
+<td>51.67</td>
+<td>25828.36</td>
+<td>1.78</td>
+</tr>
+<tr class="even">
+<td>50</td>
+<td>5057.70</td>
+<td>96.28</td>
+<td>31171.90</td>
+<td>1.81</td>
+</tr>
+<tr class="odd">
+<td>80</td>
+<td>6609.07</td>
+<td>133.37</td>
+<td>35970.28</td>
+<td>1.82</td>
+</tr>
+<tr class="even">
+<td>120</td>
+<td>8166.49</td>
+<td>166.97</td>
+<td>40459.34</td>
+<td>1.83</td>
+</tr>
+<tr class="odd">
+<td>180</td>
+<td>10020.30</td>
+<td>204.79</td>
+<td>45304.34</td>
+<td>1.83</td>
+</tr>
+</tbody>
+</table>
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-gaussian-radius-check-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;3: The normalized Gaussian radius <span class="math inline">\|X\|/\sqrt{d}</span> concentrates near <span class="math inline">1</span> as the ambient dimension grows.
+</div>
+</figure>
+</div>
+</div>
+<h2 id="a-noisy-ml-style-example">A noisy ML-style example</h2>
+<p>In machine learning we usually do not observe a noiseless function. We observe data.</p>
+<p>A tempting substitution is to replace the unknown <span class="math inline">\|f\|_{\mathcal H}</span> by the fitted interpolation norm</p>
+<p><span class="math display">
+\|s_X\|_{\mathcal H}^{2}=y^\top K_X^{-1}y.
+</span></p>
+<p>This quantity is computable. But it is not the unknown target norm. It is a data-dependent interpolation norm.</p>
+<p>With noise, it can mostly measure the cost of fitting noise.</p>
+<div class="narrow-figure">
+<div id="cell-fig-noisy-fitted-norm" class="cell" data-execution_count="6">
+<div class="cell-output cell-output-display">
+<div id="fig-noisy-fitted-norm" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-noisy-fitted-norm-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-noisy-fitted-norm-output-1.png" width="617" height="353">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-noisy-fitted-norm-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Interpolating noisy observations can make the fitted RKHS norm unstable. The computable fitted norm is not the unknown target norm.
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
 </div>
-<h2 id="symmetric-mixture-shell-concentration-is-radial-separation-is-directional">Symmetric mixture: shell concentration is radial, separation is directional</h2>
-<p>Now consider <span class="math display">
-X = S \Delta e_1 + Z.
+<p>If ridge regularization is introduced, the fitted norm can be stabilized. But then the original interpolation theorem is no longer being used as stated. One has moved from a deterministic interpolation bound to a different regularized statistical procedure.</p>
+<p>That may be reasonable. It is just not the same certificate.</p>
+<h2 id="vacuity-ratios">Vacuity ratios</h2>
+<p>A bound is useful only if its scale is meaningful relative to the prediction problem.</p>
+<p>Define the simple diagnostic</p>
+<p><span class="math display">
+V = \frac{\max_x P_X(x) C}{\operatorname{range}(y)},
 </span></p>
-<p>This distribution is bimodal, but the bimodality is not primarily a radial phenomenon.</p>
-<p>Indeed, <span class="math display">
-\|X\|^2
-= \|S\Delta e_1 + Z\|^2
-= \Delta^2 + \|Z\|^2 + 2S\Delta\, e_1^\top Z.
-</span> Therefore <span class="math display">
-\mathbb{E}\|X\|^2 = d + \Delta^2,
-\qquad
-\operatorname{Var}(\|X\|^2) = 2d + 4\Delta^2.
-</span></p>
-<p>So the norm still concentrates, and the cloud still lives near a shell of radius on the order of <span class="math inline">\sqrt{d+\Delta^2}</span>.</p>
-<p>But the mixture separation lies along a specific direction, namely <span class="math inline">e_1</span>. That is the central distinction:</p>
+<p>where <span class="math inline">C</span> is a candidate norm scale.</p>
+<p>If <span class="math inline">C=\|f\|_{\mathcal H}</span>, this is the formal native-space constant. In practice <span class="math inline">C</span> is usually unavailable. If one replaces it with a fitted norm or a finite-grid proxy, the number should be interpreted only as a scale diagnostic, not as a theorem.</p>
+<div class="cell" data-execution_count="7">
+<div id="tbl-vacuity-ratios" class="cell quarto-float quarto-figure quarto-figure-center" data-execution_count="7">
+<figure class="quarto-float quarto-float-tbl">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-vacuity-ratios-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3: Vacuity ratios for candidate norm scales. The ratios compare the scale of the power-function bound with the output range when using either the fitted interpolation norm or the finite-grid norm proxy.
+</figcaption>
+<div aria-describedby="tbl-vacuity-ratios-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output cell-output-display">
+<table class="dataframe cell caption-top">
+<thead>
+<tr class="header" style="text-align: right;">
+<th data-quarto-table-cell-role="th">target</th>
+<th data-quarto-table-cell-role="th">max power</th>
+<th data-quarto-table-cell-role="th">output range</th>
+<th data-quarto-table-cell-role="th">fit norm</th>
+<th data-quarto-table-cell-role="th">grid norm proxy</th>
+<th data-quarto-table-cell-role="th">V, fit norm</th>
+<th data-quarto-table-cell-role="th">V, grid norm</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>smooth</td>
+<td>0.000301</td>
+<td>2</td>
+<td>1.8</td>
+<td>1.83</td>
+<td>0.00027</td>
+<td>0.000276</td>
+</tr>
+<tr class="even">
+<td>oscillatory</td>
+<td>0.000301</td>
+<td>2</td>
+<td>4.95e+04</td>
+<td>4.05e+04</td>
+<td>7.46</td>
+<td>6.09</td>
+</tr>
+<tr class="odd">
+<td>kink</td>
+<td>0.000301</td>
+<td>0.499</td>
+<td>1.57</td>
+<td>167</td>
+<td>0.000948</td>
+<td>0.101</td>
+</tr>
+<tr class="even">
+<td>jump</td>
+<td>0.000301</td>
+<td>1</td>
+<td>152</td>
+<td>8.17e+03</td>
+<td>0.0458</td>
+<td>2.46</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>When these ratios are much larger than one, the bound may be formally true but no longer informative at the scale of the prediction problem.</p>
+<p>This is the sense in which the norm term becomes vacuous: not because the power function is wrong, but because the hidden complexity factor is too large, too unstable, or unavailable.</p>
+<h2 id="what-the-power-function-sees">What the power function sees</h2>
+<p>The power function sees:</p>
 <ul>
-<li>shell concentration is <strong>radial</strong></li>
-<li>mixture separation is <strong>directional</strong></li>
+<li>the kernel</li>
+<li>the design points</li>
+<li>geometric coverage under the kernel metric</li>
+<li>where interpolation is weakly constrained by the data locations</li>
 </ul>
-<p>The next figures compare three views:</p>
+<p>The power function does not see:</p>
 <ul>
-<li><strong>Row 1:</strong> the actual cloud when <span class="math inline">d=2</span>, and a radius-only shell proxy when <span class="math inline">d&gt;2</span></li>
-<li><strong>Row 2:</strong> a random 2D projection</li>
-<li><strong>Row 3:</strong> the 2D PCA projection</li>
+<li>the unknown target complexity</li>
+<li>misspecification of the kernel class</li>
+<li>observation noise</li>
+<li>distribution shift</li>
+<li>model-selection error</li>
+<li>hyperparameter-selection error</li>
+<li>whether the fitted norm is signal or noise</li>
+<li>whether the target belongs to the native space at all</li>
 </ul>
-<div class="narrow-figure">
-<div id="cell-fig-mixture-small" class="cell" data-execution_count="5">
-<div class="cell-output cell-output-display">
-<div id="fig-mixture-small" class="quarto-float quarto-figure quarto-figure-center">
-<figure class="quarto-float quarto-float-fig">
-<div aria-describedby="fig-mixture-small-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-mixture-small-output-1.png" width="705" height="567">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mixture-small-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4: Symmetric Gaussian mixture in dimensions 2, 5, and 20. The first row shows the true cloud for <span class="math inline">d=2</span> and a radius-only shell proxy for <span class="math inline">d&gt;2</span>; the second row shows a random 2D projection; the third shows PCA. The shell persists, but a random projection can hide the bimodality.
-</figcaption>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<div class="narrow-figure">
-<div id="cell-fig-mixture-large" class="cell" data-execution_count="6">
-<div class="cell-output cell-output-display">
-<div id="fig-mixture-large" class="quarto-float quarto-figure quarto-figure-center">
-<figure class="quarto-float quarto-float-fig">
-<div aria-describedby="fig-mixture-large-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-mixture-large-output-1.png" width="474" height="562">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mixture-large-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;5: Symmetric Gaussian mixture in dimensions 50 and 200. The cloud remains shell-like in radius, but the bimodal structure becomes hard to see in a random 2D projection and is much clearer in PCA.
-</figcaption>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<p>The mixed first row is deliberate. In two dimensions, the true cloud should show the two blobs directly. In higher dimensions, the shell proxy isolates radial concentration and therefore suppresses directional information by construction.</p>
-<h2 id="why-random-projections-hide-the-mixture">Why random projections hide the mixture</h2>
-<p>Under a 2D projection with orthonormal columns <span class="math inline">U</span>, <span class="math display">
-Y = U^\top X
-\sim
-\frac{1}{2}\mathcal{N}(+\Delta U^\top e_1, I_2)
-+
-\frac{1}{2}\mathcal{N}(-\Delta U^\top e_1, I_2).
+<p>This is why the object is useful as a design diagnostic but fragile as a pointwise uncertainty statement.</p>
+<h2 id="the-misleading-substitution">The misleading substitution</h2>
+<p>The tempting applied substitution is</p>
+<p><span class="math display">
+|f(x)-s_X f(x)|
+\leq
+P_X(x)\,\|f\|_{\mathcal H}
+\qquad\leadsto\qquad
+\text{error at }x \approx P_X(x).
 </span></p>
-<p>So the visible separation is controlled by <span class="math display">
-\Delta \|U^\top e_1\|.
+<p>But this removes the factor that depends on the target.</p>
+<p>A slightly less naive substitution is</p>
+<p><span class="math display">
+\|f\|_{\mathcal H}
+\approx
+\|s_X\|_{\mathcal H}.
 </span></p>
-<p>For a random 2D subspace, <span class="math display">
-\mathbb{E}\|U^\top e_1\|^2 = \frac{2}{d},
-</span> so the apparent signal is typically of order <span class="math inline">\Delta \sqrt{2/d}</span>.</p>
-<p>That decay explains why the random projections become less informative as the ambient dimension grows.</p>
-<div class="narrow-figure">
-<div id="cell-fig-random-projection-signal" class="cell" data-execution_count="7">
-<div class="cell-output cell-output-display">
-<div id="fig-random-projection-signal" class="quarto-float quarto-figure quarto-figure-center">
-<figure class="quarto-float quarto-float-fig">
-<div aria-describedby="fig-random-projection-signal-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-random-projection-signal-output-1.png" width="584" height="342">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-random-projection-signal-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;6: Repeated random 2D projections of the mixture. The visible projected signal decays like <span class="math inline">\Delta \sqrt{2/d}</span>, so random low-dimensional views become less informative as dimension grows.
-</figcaption>
-</figure>
-</div>
-</div>
-</div>
-</div>
-<h2 id="why-pca-helps-in-this-model">Why PCA helps in this model</h2>
-<p>For this mixture, <span class="math display">
-\mathbb{E}[X] = 0,
-\qquad
-\operatorname{Cov}(X) = I_d + \Delta^2 e_1 e_1^\top.
-</span></p>
-<p>So the leading population principal component is exactly <span class="math inline">e_1</span>, with top eigenvalue <span class="math inline">1+\Delta^2</span>. In this model, PCA aligns with the signal because the signal direction is also the dominant variance direction.</p>
-<p>A one-dimensional comparison makes this especially clear. Projection onto the signal coordinate remains bimodal, while projection onto a random direction becomes less informative in high dimension.</p>
-<div class="narrow-figure">
-<div id="cell-fig-signal-vs-random-1d" class="cell" data-execution_count="8">
-<div class="cell-output cell-output-display">
-<div id="fig-signal-vs-random-1d" class="quarto-float quarto-figure quarto-figure-center">
-<figure class="quarto-float quarto-float-fig">
-<div aria-describedby="fig-signal-vs-random-1d-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="index_files/figure-html/fig-signal-vs-random-1d-output-1.png" width="683" height="265">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-signal-vs-random-1d-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;7: One-dimensional projections of the mixture. Projection onto the signal coordinate remains bimodal, while projection onto a random direction becomes progressively less informative in higher dimension.
-</figcaption>
-</figure>
-</div>
-</div>
-</div>
-</div>
+<p>This is also not a theorem. It can be a heuristic, but it is data-dependent and can be dominated by noise, conditioning, and hyperparameters.</p>
+<p>The formal theorem controls approximation error for functions in the RKHS. The machine-learning problem is usually to learn an unknown target from finite, noisy data under model uncertainty. These are not the same problem.</p>
 <h2 id="takeaway">Takeaway</h2>
-<p>A high-dimensional dataset can have all of the following properties at once:</p>
-<ol type="1">
-<li>its norm is concentrated near a thin shell</li>
-<li>a random 2D projection looks simple</li>
-<li>a data-adaptive projection reveals strong structure</li>
-</ol>
-<p>That is why 2D plots in high dimension need interpretation, not just inspection.</p>
+<p>The power function is a valid geometric quantity. It tells us something real about the design and the kernel.</p>
+<p>But the pointwise error bound is a product:</p>
+<p><span class="math display">
+\text{pointwise error}
+\leq
+\text{design geometry}
+\times
+\text{unknown target complexity}.
+</span></p>
+<p>In applications, the first term is computable and visually appealing. The second term is usually unknown, unstable, or incompatible with the modeling assumptions.</p>
+<p>A cautious interpretation is therefore:</p>
+<blockquote>
+<p>The power function is a geometry-of-information diagnostic. It is not, without a meaningful and calibrated control of <span class="math inline">\|f\|_{\mathcal H}</span>, a pointwise prediction-error estimate.</p>
+</blockquote>
 <h2 id="references">References</h2>
-<p>Roman Vershynin. <em>High-Dimensional Probability: An Introduction with Applications in Data Science</em>. Cambridge University Press, 2018.</p>
-<p>Persi Diaconis and David Freedman. “Asymptotics of Graphical Projection Pursuit.” <em>The Annals of Statistics</em> 12(3), 1984.</p>
-<p>Elizabeth S. Meckes. “Quantitative asymptotics of graphical projection pursuit.” <em>Electronic Communications in Probability</em> 14, 2009.</p>
-<p>Iain M. Johnstone and Debashis Paul. “PCA in High Dimensions: An Orientation.” <em>Proceedings of the IEEE</em> 106(8), 2018.</p>
+<p>Gregory E. Fasshauer. <em>Meshfree Approximation Methods with MATLAB</em>. World Scientific, 2007.</p>
+<p>Holger Wendland. <em>Scattered Data Approximation</em>. Cambridge University Press, 2005.</p>
+<p>Robert Schaback and Holger Wendland. “Kernel techniques: From machine learning to meshless methods.” <em>Acta Numerica</em> 15, 2006.</p>
+<p>Carl Edward Rasmussen and Christopher K. I. Williams. <em>Gaussian Processes for Machine Learning</em>. MIT Press, 2006.</p>
 <h2 id="suggested-citation">Suggested citation</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bibtex code-with-copy"><code class="sourceCode bibtex"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="va">@misc</span>{<span class="ot">miryusupov2026thinshells</span>,</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bibtex code-with-copy"><code class="sourceCode bibtex"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="va">@misc</span>{<span class="ot">miryusupov2026powerfunction</span>,</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">author</span>       = {Miryusupov, Shohruh},</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">title</span>        = {Thin Shells and Misleading Projections},</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">title</span>        = {When the Power Function Is Not an Error Bar},</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">year</span>         = {2026},</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">howpublished</span> = {Research note},</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">url</span>          = {https://www.miryusupov.com/blog/posts/thin-shells/index.html}</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">url</span>          = {https://www.miryusupov.com/blog/posts/power-function-error-bar/index.html}</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 
 

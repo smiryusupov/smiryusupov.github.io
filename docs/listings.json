@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/blog/posts/power_function_not_error_bar/index.html",
       "/blog/posts/when_exact_matching_is_the_wrong_comfort/index.html",
       "/blog/posts/geometry_conformal_scores/index.html",
       "/blog/posts/fisher_geometry_basin_selection/index.html",
@@ -14,6 +15,7 @@
   {
     "listing": "/blog/index.html",
     "items": [
+      "/blog/posts/power_function_not_error_bar/index.html",
       "/blog/posts/when_exact_matching_is_the_wrong_comfort/index.html",
       "/blog/posts/geometry_conformal_scores/index.html",
       "/blog/posts/fisher_geometry_basin_selection/index.html",
