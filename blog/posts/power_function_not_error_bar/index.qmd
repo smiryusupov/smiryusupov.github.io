@@ -382,7 +382,11 @@ $$
 
 This quantity is computable. But it is not the unknown target norm. It is a data-dependent interpolation norm.
 
-With noise, it can mostly measure the cost of fitting noise.
+This quantity is computable. But it is not the unknown target norm. 
+It is a data-dependent interpolation norm.
+
+When the noise variance is not negligible relative to the signal, the interpolant is forced to pass through the noise, and the 
+resulting fitted norm can be much larger than the norm of the underlying signal.
 
 ::: {.narrow-figure}
 
@@ -581,6 +585,6 @@ Carl Edward Rasmussen and Christopher K. I. Williams. *Gaussian Processes for Ma
   title        = {When the Power Function Is Not an Error Bar},
   year         = {2026},
   howpublished = {Research note},
-  url          = {https://www.miryusupov.com/blog/posts/power-function-error-bar/index.html}
+  url          = {https://www.miryusupov.com/blog/posts/power_function_not_error_bar/index.html}
 }
 ```

@@ -422,7 +422,8 @@ Table&nbsp;2: Finite-grid RKHS norm proxy versus grid resolution. The smooth tar
 \|s_X\|_{\mathcal H}^{2}=y^\top K_X^{-1}y.
 </span></p>
 <p>This quantity is computable. But it is not the unknown target norm. It is a data-dependent interpolation norm.</p>
-<p>With noise, it can mostly measure the cost of fitting noise.</p>
+<p>This quantity is computable. But it is not the unknown target norm. It is a data-dependent interpolation norm.</p>
+<p>When the noise variance is not negligible relative to the signal, the interpolant is forced to pass through the noise, and the resulting fitted norm can be much larger than the norm of the underlying signal.</p>
 <div class="narrow-figure">
 <div id="cell-fig-noisy-fitted-norm" class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display">
@@ -579,7 +580,7 @@ P_X(x)\,\|f\|_{\mathcal H}
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">title</span>        = {When the Power Function Is Not an Error Bar},</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">year</span>         = {2026},</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">howpublished</span> = {Research note},</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">url</span>          = {https://www.miryusupov.com/blog/posts/power-function-error-bar/index.html}</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">url</span>          = {https://www.miryusupov.com/blog/posts/power_function_not_error_bar/index.html}</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 
 
