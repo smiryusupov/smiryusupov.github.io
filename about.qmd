@@ -1,6 +1,6 @@
 ---
 title: "About"
-body-classes: section-page
+body-classes: "section-page about-page"
 ---
 
 <div class="epigraph" lang="el">

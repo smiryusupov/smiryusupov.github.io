@@ -1,6 +1,6 @@
 ---
 title: "Writings"
-body-classes: section-page
+body-classes: "section-page writings-page"
 listing:
   contents: posts
   type: default
