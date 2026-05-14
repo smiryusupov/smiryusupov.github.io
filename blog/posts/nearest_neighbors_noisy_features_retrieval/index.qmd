@@ -9,6 +9,13 @@ execute:
   warning: false
   message: false
   freeze: auto
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-depth: 2
+    anchor-sections: false
+    smooth-scroll: false
 ---
 
 <style>
