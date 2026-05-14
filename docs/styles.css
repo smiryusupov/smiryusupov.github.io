@@ -326,7 +326,7 @@ blockquote p {
 }
 
 .quarto-post .metadata {
-  font-size: 0.8rem;
+  font-size: 0.76rem;
   color: var(--muted);
   white-space: nowrap;
   padding: 0 !important;
@@ -430,6 +430,16 @@ table,
   border-collapse: collapse;
   font-size: 0.95rem;
   line-height: 1.55;
+}
+
+caption,
+.quarto-float-caption {
+  max-width: var(--reading);
+  margin: 0.5rem auto 0.75rem;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--muted);
+  text-align: left;
 }
 
 table th,
@@ -731,4 +741,13 @@ footer.footer,
   max-width: none !important;
   margin-left: 0 !important;
   margin-right: 0 !important;
+}
+
+/* Align blog page title with the post listing column */
+body.section-page #title-block-header {
+  max-width: var(--reading) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
