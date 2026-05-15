@@ -1,8 +1,10 @@
-.quarto/
+/.quarto/
 *.Rproj
 .Rproj.user/
 .DS_Store
 Thumbs.db
-
-/.quarto/
 **/*.quarto_ipynb
+
+__pycache__/
+*.pyc
+.ipynb_checkpoints/

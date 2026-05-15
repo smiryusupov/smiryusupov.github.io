@@ -12,8 +12,13 @@ Working on statistics, applied mathematics, and machine learning.
 
 I use this site to think through statistical geometry, uncertainty, high-dimensional effects, and small empirical diagnostics.
 
-These are notes and experiments — things worth writing down.
+These are notes and experiments: small examples, limitations, diagnostics, and changes of viewpoint that help me understand something more precisely.
+
+The site is not meant to be a collection of tutorials, survey articles, or explainers of fashionable topics. I usually revisit known ideas from my own perspective. The aim is to understand limits, edge cases, and interpretation gaps, not to claim invention or priority unless explicitly stated.
 
 ## Independence
 
-This is a personal academic site. The views, writing, examples, code, and experiments published here are my own and do not represent my employer. Material is produced independently, outside work duties, using public sources, publicly available software, and personal resources. It does not contain confidential information, client data, internal materials, or non-public employer know-how.
+This is a personal academic site. The views, writing, examples, code, and experiments published here are my own and do not represent my employer.
+
+Material is produced independently, outside work duties, using public sources, publicly available software, and personal resources. It does not contain
+confidential information, client data, internal materials, or non-public employer know-how.
