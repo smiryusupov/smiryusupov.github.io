@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/blog/posts/wasserstein-scale-note/index.html",
       "/blog/posts/power_function_not_error_bar/index.html",
       "/blog/posts/when_exact_matching_is_the_wrong_comfort/index.html",
       "/blog/posts/geometry_conformal_scores/index.html",
@@ -15,6 +16,7 @@
   {
     "listing": "/blog/index.html",
     "items": [
+      "/blog/posts/wasserstein-scale-note/index.html",
       "/blog/posts/power_function_not_error_bar/index.html",
       "/blog/posts/when_exact_matching_is_the_wrong_comfort/index.html",
       "/blog/posts/geometry_conformal_scores/index.html",
