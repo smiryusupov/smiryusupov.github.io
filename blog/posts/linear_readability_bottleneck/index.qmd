@@ -516,11 +516,11 @@ Bradley Efron and Robert Tibshirani. *An Introduction to the Bootstrap*. Chapman
 ## Suggested citation
 
 ```bibtex
-@misc{miryusupov2026linearseparability,
+@misc{miryusupov2026linearreadability,
   author       = {Miryusupov, Shohruh},
-  title        = {Linear Separability Is the Bottleneck},
+  title        = {When Linear Readability Is the Bottleneck},
   year         = {2026},
   howpublished = {Research note},
-  url          = {https://www.miryusupov.com/blog/posts/linear_separability_bottleneck/}
+  url          = {https://www.miryusupov.com/blog/posts/linear_readability_bottleneck/}
 }
 ```
