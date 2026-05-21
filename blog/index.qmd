@@ -2,7 +2,8 @@
 title: "Writings"
 body-classes: "section-page writings-page"
 listing:
-  contents: posts
+  contents:
+    - posts/*/index.qmd
   type: default
   sort: "date desc"
   fields: [title, date, description]

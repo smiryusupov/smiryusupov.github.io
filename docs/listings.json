@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/blog/posts/linear_readibility_bottleneck/index.html",
       "/blog/posts/wasserstein-wrong-geometry/index.html",
       "/blog/posts/power_function_not_error_bar/index.html",
       "/blog/posts/when_exact_matching_is_the_wrong_comfort/index.html",
@@ -16,6 +17,7 @@
   {
     "listing": "/blog/index.html",
     "items": [
+      "/blog/posts/linear_readibility_bottleneck/index.html",
       "/blog/posts/wasserstein-wrong-geometry/index.html",
       "/blog/posts/power_function_not_error_bar/index.html",
       "/blog/posts/when_exact_matching_is_the_wrong_comfort/index.html",
@@ -24,8 +26,7 @@
       "/blog/posts/nearest_neighbors_noisy_features_retrieval/index.html",
       "/blog/posts/superefficiency/index.html",
       "/blog/posts/kosmidis-firth/index.html",
-      "/blog/posts/thin-shells/index.html",
-      "/blog/posts/first-post.html"
+      "/blog/posts/thin-shells/index.html"
     ]
   }
 ]

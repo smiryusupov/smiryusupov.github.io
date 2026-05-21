@@ -141,7 +141,7 @@ window.Quarto = {
    
   <ul>
   <li><a href="#preface" id="toc-preface">Preface</a></li>
-  <li><a href="#part-i-intuition" id="toc-part-i-intuition">Part I: Intuition</a></li>
+  <li><a href="#part-i-curvature-and-volume" id="toc-part-i-curvature-and-volume">Part I: Curvature and volume</a></li>
   <li><a href="#part-ii-the-kosmidisfirth-program" id="toc-part-ii-the-kosmidisfirth-program">Part II: The Kosmidis–Firth program</a></li>
   <li><a href="#part-iii-a-small-synthetic-fraud-example" id="toc-part-iii-a-small-synthetic-fraud-example">Part III: A small synthetic fraud example</a></li>
   <li><a href="#part-iv-technical-appendix" id="toc-part-iv-technical-appendix">Part IV: Technical appendix</a></li>
@@ -168,7 +168,8 @@ window.Quarto = {
   margin-right: auto;
 }
 </style>
-<p><em>Status: research note; not peer reviewed. The mathematical facts about Firth adjustment and Jeffreys-volume penalization are standard; the examples are meant to give a geometric reading of why the adjustment behaves well near separation.</em></p>
+<p><strong>Claim.</strong> Firth’s adjustment can be read as a geometric bias that keeps likelihood inference away from the boundary.<br>
+<strong>Scope.</strong> Standard Firth and Jeffreys-volume facts; examples focused on separation in logistic models.</p>
 <h2 id="preface">Preface</h2>
 <p>A personal motivation sits behind this note. My friend and former professor Andrew P. Mullhaupt opened my eyes to a simple but easily forgotten point: bias is not always a disease. Used carelessly, bias distorts. Used deliberately, with an understanding of the geometry, it can be a remedy.</p>
 <p>Firth’s adjustment was introduced as a frequentist bias-reduction device: modify the likelihood score so that the leading <span class="math inline">O(n^{-1})</span> bias of the maximum likelihood estimator disappears (Firth 1993). Jeffreys’ prior, on the other hand, is a geometric volume element: if Fisher information is the metric on a statistical model, then <span class="math inline">|i(\beta)|^{1/2}\,d\beta</span> is the natural volume form on that model. In canonical-link exponential-family GLMs, these two ideas meet:</p>
@@ -177,13 +178,14 @@ window.Quarto = {
 </span></p>
 <p>where <span class="math inline">A_s</span> is Firth’s adjustment to the <span class="math inline">s</span>th score component.</p>
 <p>Kosmidis and Firth’s 2009 and 2021 papers can be read as two developments of this same geometric picture (Kosmidis and Firth 2009; Kosmidis and Firth 2021). The 2009 paper extends bias reduction to exponential-family nonlinear models, where the model manifold bends because the predictor itself is nonlinear. The 2021 paper studies binomial-response GLMs, where the important geometric feature is not just curvature but the <strong>boundary</strong>: fitted probabilities can run to 0 or 1, Fisher volume collapses, and ordinary maximum likelihood can fail to exist.</p>
-<p>The slogan is:</p>
+<p>The geometric reading is:</p>
 <blockquote>
 <p>Firth’s adjustment corrects the first-order drift caused by statistical geometry, and in canonical GLMs that correction is exactly the gradient of the Jeffreys volume element. In separated binomial problems, the same volume element becomes a barrier at the boundary.</p>
 </blockquote>
 <p>There is also a philosophical point running through the note. Classical statistics often treats bias as something to be removed. Firth’s approach is subtler. It starts from bias reduction, but the adjustment can also be read as a deliberate geometric regularization: the estimator is nudged away from regions where maximum likelihood behaves badly. In separated binomial GLMs, that nudge is not a cosmetic correction; it restores existence. The lesson is not that bias is good in itself, but that insisting on unpenalized likelihood can be worse than accepting a small, principled shrinkage bias that keeps the estimator inside the finite part of the model.</p>
 <p>The note has four parts. Part I gives the geometric intuition. Part II reads the Kosmidis–Firth papers through that lens. Part III gives a small synthetic fraud example. Part IV gives the technical appendix.</p>
-<h2 id="part-i-intuition">Part I: Intuition</h2>
+<p>The distinction I want to keep visible is this: curvature explains first-order bias, while the boundary explains non-existence under separation. Firth’s adjustment touches both, but the mechanisms are different.</p>
+<h2 id="part-i-curvature-and-volume">Part I: Curvature and volume</h2>
 <h3 id="the-space-of-distributions-as-a-landscape">The space of distributions as a landscape</h3>
 <p>Fix a sample space. Think of every probability distribution on it as a point in a large abstract space <span class="math inline">\mathcal P</span>. For Bernoulli data with three observations, <span class="math inline">\mathcal P</span> is a simplex. For richer sample spaces, it may be infinite-dimensional. The picture we need is simple: one distribution, one point.</p>
 <p>A parametric model</p>

@@ -40,7 +40,9 @@ format:
 }
 </style>
 
-*Status: research note; not peer reviewed. The finite assignment facts are standard. The examples are synthetic diagnostics meant to illustrate when exact empirical matching should not be interpreted as population transport.*
+**Claim.** Exact LSAP matching is exact for empirical measures, not automatically for population transport.  
+
+**Scope.** Standard finite-assignment facts; examples about missing tail mass and out-of-sample interpretation.
 
 ## Preface
 
@@ -68,7 +70,7 @@ The assignment is exact for $\hat\mu_n$ and $\hat\nu_n$. It is not automatically
 
 The important word is *empirical*.
 
-> LSAP solves the finite matching problem. It does not, by itself, learn a population transport rule.
+> LSAP solves the finite matching problem exactly. It does not, by itself, turn two samples into a population transport rule.
 
 This distinction matters most in tail-risk problems. A rare target region can have small probability and large consequence. If that region is absent from the finite target sample, LSAP still returns an exact empirical assignment. But the assignment contains no target atom in the rare region.
 
@@ -269,7 +271,7 @@ So even with one hundred target samples, a one-percent rare region is absent wit
 
 This is the tail-miss event:
 
-> the empirical problem can be solved exactly while the population feature of interest is missing.
+> the empirical problem can be solved exactly while the population feature of interest is missing. This is not a numerical failure of assignment. It is a sampling failure hidden by an exact combinatorial solution.
 
 A crude risk calculation makes the point. If missing $A$ has consequence $C_A$, then the contribution from the event that the target sample contains no atom in $A$ is of order
 
@@ -431,13 +433,13 @@ X_1,\ldots,X_n\sim\mu,
 Y_1,\ldots,Y_n\sim\nu.
 $$
 
-LSAP returns a permutation $\sigma_n$. If the empirical assignment recovered the population map exactly, then
+LSAP returns a permutation $\sigma_n$. If the empirical assignment were literally the population map evaluated on the sample, then
 
 $$
 Y_{\sigma_n(i)}=X_i+a
 $$
 
-for every $i$. But with probability one,
+for every \(i\). But with probability one,
 
 $$
 \{Y_1,\ldots,Y_n\}
@@ -519,21 +521,21 @@ The stronger statement is not automatic:
 
 The gap appears in three places.
 
-First, the LSAP assignment is defined only on the observed source atoms. For a continuous source distribution, that set has population measure zero.
+First, the assignment is defined only on the observed source atoms. For a continuous source distribution, that set has population measure zero.
 
 Second, rare target regions can be absent from the empirical target sample with non-negligible probability. On that event, the empirical assignment is exact but contains no target atom in the rare region.
 
-Third, empirical OT is an estimator. Even in a Gaussian shift model where the population OT map is known, an exact finite assignment does not recover the population map exactly from independent samples.
+Third, empirical OT is an estimator. Exact finite optimization does not remove sampling error.
 
-The practical question is therefore not:
+So the practical question is not:
 
-> did LSAP solve the assignment problem?
+> Did LSAP solve the assignment problem?
 
 It did.
 
 The practical question is:
 
-> does the empirical assignment contain enough information to define the population transport needed for the task?
+> Does the empirical assignment contain enough information to support the population transport claim being made?
 
 When the answer is no, exact matching is the wrong comfort.
 
@@ -671,7 +673,7 @@ So equal weights are not a cosmetic assumption. They are what make the finite OT
 
 ### Empirical geodesics
 
-Under squared Euclidean cost, the empirical LSAP solution defines the coupling
+This section is optional; it explains what the LSAP coupling can produce under squared Euclidean cost. The empirical LSAP solution defines the coupling
 
 $$
 \pi_n

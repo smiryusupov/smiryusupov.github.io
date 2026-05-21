@@ -156,9 +156,10 @@ window.Quarto = {
   margin-right: auto;
 }
 </style>
-<p><em>Status: research note; not peer reviewed. The thin-shell and projection facts are standard; the experiments are small visual diagnostics about why high-dimensional structure can be hidden by low-dimensional views.</em></p>
+<p><strong>Claim.</strong> In high dimensions, radial structure and visible low-dimensional structure can decouple. A cloud may concentrate on a thin shell while every random 2D view looks ordinary.</p>
+<p><strong>Scope.</strong> Standard Gaussian/projection facts with small visual diagnostics.</p>
 <p>A recurring trap in high-dimensional exploratory data analysis is that a dataset can have strong geometric structure in the ambient space and still look ordinary in a low-dimensional plot.</p>
-<p>We use two examples.</p>
+<p>Two examples expose the failure mode.</p>
 <ul>
 <li>For a standard Gaussian, the full cloud concentrates near a thin shell, even though every fixed 2D projection is again an ordinary Gaussian cloud.</li>
 <li>For a symmetric Gaussian mixture, shell concentration still occurs, but the bimodality is directional rather than radial. A random 2D projection may hide it, while PCA can recover it.</li>
@@ -179,7 +180,7 @@ X \sim \frac{1}{2}\mathcal{N}(+\Delta e_1, I_d)
 </span></p>
 <p>Hence the typical radius is about <span class="math inline">\sqrt d</span>, while the relative shell thickness shrinks with dimension.</p>
 <p>At the same time, if <span class="math inline">U \in \mathbb{R}^{d \times 2}</span> has orthonormal columns, then <span class="math inline">Y = U^\top X \sim \mathcal{N}(0, I_2)</span>.</p>
-<p>So the shell is a property of the full ambient-space norm, not of any single 2D projection.</p>
+<p><strong>The shell is a property of the full ambient-space norm, not of any single 2D projection.</strong></p>
 <p>In the shell panels below, each point is placed at radius <span class="math inline">\|X\|/\sqrt d</span> with a random angle. This is not a true projection; it is only a visualization of radial concentration.</p>
 <div class="narrow-figure">
 <div id="cell-fig-gaussian-shell-small" class="cell" data-execution_count="2">
@@ -206,7 +207,7 @@ Figure&nbsp;1: Gaussian warm-up for dimensions 2, 5, and 20.
 <img src="index_files/figure-html/fig-gaussian-shell-large-output-1.png" width="446" height="397">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-gaussian-shell-large-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2: Gaussian warm-up for dimensions 2, 5, and 20. The top row is a radius-only shell proxy; the bottom row is a genuine random 2D projection. As dimension grows, the shell becomes clearer in radius, while the 2D projection remains an ordinary Gaussian cloud.
+Figure&nbsp;2: Gaussian warm-up for dimensions 50 and 200. The top row is a radius-only shell proxy; the bottom row is a genuine random 2D projection. As dimension grows, the shell becomes clearer in radius, while the 2D projection remains an ordinary Gaussian cloud.
 </figcaption>
 </figure>
 </div>
@@ -232,8 +233,8 @@ Figure&nbsp;3: The normalized Gaussian radius <span class="math inline">\|X\|/\s
 </div>
 </div>
 </div>
-<h2 id="symmetric-mixture-shell-concentration-is-radial-separation-is-directional">Symmetric mixture: shell concentration is radial, separation is directional</h2>
-<p>Now consider <span class="math display">
+<h2 id="the-shell-can-survive-while-the-signal-disappears">The shell can survive while the signal disappears</h2>
+<p>In the mixture, radial concentration remains visible in the norm, but the class structure lives in a direction. Now consider <span class="math display">
 X = S \Delta e_1 + Z.
 </span></p>
 <p>This distribution is bimodal, but the bimodality is not primarily a radial phenomenon.</p>
@@ -305,7 +306,7 @@ Y = U^\top X
 <p>For a random 2D subspace, <span class="math display">
 \mathbb{E}\|U^\top e_1\|^2 = \frac{2}{d},
 </span> so the apparent signal is typically of order <span class="math inline">\Delta \sqrt{2/d}</span>.</p>
-<p>That decay explains why the random projections become less informative as the ambient dimension grows.</p>
+<p>That decay explains why the random projections become less informative as the ambient dimension grows. The signal has not disappeared from the data; it has disappeared from the random view.</p>
 <div class="narrow-figure">
 <div id="cell-fig-random-projection-signal" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
@@ -347,13 +348,9 @@ Figure&nbsp;7: One-dimensional projections of the mixture. Projection onto the s
 </div>
 </div>
 <h2 id="takeaway">Takeaway</h2>
-<p>A high-dimensional dataset can have all of the following properties at once:</p>
-<ol type="1">
-<li>its norm is concentrated near a thin shell</li>
-<li>a random 2D projection looks simple</li>
-<li>a data-adaptive projection reveals strong structure</li>
-</ol>
-<p>That is why 2D plots in high dimension need interpretation, not just inspection.</p>
+<p>Low-dimensional plots do not merely compress high-dimensional geometry; they choose which geometry survives.</p>
+<p>A high-dimensional dataset can concentrate radially, look featureless in a random 2D view, and still contain strong directional structure recoverable by an adaptive projection.</p>
+<p>The lesson is not that 2D plots are useless. The lesson is that their geometry must be named.</p>
 <h2 id="references">References</h2>
 <p>Roman Vershynin. <em>High-Dimensional Probability: An Introduction with Applications in Data Science</em>. Cambridge University Press, 2018.</p>
 <p>Persi Diaconis and David Freedman. “Asymptotics of Graphical Projection Pursuit.” <em>The Annals of Statistics</em> 12(3), 1984.</p>

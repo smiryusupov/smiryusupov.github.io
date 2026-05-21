@@ -191,7 +191,8 @@ table.dataframe td:first-child {
   text-align: left;
 }
 </style>
-<p><em>Status: research note; not peer reviewed. The power-function bound is a standard fact from kernel approximation theory; the experiments below are small diagnostics about why its direct interpretation as a pointwise machine-learning error bar can become vacuous.</em></p>
+<p><strong>Claim.</strong> The power function is not an error bar by itself. It is the computable geometric factor in a bound whose scale is controlled by an unknown RKHS norm.<br>
+<strong>Scope.</strong> Standard kernel approximation facts; illustrative diagnostics about when the bound becomes practically vacuous.</p>
 <p>A recurring trap in kernel methods is that a computable geometric quantity can look like an uncertainty estimate.</p>
 <p>The power function is such a quantity. It is mathematically meaningful. It measures how well the design points constrain evaluation at a new point, relative to a chosen kernel.</p>
 <p>But the usual pointwise error bound is not a power-function-only statement. It has a hidden constant:</p>
@@ -242,7 +243,7 @@ P_X(x) = \text{design geometry under the kernel},
 </span></p>
 <p>The second term is usually where the statistical difficulty lives.</p>
 <h2 id="setup">Setup</h2>
-<p>The examples use a one-dimensional Gaussian kernel. This is only for visualization. The point is not specific to this implementation.</p>
+<p>The examples use a one-dimensional Gaussian kernel. This is only for visualization. The point is not specific to this implementation. The small Cholesky jitter used below is numerical stabilization; it should not be interpreted as a statistical ridge penalty.</p>
 <h2 id="same-power-function-different-errors">Same power function, different errors</h2>
 <p>Fix the training sites and the kernel. Then the power function is fixed.</p>
 <p>Now change only the target.</p>
@@ -264,7 +265,7 @@ Figure&nbsp;1: Same design and same kernel. The power function is unchanged, but
 </div>
 <p>The design has not changed. The kernel has not changed. The power function has not changed.</p>
 <p>Only the target changed.</p>
-<p>That is enough to rule out the interpretation of <span class="math inline">P_X(x)</span> alone as a pointwise error estimate. At most, it is the computable geometric factor in a bound whose missing factor is the target norm.</p>
+<p>So <span class="math inline">P_X(x)</span> cannot be a pointwise error estimate by itself. It does not see the target. It only sees the kernel, the design, and the evaluation point. At most, it is the computable geometric factor in a bound whose missing factor is the target norm.</p>
 <p>Table 1 reports the numerical version of Figure 1. Since the design and kernel are fixed, max power is identical for every target. The changing columns show that the actual error depends on the target and on the relevant norm scale, not on the power function alone.</p>
 <p>Here, the fitted norm is the computable interpolation norm <span class="math inline">\|s_X\|_{\mathcal H}</span>, and bound scale means <span class="math inline">\max_x P_X(x)\,\|s_X\|_{\mathcal H}</span>. This is a diagnostic scale, not the theorem’s true bound with the unknown <span class="math inline">\|f\|_{\mathcal H}</span>. Therefore it can be smaller than the actual error.</p>
 <div class="cell" data-execution_count="3">
@@ -335,7 +336,7 @@ Table&nbsp;1: Same power function, different target errors. With the same design
 f(Z)^\top K_Z^{-1}f(Z),
 </span></p>
 <p>where <span class="math inline">Z</span> is a fine grid. This is the RKHS norm of the minimum-norm interpolant through the values of <span class="math inline">f</span> on <span class="math inline">Z</span>.</p>
-<p>It is not the true continuous RKHS norm of <span class="math inline">f</span>. It is only a diagnostic. But it is useful: if this proxy grows rapidly as the grid is refined, then the native-space assumption is not giving a stable scale for the target.</p>
+<p>It is not the true continuous RKHS norm of <span class="math inline">f</span>. It is only a diagnostic. It is also affected by conditioning and the stabilization used to invert <span class="math inline">K_Z</span>, so the point is qualitative rather than metrological. But it is useful: if this proxy grows rapidly as the grid is refined, then the native-space assumption is not giving a stable scale for the target.</p>
 <div class="narrow-figure">
 <div id="cell-fig-norm-proxy-resolution" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
@@ -421,8 +422,7 @@ Table&nbsp;2: Finite-grid RKHS norm proxy versus grid resolution. The smooth tar
 <p><span class="math display">
 \|s_X\|_{\mathcal H}^{2}=y^\top K_X^{-1}y.
 </span></p>
-<p>This quantity is computable. But it is not the unknown target norm. It is a data-dependent interpolation norm.</p>
-<p>This quantity is computable. But it is not the unknown target norm. It is a data-dependent interpolation norm.</p>
+<p>This quantity is computable. But it is not the unknown target norm; it is a data-dependent interpolation norm.</p>
 <p>When the noise variance is not negligible relative to the signal, the interpolant is forced to pass through the noise, and the resulting fitted norm can be much larger than the norm of the underlying signal.</p>
 <div class="narrow-figure">
 <div id="cell-fig-noisy-fitted-norm" class="cell" data-execution_count="6">
@@ -532,7 +532,7 @@ Table&nbsp;3: Vacuity ratios for candidate norm scales. The ratios compare the s
 <li>distribution shift</li>
 <li>model-selection error</li>
 <li>hyperparameter-selection error</li>
-<li>whether the fitted norm is signal or noise</li>
+<li>whether the fitted norm is fitting signal or noise</li>
 <li>whether the target belongs to the native space at all</li>
 </ul>
 <p>This is why the object is useful as a design diagnostic but fragile as a pointwise uncertainty statement.</p>

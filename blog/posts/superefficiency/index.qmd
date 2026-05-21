@@ -38,7 +38,8 @@ format:
 }
 </style>
 
-*Status: research note; not peer reviewed. The James--Stein risk facts are classical; the simulations and discussion are meant to give a geometric reading of shrinkage and high-dimensional noise.*
+**Claim.** In high dimension, unbiasedness can waste noise length; shrinkage can reduce risk by spending a little bias.  
+**Scope.** Classical James--Stein facts; simulations and geometry for intuition.
 
 ## Preface
 
@@ -85,9 +86,9 @@ The slogan is:
 
 > In high dimension, noise has length. The estimator $X$ treats all of that length as signal. Shrinkage deliberately gives up unbiasedness to remove part of the noise length.
 
-There is also a philosophical point running through the note. Classical statistics often treats unbiasedness as a kind of cleanliness condition. The James--Stein phenomenon shows that this is too narrow. Under squared-error loss, risk is the relevant object, and risk contains both bias and variance.
+Classical statistics often treats unbiasedness as a cleanliness condition. James--Stein shows why that is too narrow: under squared-error loss, the relevant object is risk, and risk contains both bias and variance.
 
-The lesson is not that bias is good in itself. The lesson is that a small, structured bias can be better than a large variance.
+The lesson is not that bias is good. The lesson is that a small, structured bias can be cheaper than a large variance.
 
 The note has five parts. Part I gives the fixed-shrinkage warm-up. Part II states the James--Stein phenomenon. Part III explains the geometry. Part IV gives a small machine-learning analogue. Part V discusses super-efficiency at the shrinkage target.
 
@@ -522,7 +523,7 @@ The penalty introduces bias. But it also shrinks unstable directions, making the
 
 The loss is not identical to the James--Stein loss. Here the figure measures prediction error, while James--Stein is about parameter-estimation risk.
 
-But the mechanism is the same:
+The theorem is different, but the geometry is similar:
 
 > Do not trust every noisy direction equally. Shrink the unstable ones.
 
@@ -617,8 +618,7 @@ This is the machine-learning version of the same principle. Shrinkage is not a h
 
 ## Part V: Super-efficiency at the shrinkage target
 
-There is also an asymptotic reading of the same phenomenon.
-
+This section is optional. It gives an asymptotic reading of the same shrinkage target phenomenon. 
 Write the small-noise model as
 
 $$
@@ -748,16 +748,17 @@ At the shrinkage target, the estimator beats the usual first-order benchmark. Aw
 This is consistent with the general message. Super-efficiency cannot happen everywhere in a regular problem. The exceptional set must be small. Here the exceptional point is the shrinkage target.
 
 
-## Concluding
+## Takeaway
 
-Unbiasedness is a clean property. It is not the same as optimality. In the normal-means problem, the estimator $X$ is unbiased and has constant risk $d$. In dimensions $d\ge3$, James--Stein shrinkage improves on it uniformly under total squared-error loss.
+Unbiasedness is a clean property. It is not the same as optimality.
 
-* The price is bias.
-* The reward is a larger reduction in variance.
+In the normal-means problem, \(X\) is unbiased and has constant risk \(d\). But for \(d\ge3\), James--Stein shrinkage improves on it uniformly under total squared-error loss.
 
-The geometric reason is that high-dimensional noise has length. The usual estimator treats the whole observed length as signal. Shrinkage refuses to do that.
+The price is bias. The reward is a larger reduction in variance.
 
-So the lesson is not that bias is good by itself. The lesson is that bias can be a tool. 
+The geometric reason is that high-dimensional noise has length. The usual estimator treats the whole observed vector as signal. Shrinkage refuses to do that.
+
+So the lesson is not that bias is good by itself. The lesson is that bias can be a tool.
 
 * In Firth's adjustment, bias keeps likelihood away from the boundary.
 * In James--Stein estimation, bias removes part of the length created by noise.

@@ -38,7 +38,8 @@ format:
 }
 </style>
 
-*Status: research note; not peer reviewed. The mathematical facts about Firth adjustment and Jeffreys-volume penalization are standard; the examples are meant to give a geometric reading of why the adjustment behaves well near separation.*
+**Claim.** Firth’s adjustment can be read as a geometric bias that keeps likelihood inference away from the boundary.  
+**Scope.** Standard Firth and Jeffreys-volume facts; examples focused on separation in logistic models.
 
 ## Preface
 
@@ -54,7 +55,7 @@ where $A_s$ is Firth's adjustment to the $s$th score component.
 
 Kosmidis and Firth's 2009 and 2021 papers can be read as two developments of this same geometric picture (Kosmidis and Firth 2009; Kosmidis and Firth 2021). The 2009 paper extends bias reduction to exponential-family nonlinear models, where the model manifold bends because the predictor itself is nonlinear. The 2021 paper studies binomial-response GLMs, where the important geometric feature is not just curvature but the **boundary**: fitted probabilities can run to 0 or 1, Fisher volume collapses, and ordinary maximum likelihood can fail to exist.
 
-The slogan is:
+The geometric reading is:
 
 > Firth's adjustment corrects the first-order drift caused by statistical geometry, and in canonical GLMs that correction is exactly the gradient of the Jeffreys volume element. In separated binomial problems, the same volume element becomes a barrier at the boundary.
 
@@ -62,7 +63,9 @@ There is also a philosophical point running through the note. Classical statisti
 
 The note has four parts. Part I gives the geometric intuition. Part II reads the Kosmidis--Firth papers through that lens. Part III gives a small synthetic fraud example. Part IV gives the technical appendix.
 
-## Part I: Intuition
+The distinction I want to keep visible is this: curvature explains first-order bias, while the boundary explains non-existence under separation. Firth's adjustment touches both, but the mechanisms are different.
+
+## Part I: Curvature and volume
 
 ### The space of distributions as a landscape
 

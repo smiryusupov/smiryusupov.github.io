@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2026-05-21">
+<meta name="description" content="A diagnostic on when nonlinear heads stop adding much after a frozen representation becomes linearly readable.">
+
+<title>When linear readability is the bottleneck – Shohruh Miryusupov</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-html/tabby.min.js"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-html-640605f58ae58ee79329c070719e555b.min.css" rel="stylesheet" append-hash="true" data-mode="light">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../../styles.css">
+</head>
+
+<body>
+
+<nav class="site-nav">
+  <a class="nav-name" href="../../../">Shohruh Miryusupov</a>
+  <div class="nav-links">
+    <a href="../../../blog/">Writings</a>
+    <a href="../../../about.html">About</a>
+    <a href="https://github.com/smiryusupov">GitHub</a>
+  </div>
+</nav>
+
+<header id="title-block-header">
+<h1 class="title">When linear readability is the bottleneck</h1>
+
+<p class="date">2026-05-21</p>
+</header>
+
+<nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#preface" id="toc-preface">Preface</a></li>
+  <li><a href="#the-fixed-representation-question" id="toc-the-fixed-representation-question">The fixed-representation question</a></li>
+  <li><a href="#a-linearization-experiment" id="toc-a-linearization-experiment">A linearization experiment</a></li>
+  <li><a href="#what-changes-during-training" id="toc-what-changes-during-training">What changes during training?</a></li>
+  <li><a href="#pca-is-a-shadow-not-the-proof" id="toc-pca-is-a-shadow-not-the-proof">PCA is a shadow, not the proof</a></li>
+  <li><a href="#the-leaderboard-gain" id="toc-the-leaderboard-gain">The leaderboard gain</a></li>
+  <li><a href="#why-the-late-gain-is-small" id="toc-why-the-late-gain-is-small">Why the late gain is small</a></li>
+  <li><a href="#conformal-prediction-as-an-uncertainty-diagnostic" id="toc-conformal-prediction-as-an-uncertainty-diagnostic">Conformal prediction as an uncertainty diagnostic</a></li>
+  <li><a href="#what-the-experiment-does-not-show" id="toc-what-the-experiment-does-not-show">What the experiment does not show</a></li>
+  <li><a href="#takeaway" id="toc-takeaway">Takeaway</a></li>
+  <li><a href="#reproducibility-notes" id="toc-reproducibility-notes">Reproducibility notes</a></li>
+  <li><a href="#references" id="toc-references">References</a></li>
+  <li><a href="#suggested-citation" id="toc-suggested-citation">Suggested citation</a></li>
+  </ul>
+</nav>
+<style>
+.narrow-figure {
+  max-width: 760px;
+  margin: 1.35rem auto 1.75rem auto;
+}
+.narrow-figure figure,
+.narrow-figure .quarto-figure {
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+.narrow-figure img {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 4px;
+}
+.narrow-figure figcaption {
+  margin-top: 0.55rem;
+  font-size: 0.92rem;
+  line-height: 1.35;
+  color: var(--bs-secondary-color, #666);
+  text-align: left;
+}
+</style>
+<p><strong>Claim.</strong> Once a frozen representation makes labels linearly readable, nonlinear heads have little geometry left to exploit.</p>
+<p><strong>Scope.</strong> A small MNIST/ViT diagnostic comparing nonlinear heads against the best linear head, not just logistic regression.</p>
+<h2 id="preface">Preface</h2>
+<p>A common recipe in representation learning is</p>
+<p><span class="math display">
+x \longmapsto z=\phi(x)\in\mathbb R^d
+\longmapsto \text{head}(z),
+</span></p>
+<p>where <span class="math inline">\phi</span> is a frozen backbone and the head is replaced by something more expressive: a random forest, an RBF-kernel SVM, a Gaussian process, a <span class="math inline">k</span>-nearest-neighbor rule, or a small MLP. The usual headline is then:</p>
+<blockquote>
+<p>adding a nonlinear head improves accuracy.</p>
+</blockquote>
+<p>That sentence is not false, but it hides the more important geometric question:</p>
+<blockquote>
+<p>Did the backbone already make the labels linearly readable?</p>
+</blockquote>
+<p>If the answer is yes, then the nonlinear head has little left to do. It may still win a leaderboard by a few examples. It may regularize differently. It may change the tie-breaking on borderline points. But it is no longer solving the main representation problem. The backbone has already done that.</p>
+<p>The point of this note is not that nonlinear heads are useless. The point is narrower:</p>
+<blockquote>
+<p>nonlinear heads diagnose what geometry the frozen representation left behind.</p>
+</blockquote>
+<p>In the final checkpoint below, nonlinear heads do beat logistic regression. But they do not stably beat the best linear head. That difference is the point of the note.</p>
+<p>If a nonlinear head gives a large and stable gain over the best linear head, the representation still contains useful nonlinear label geometry. If the gain is small, unstable, and concentrated near the remaining boundary errors, then the main bottleneck is no longer the head. It is the linear readability of the representation.</p>
+<h2 id="the-fixed-representation-question">The fixed-representation question</h2>
+<p>Let</p>
+<p><span class="math display">
+Z=\phi(X)\in\mathbb R^d,
+</span></p>
+<p>where <span class="math inline">\phi</span> is a representation learned by a backbone. Once <span class="math inline">\phi</span> is frozen, the learning problem changes. We are no longer asking whether the original input <span class="math inline">X</span> is easy. We are asking whether the labels are simple functions of <span class="math inline">Z</span>.</p>
+<p>The linear family is</p>
+<p><span class="math display">
+\mathcal H_{\mathrm{lin}}
+=
+\left\{
+  z\mapsto \arg\max_k\; w_k^\top z+b_k
+\right\}.
+</span></p>
+<p>A richer comparison class can include nonlinear heads:</p>
+<p><span class="math display">
+\mathcal H_{\mathrm{rich}}
+=
+\mathcal H_{\mathrm{lin}}
+\cup
+\{\text{RBF-SVM},\;\text{random forest},\;k\text{NN},\;\text{small MLP},\ldots\}.
+</span></p>
+<p>For a fixed representation <span class="math inline">\phi</span>, define</p>
+<p><span class="math display">
+R^*_{\mathrm{lin}}(\phi)
+=
+\inf_{h\in\mathcal H_{\mathrm{lin}}}
+\mathbb P\{h(\phi(X))\ne Y\},
+</span></p>
+<p>and</p>
+<p><span class="math display">
+R^*_{\mathrm{rich}}(\phi)
+=
+\inf_{h\in\mathcal H_{\mathrm{rich}}}
+\mathbb P\{h(\phi(X))\ne Y\}.
+</span></p>
+<p>The quantity a richer head class can exploit is</p>
+<p><span class="math display">
+G(\phi)
+=
+R^*_{\mathrm{lin}}(\phi)-R^*_{\mathrm{rich}}(\phi).
+</span></p>
+<p>If <span class="math inline">G(\phi)</span> is large, the representation still contains useful nonlinear label geometry. If <span class="math inline">G(\phi)</span> is small, then the representation has already made the task essentially linearly readable.</p>
+<p>Empirically, we do not observe <span class="math inline">G(\phi)</span> directly. We fit several heads on the same frozen features and compare them on the same held-out examples. For a nonlinear head <span class="math inline">h</span> and a linear baseline <span class="math inline">g</span>, define the paired accuracy difference</p>
+<p><span class="math display">
+\widehat\Delta(h,g)
+=
+\frac1n\sum_{i=1}^n
+\left[
+\mathbf 1\{h(z_i)=y_i\}
+-
+\mathbf 1\{g(z_i)=y_i\}
+\right].
+</span></p>
+<p>The pairing matters. Two classifiers evaluated on the same examples are not independent. A nonlinear head is meaningfully better only if it wins more disagreements than it loses, not merely if its point estimate is slightly higher. I therefore look at bootstrap confidence intervals for paired differences and at McNemar counts</p>
+<p><span class="math display">
+n_{01}=\#\{g\text{ wrong},\;h\text{ correct}\},
+\qquad
+n_{10}=\#\{g\text{ correct},\;h\text{ wrong}\}.
+</span></p>
+<h2 id="a-linearization-experiment">A linearization experiment</h2>
+<p>The experiment is deliberately small. I trained a compact ViT-style backbone on MNIST and saved checkpoints during training. At each checkpoint <span class="math inline">t</span>, I froze the representation</p>
+<p><span class="math display">
+z=\phi_t(x),
+</span></p>
+<p>extracted features, and trained heads on top of those features only.</p>
+<p>The heads were logistic regression, linear SVM, distance-weighted <span class="math inline">k</span>-nearest neighbors, random forest, RBF-SVM, and a small MLP.</p>
+<p>The key comparison is not only nonlinear heads versus logistic regression. Logistic regression is just one linear probe. The stricter comparison is nonlinear heads versus the <strong>best linear head</strong> at the same checkpoint.</p>
+<h2 id="what-changes-during-training">What changes during training?</h2>
+<p>The geometric diagnostics show the backbone doing the hard work.</p>
+<p>Let <span class="math inline">\mu_k</span> be the class mean in feature space and <span class="math inline">\mu</span> the global mean. A crude but useful diagnostic is the within/between ratio</p>
+<p><span class="math display">
+\rho
+=
+\frac{
+\frac1n\sum_{i=1}^n\|z_i-\mu_{y_i}\|^2
+}{
+\frac1K\sum_{k=1}^K\|\mu_k-\mu\|^2
+}.
+</span></p>
+<p>Low <span class="math inline">\rho</span> means that classes are compact relative to their separation. This is not a proof of linear separability, but it is a good diagnostic for whether the representation is forming separated class clouds.</p>
+<p>I also fit a linear head and measure its multiclass margin</p>
+<p><span class="math display">
+m_i
+=
+s_{y_i}(z_i)-\max_{k\ne y_i}s_k(z_i),
+</span></p>
+<p>where <span class="math inline">s_k(z)=w_k^\top z+b_k</span>. Negative margin means the linear classifier gets the point wrong.</p>
+<p>In the run here, from epoch 1 to epoch 20,</p>
+<p><span class="math display">
+\rho_{\mathrm{test}}: 0.4526\longrightarrow 0.0510,
+</span></p>
+<p>while the fraction of negative linear margins drops from</p>
+<p><span class="math display">
+0.1553\longrightarrow 0.0135.
+</span></p>
+<p>The median linear margin grows from about</p>
+<p><span class="math display">
+3.08\longrightarrow 9.36.
+</span></p>
+<p>So the story is not merely that accuracy goes up. The representation itself is being reshaped into a geometry where a linear rule has a large positive margin on almost all points.</p>
+<div class="narrow-figure">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img src="figures/geometry_diagnostics.png" class="img-fluid"></p>
+<figcaption>Separability diagnostics over training. The within/between ratio falls while linear margins become more positive.</figcaption>
+</figure>
+</div>
+</div>
+<h2 id="pca-is-a-shadow-not-the-proof">PCA is a shadow, not the proof</h2>
+<p>A two-dimensional PCA projection is not a certificate of separability. High-dimensional classes can be linearly separated even when a two-dimensional projection overlaps, and a clean projection can also be misleading.</p>
+<p>Still, PCA is useful as a visual sanity check. If the backbone is really linearizing the task, the PCA shadow should show class clouds becoming more organized over checkpoints. The margins above are the measurement; PCA is only the picture.</p>
+<div id="cell-fig-pca-points" class="cell" data-execution_count="2">
+<div class="cell-output cell-output-display">
+<div id="fig-pca-points" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-pca-points-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-pca-points-output-1.png" width="1200" height="682">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pca-points-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: PCA projections of frozen test features across checkpoints. This is only a two-dimensional shadow of the representation geometry.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<h2 id="the-leaderboard-gain">The leaderboard gain</h2>
+<p>At the final checkpoint, nonlinear heads do improve over plain logistic regression:</p>
+<p><span class="math display">
+\text{logistic regression}=0.9865,
+\qquad
+\text{best nonlinear heads}\approx 0.9881.
+</span></p>
+<p>That is a gain of about</p>
+<p><span class="math display">
+0.0016,
+</span></p>
+<p>or 16 examples per 10,000. Against logistic regression, some paired tests are significant.</p>
+<p>But this is the weaker comparison. The best linear head at the same checkpoint was a linear SVM:</p>
+<p><span class="math display">
+\text{linear SVM}=0.9875.
+</span></p>
+<p>Against this stronger linear baseline, the nonlinear heads improve by only</p>
+<p><span class="math display">
+0.0005\text{ to }0.0006,
+</span></p>
+<p>with bootstrap confidence intervals crossing zero and McNemar <span class="math inline">p</span>-values around <span class="math inline">0.38</span> to <span class="math inline">0.54</span>.</p>
+<p>So the main conclusion is not that nonlinear heads never help. The conclusion is sharper:</p>
+<blockquote>
+<p>A nonlinear head can beat a weak linear probe while failing to beat the best regularized linear probe in a statistically stable way.</p>
+</blockquote>
+<p>That distinction matters. If the claim is that the backbone has left important nonlinear structure in the features, the right baseline is not just logistic regression. It is the best simple linear decision rule we can reasonably fit.</p>
+<div class="narrow-figure">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img src="figures/head_accuracy_by_epoch.png" class="img-fluid"></p>
+<figcaption>Accuracy of all heads across checkpoints.</figcaption>
+</figure>
+</div>
+</div>
+<div class="narrow-figure">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img src="figures/nonlinear_gain_by_epoch.png" class="img-fluid"></p>
+<figcaption>Nonlinear gain relative to the logistic-regression probe.</figcaption>
+</figure>
+</div>
+</div>
+<div class="narrow-figure">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img src="figures/gain_vs_linear_accuracy.png" class="img-fluid"></p>
+<figcaption>Nonlinear gain shrinks as linear accuracy improves.</figcaption>
+</figure>
+</div>
+</div>
+<div class="narrow-figure">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img src="figures/best_gain_vs_linear_error.png" class="img-fluid"></p>
+<figcaption>Best nonlinear gain versus remaining linear error.</figcaption>
+</figure>
+</div>
+</div>
+<h2 id="why-the-late-gain-is-small">Why the late gain is small</h2>
+<p>Once the representation is nearly linearly separable, most examples are easy for all reasonable heads. The remaining disagreements are concentrated near the boundary or among ambiguous examples.</p>
+<p>A nonlinear head can still change the labels of some of those points. But the size of the possible gain is now controlled by the small remaining error of the best linear head.</p>
+<p>In this run, the best linear head has error about</p>
+<p><span class="math display">
+1-0.9875=0.0125.
+</span></p>
+<p>The nonlinear gain over it is about</p>
+<p><span class="math display">
+0.0006,
+</span></p>
+<p>which is roughly</p>
+<p><span class="math display">
+\frac{0.0006}{0.0125}\approx 4.8\%
+</span></p>
+<p>of the remaining linear error.</p>
+<p>That is not nothing. But it is not a qualitative change in the geometry. It is a small improvement inside a regime where the backbone has already made the task mostly linear.</p>
+<h2 id="conformal-prediction-as-an-uncertainty-diagnostic">Conformal prediction as an uncertainty diagnostic</h2>
+<p>Accuracy asks which head wins point prediction. Conformal prediction asks a slightly different question:</p>
+<blockquote>
+<p>At fixed coverage, does the nonlinear head produce smaller prediction sets?</p>
+</blockquote>
+<p>At 90% coverage, this diagnostic is intentionally coarse. Since the final top-1 accuracies are already far above 90%, rank conformal has little room to distinguish the heads. That triviality is itself informative: at this coverage level, uncertainty has already collapsed to singleton predictions.</p>
+<p>For classification, a split-conformal predictor returns a set</p>
+<p><span class="math display">
+C(x)\subseteq\{1,\ldots,K\}
+</span></p>
+<p>rather than a single label. Ideally,</p>
+<p><span class="math display">
+\mathbb P\{Y\in C(X)\}\ge 1-\alpha.
+</span></p>
+<p>The experiment uses a separate selection, calibration, and evaluation protocol, so the head is not selected on the same examples used for the final conformal report.</p>
+<p>For the main run I used a rank score. Let <span class="math inline">S_k(x)</span> be the score assigned to class <span class="math inline">k</span>. Define the rank nonconformity score</p>
+<p><span class="math display">
+r_y(x)
+=
+1+\#\{k:S_k(x)&gt;S_y(x)\}.
+</span></p>
+<p>The true top class has rank <span class="math inline">1</span>, the second class has rank <span class="math inline">2</span>, and so on. On calibration data, compute the conformal quantile <span class="math inline">\widehat q</span>. On a new point,</p>
+<p><span class="math display">
+C(x)=\{y:r_y(x)\le \widehat q\}.
+</span></p>
+<p>With this rank score, singleton conformal sets occur when <span class="math inline">\widehat q=1</span>, meaning the top-ranked label is already sufficient for the desired marginal coverage.</p>
+<p>At the final checkpoint, the answer is yes for every head. With a 90% target, all heads have</p>
+<p><span class="math display">
+\text{average set size}=1.0,
+\qquad
+\text{singleton rate}=1.0,
+</span></p>
+<p>and coverage around <span class="math inline">0.988</span> on the conformal evaluation split.</p>
+<p>This is not evidence that the heads are perfectly calibrated. It says something simpler and more geometric: by the final checkpoint, top-1 prediction is already conservative relative to a 90% coverage target. Conformal uncertainty has collapsed to singleton sets.</p>
+<div class="narrow-figure">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img src="figures/conformal_avg_set_size_by_epoch.png" class="img-fluid"></p>
+<figcaption>Average conformal set size over checkpoints.</figcaption>
+</figure>
+</div>
+</div>
+<div class="narrow-figure">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img src="figures/conformal_singleton_rate_by_epoch.png" class="img-fluid"></p>
+<figcaption>Conformal singleton rate over checkpoints.</figcaption>
+</figure>
+</div>
+</div>
+<div class="narrow-figure">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img src="figures/conformal_coverage_by_epoch.png" class="img-fluid"></p>
+<figcaption>Conformal coverage over checkpoints.</figcaption>
+</figure>
+</div>
+</div>
+<p>The early checkpoints are more informative. Around epoch 0, the selected conformal predictor has average set size about <span class="math inline">2.69</span> and singleton rate about <span class="math inline">0.23</span>. Around epoch 1, average set size is already about <span class="math inline">1.19</span> and singleton rate about <span class="math inline">0.82</span>. From epoch 2 onward, singleton sets are enough.</p>
+<p>So the conformal story mirrors the separability story:</p>
+<blockquote>
+<p>As the backbone linearizes the task, conformal sets collapse from multi-label uncertainty to singleton predictions.</p>
+</blockquote>
+<p>The nonlinear head may still win a few point predictions, but it does not buy a qualitatively smaller uncertainty set once the representation is already linearly readable.</p>
+<h2 id="what-the-experiment-does-not-show">What the experiment does not show</h2>
+<p>This is a diagnostic, not a universal theorem.</p>
+<p>First, MNIST is easy. A harder dataset such as CIFAR-10 should leave a longer middle regime where nonlinear heads and conformal set sizes differ more visibly.</p>
+<p>Second, finite-sample separability is not the same as useful separability. In high dimension, many training sets can be separated. The relevant question is whether a regularized linear classifier generalizes with margin.</p>
+<p>Third, rank conformal is coarse. Once top-1 accuracy exceeds the coverage target, rank conformal returns singleton sets. For a finer uncertainty comparison, one should also try higher coverage targets such as <span class="math inline">99\%</span>, or probability-based scores such as LAC, APS, or RAPS.</p>
+<p>But for this note, the coarse diagnostic is useful precisely because it becomes trivial: when top-1 singleton sets already overcover, uncertainty is no longer where the nonlinear head is helping.</p>
+<h2 id="takeaway">Takeaway</h2>
+<p>The nonlinear head is not magic added after the backbone. It is a test of what geometry the backbone left behind.</p>
+<p>If nonlinear heads help a lot, the representation has not made the task linearly readable. If nonlinear heads help only by a few borderline examples, and if conformal sets are already singleton at the desired coverage, then the backbone has already done the main work.</p>
+<p>In this experiment, the late-checkpoint representation is not merely accurate. It is linearly readable with large margin. Nonlinear heads can slightly reshuffle the boundary, but they do not change the basic picture:</p>
+<p><span class="math display">
+\boxed{
+\text{the bottleneck is linear readability of the representation.}
+}
+</span></p>
+<h2 id="reproducibility-notes">Reproducibility notes</h2>
+<p>The run used saved checkpoints and posthoc frozen-feature evaluation. For the blog version, the post directory is organized as</p>
+<pre class="text"><code>blog/posts/linear_separability_bottleneck/
+  index.qmd
+  figures/
+    geometry_diagnostics.png
+    head_accuracy_by_epoch.png
+    nonlinear_gain_by_epoch.png
+    gain_vs_linear_accuracy.png
+    best_gain_vs_linear_error.png
+    conformal_avg_set_size_by_epoch.png
+    conformal_singleton_rate_by_epoch.png
+    conformal_coverage_by_epoch.png
+  data/
+    head_results.csv
+    separability_metrics.csv
+    conformal_results.csv
+    conformal_examples.csv
+    pca_points.csv
+  config.json
+  summary.md</code></pre>
+<p>The PCA panel is generated from <code>data/pca_points.csv</code>. The other figures are loaded from the saved <code>figures/</code> directory. The CSV files are included as resources so that the post remains reproducible without rerunning the training script.</p>
+<h2 id="references">References</h2>
+<p>Guillaume Alain and Yoshua Bengio. “Understanding Intermediate Layers Using Linear Classifier Probes.” arXiv:1610.01644, 2016.</p>
+<p>Simon Kornblith, Jonathon Shlens, and Quoc V. Le. “Do Better ImageNet Models Transfer Better?” <em>Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition</em>, 2019.</p>
+<p>Vladimir Vovk, Alexander Gammerman, and Glenn Shafer. <em>Algorithmic Learning in a Random World</em>. Springer, 2005.</p>
+<p>Anastasios N. Angelopoulos and Stephen Bates. “A Gentle Introduction to Conformal Prediction and Distribution-Free Uncertainty Quantification.” arXiv:2107.07511, 2021.</p>
+<p>Quinn McNemar. “Note on the Sampling Error of the Difference Between Correlated Proportions or Percentages.” <em>Psychometrika</em> 12, 1947.</p>
+<p>Bradley Efron and Robert Tibshirani. <em>An Introduction to the Bootstrap</em>. Chapman &amp; Hall, 1993.</p>
+<h2 id="suggested-citation">Suggested citation</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bibtex code-with-copy"><code class="sourceCode bibtex"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="va">@misc</span>{<span class="ot">miryusupov2026linearseparability</span>,</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">author</span>       = {Miryusupov, Shohruh},</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">title</span>        = {Linear Separability Is the Bottleneck},</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">year</span>         = {2026},</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">howpublished</span> = {Research note},</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">url</span>          = {https://www.miryusupov.com/blog/posts/linear_separability_bottleneck/}</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+
+
+<footer id="site-footer" class="site-footer">
+  <span class="site-disclaimer">
+    Personal academic site. Views and notes are my own and do not represent my employer. Written independently, using public sources and personal resources.
+  </span>
+</footer>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const footer = document.getElementById("site-footer");
+    if (footer) {
+      document.body.appendChild(footer);
+    }
+  });
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const tocLinks = [...document.querySelectorAll("#TOC a[href^='#']")];
+  const sections = tocLinks
+    .map(link => document.querySelector(decodeURIComponent(link.getAttribute("href"))))
+    .filter(Boolean);
+
+  if (!tocLinks.length || !sections.length) return;
+
+  const setActive = () => {
+    let active = sections[0];
+
+    for (const section of sections) {
+      if (section.getBoundingClientRect().top <= 120) {
+        active = section;
+      }
+    }
+
+    tocLinks.forEach(link => {
+      link.classList.toggle(
+        "active",
+        link.getAttribute("href") === "#" + CSS.escape(active.id)
+      );
+    });
+  };
+
+  setActive();
+  window.addEventListener("scroll", setActive, { passive: true });
+});
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+    tabsets.forEach(function(tabset) {
+      const tabby = new Tabby('#' + tabset.id);
+    });
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/www\.miryusupov\.com");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'light-border',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+
+
+
+
+</body></html>

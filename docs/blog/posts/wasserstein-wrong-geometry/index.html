@@ -173,7 +173,8 @@ window.Quarto = {
   margin-right: auto;
 }
 </style>
-<p><em>Status: research note; not peer reviewed. The Gaussian Wasserstein and Fisher–Rao calculations below are standard. The examples are small diagnostics, not benchmarks. Their purpose is to isolate a modeling issue: Wasserstein loss measures discrepancy in the geometry supplied to it, and that geometry may or may not match the statistical meaning of the error.</em></p>
+<p><strong>Claim.</strong> Wasserstein loss is only as meaningful as the ground geometry supplied to it.</p>
+<p><strong>Scope.</strong> Standard Gaussian Wasserstein and Fisher–Rao calculations; illustrative diagnostics.</p>
 <p>Wasserstein distance has a clean promise: it compares probability distributions by asking how much mass must move, and how far it must move.</p>
 <p>That is often exactly the right question. If the sample-space geometry is the geometry of the problem, then Wasserstein distance is natural. A meter is a meter. A pixel is a pixel. A coordinate displacement is a coordinate displacement.</p>
 <p>But when Wasserstein distance is used as a statistical loss, there is a small trap:</p>

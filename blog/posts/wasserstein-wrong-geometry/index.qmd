@@ -38,7 +38,9 @@ format:
 }
 </style>
 
-*Status: research note; not peer reviewed. The Gaussian Wasserstein and Fisher--Rao calculations below are standard. The examples are small diagnostics, not benchmarks. Their purpose is to isolate a modeling issue: Wasserstein loss measures discrepancy in the geometry supplied to it, and that geometry may or may not match the statistical meaning of the error.*
+**Claim.** Wasserstein loss is only as meaningful as the ground geometry supplied to it.  
+
+**Scope.** Standard Gaussian Wasserstein and Fisher--Rao calculations; illustrative diagnostics.
 
 Wasserstein distance has a clean promise: it compares probability distributions by asking how much mass must move, and how far it must move.
 

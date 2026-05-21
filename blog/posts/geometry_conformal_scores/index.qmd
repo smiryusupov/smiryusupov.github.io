@@ -47,7 +47,8 @@ format:
 }
 </style>
 
-*Status: research note; not peer reviewed. The conformal validity claims are standard; the experiments study how score choice changes efficiency and local behavior.*
+**Claim.** Conformal calibration supplies marginal validity; the score supplies the geometry of the prediction set.  
+**Scope.** Standard split-conformal validity; experiments illustrating efficiency and local behavior.
 
 ## Preface
 
@@ -109,7 +110,7 @@ $$
 \mathbb P\{Y_{n+1}\in C_\alpha(X_{n+1})\}\ge 1-\alpha.
 $$
 
-The important word is *any*. The score can come from a random forest, a kernel method, a neural network, a quantile model, or a density model. If the calibration and test scores are exchangeable, the marginal guarantee remains.
+The important word is *any*, after the score has been fixed. In split conformal, the model or score is fitted on a separate training split, and then treated as fixed when calibration and test scores are compared. The score can come from a random forest, a kernel method, a neural network, a quantile model, or a density model. Conditional on the fitted score, if the calibration and test examples are exchangeable, the marginal guarantee remains.
 
 This is why I do not view information geometry as a new validity proof for conformal prediction. The validity proof is already there. The role of geometry is narrower: a geometric score may rank candidate labels better. Better ranking can mean shorter intervals, smaller sets, or better conditional behavior. But it is not what makes the method valid.
 
@@ -348,11 +349,11 @@ The earlier diagnostic was partly asking the wrong question. If the score models
 
 ## Takeaway
 
-This experiment is not a theorem about optimal conformal prediction. The claim is smaller:
+Conformal calibration and score geometry do different jobs.
 
-> conformal calibration gives marginal validity, while the score determines the geometry of the set.
+Calibration supplies marginal validity. The score determines which candidate labels look plausible, and therefore determines the shape and efficiency of the prediction set.
 
-That leads to the practical question:
+The practical question is:
 
 > does the score geometry match the conditional law of $Y\mid X$?
 

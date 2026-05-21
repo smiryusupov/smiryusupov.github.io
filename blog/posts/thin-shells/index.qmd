@@ -31,11 +31,13 @@ execute:
 }
 </style>
 
-*Status: research note; not peer reviewed. The thin-shell and projection facts are standard; the experiments are small visual diagnostics about why high-dimensional structure can be hidden by low-dimensional views.*
+**Claim.** In high dimensions, radial structure and visible low-dimensional structure can decouple. A cloud may concentrate on a thin shell while every random 2D view looks ordinary.
+
+**Scope.** Standard Gaussian/projection facts with small visual diagnostics.
 
 A recurring trap in high-dimensional exploratory data analysis is that a dataset can have strong geometric structure in the ambient space and still look ordinary in a low-dimensional plot.
 
-We use two examples.
+Two examples expose the failure mode.
 
 - For a standard Gaussian, the full cloud concentrates near a thin shell, even though every fixed 2D projection is again an ordinary Gaussian cloud.
 - For a symmetric Gaussian mixture, shell concentration still occurs, but the bimodality is directional rather than radial. A random 2D projection may hide it, while PCA can recover it.
@@ -271,7 +273,7 @@ Hence the typical radius is about $\sqrt d$, while the relative shell thickness 
 
 At the same time, if $U \in \mathbb{R}^{d \times 2}$ has orthonormal columns, then $Y = U^\top X \sim \mathcal{N}(0, I_2)$.
 
-So the shell is a property of the full ambient-space norm, not of any single 2D projection.
+**The shell is a property of the full ambient-space norm, not of any single 2D projection.**
 
 In the shell panels below, each point is placed at radius $\|X\|/\sqrt d$ with a random angle. This is not a true projection; it is only a visualization of radial concentration.
 
@@ -291,7 +293,7 @@ plt.show()
 
 ```{python}
 #| label: fig-gaussian-shell-large
-#| fig-cap: 'Gaussian warm-up for dimensions 2, 5, and 20. The top row is a radius-only shell proxy; the bottom row is a genuine random 2D projection. As dimension grows, the shell becomes clearer in radius, while the 2D projection remains an ordinary Gaussian cloud.'
+#| fig-cap: 'Gaussian warm-up for dimensions 50 and 200. The top row is a radius-only shell proxy; the bottom row is a genuine random 2D projection. As dimension grows, the shell becomes clearer in radius, while the 2D projection remains an ordinary Gaussian cloud.'
 
 fig = gaussian_shell_vs_projection_figure([50, 200], n=n_gaussian, rng=rng)
 plt.show()
@@ -344,9 +346,9 @@ plt.show()
 
 :::
 
-## Symmetric mixture: shell concentration is radial, separation is directional
+## The shell can survive while the signal disappears
 
-Now consider
+In the mixture, radial concentration remains visible in the norm, but the class structure lives in a direction. Now consider
 $$
 X = S \Delta e_1 + Z.
 $$
@@ -427,7 +429,7 @@ $$
 $$
 so the apparent signal is typically of order $\Delta \sqrt{2/d}$.
 
-That decay explains why the random projections become less informative as the ambient dimension grows.
+That decay explains why the random projections become less informative as the ambient dimension grows. The signal has not disappeared from the data; it has disappeared from the random view.
 
 ::: {.narrow-figure}
 
@@ -511,13 +513,11 @@ plt.show()
 
 ## Takeaway
 
-A high-dimensional dataset can have all of the following properties at once:
+Low-dimensional plots do not merely compress high-dimensional geometry; they choose which geometry survives.
 
-1. its norm is concentrated near a thin shell
-2. a random 2D projection looks simple
-3. a data-adaptive projection reveals strong structure
+A high-dimensional dataset can concentrate radially, look featureless in a random 2D view, and still contain strong directional structure recoverable by an adaptive projection.
 
-That is why 2D plots in high dimension need interpretation, not just inspection.
+The lesson is not that 2D plots are useless. The lesson is that their geometry must be named.
 
 ## References
 

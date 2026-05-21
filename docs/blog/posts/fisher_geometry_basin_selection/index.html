@@ -145,7 +145,7 @@ window.Quarto = {
   <li><a href="#preface" id="toc-preface">Preface</a></li>
   <li><a href="#part-i-the-information-geometric-view" id="toc-part-i-the-information-geometric-view">Part I: The information-geometric view</a>
   <ul>
-  <li><a href="#an-information-geometric-view" id="toc-an-information-geometric-view">An information-geometric view</a></li>
+  <li><a href="#fisher-as-a-score-gram-matrix" id="toc-fisher-as-a-score-gram-matrix">Fisher as a score Gram matrix</a></li>
   </ul></li>
   <li><a href="#part-ii-the-experiment" id="toc-part-ii-the-experiment">Part II: The experiment</a>
   <ul>
@@ -188,7 +188,8 @@ window.Quarto = {
   text-align: left;
 }
 </style>
-<p><em>Status: research note; not peer reviewed. The Fisher-geometry facts are standard; the experiments are small edge cases about local preconditioning and non-convex basin selection.</em></p>
+<p><strong>Claim.</strong> A correct local Fisher metric does not guarantee selection of the globally desirable basin.<br>
+<strong>Scope.</strong> Standard Fisher-geometry facts; small non-convex diagnostics comparing local preconditioners.</p>
 <h2 id="preface" class="anchored">Preface</h2>
 <p>Natural gradient descent has a beautiful geometric story. Ordinary gradient descent measures a step in the coordinates in which the parameters happen to be written. Natural gradient descent instead measures a step by the change it induces in the model distribution.</p>
 <p>The local ruler is the Fisher information matrix. For a parametric predictive model <span class="math inline">p_\theta(y \mid x)</span>,</p>
@@ -247,7 +248,7 @@ v^\top F(\theta)v.
 -\eta F(\theta)^{-1}\nabla L(\theta).
 </span></p>
 <p>This form makes both the promise and the limitation visible. The Fisher matrix tells us which infinitesimal steps are large or small in distribution space. It does not tell us which faraway basin has better validation loss.</p>
-<h3 id="an-information-geometric-view" class="anchored">An information-geometric view</h3>
+<h3 id="fisher-as-a-score-gram-matrix" class="anchored">Fisher as a score Gram matrix</h3>
 <p>There is also a useful Hilbert-space way to read the same formula. For a dominated model with density <span class="math inline">p_\theta(z)</span>, write the score as</p>
 <p><span class="math display">
 s_\theta(z)
@@ -331,9 +332,10 @@ J_i(\theta)J_i(\theta)^\top.
 Good-basin hit rate by initialization regime. Easy starts are positive controls; medium starts are the informative regime; hard starts expose failure modes.
 </figcaption>
 </figure>
-<p>The easy starts show that the task is not broken. Natural gradient, AdamW, SGD, and the diagonal Fisher method can all reach the good basin when the start is favorable.</p>
-<p>The medium starts are more informative. The good basin is reachable, but not all methods select it from every ambiguous start. This is where the slogan is tested: a locally correct Fisher metric need not encode the global basin structure.</p>
-<p>The hard starts are stress tests. They should not dominate the interpretation, but they show that local preconditioning can still be pulled into an undesirable attractor.</p>
+<p>The easy starts show that the task is not broken. All methods reach the good basin when the start is favorable.</p>
+<p>The hard starts show the opposite extreme. In this run, no method reaches the good basin from the hard starts. These starts are useful as stress tests, but they should not dominate the interpretation.</p>
+<p>The medium starts are the diagnostic regime. The good basin is reachable, but basin selection depends on the optimizer. In this run, exact Fisher NGD reaches the good basin on all medium starts. AdamW, diagonal exact Fisher, and SGD with momentum reach it on about half of the medium starts. Empirical Fisher NGD does not reach it from the medium starts.</p>
+<p>This should not be read as a general benchmark victory for exact Fisher. The point is narrower: the local metric induces a trajectory, and the success of that trajectory depends on the initialization regime.</p>
 <p>Aggregating over all starts gives a compact comparison, but it should be read only after the regime split.</p>
 <figure class="article-figure">
 <img src="figures/exact_fisher_2d_success_rate_by_optimizer.png" alt="Good-basin hit rate by optimizer.">
@@ -341,7 +343,8 @@ Good-basin hit rate by initialization regime. Easy starts are positive controls;
 Good-basin hit rate by optimizer, pooled over the balanced easy, medium, and hard starts.
 </figcaption>
 </figure>
-<p>The pooled number is secondary. The more important observation is regime dependence: no optimizer here turns local geometry into a global basin-selection guarantee.</p>
+<p>The pooled plot is useful only as a summary. It combines three qualitatively different regimes: easy starts where all methods succeed, hard starts where all methods fail, and medium starts where the methods actually differ.</p>
+<p>For the question in this note, the medium regime carries most of the evidence. The pooled rate should therefore be read after the regime split, not as a standalone optimizer ranking.</p>
 <h2 id="part-iv-the-trajectories" class="anchored">Part IV: The trajectories</h2>
 <p>The level-set plots make the basin story more concrete. Line color and line style identify the optimizer. The final marker identifies the endpoint class.</p>
 <p>The easy case is the sanity check.</p>
@@ -385,7 +388,7 @@ Distance to the best validation grid point for one medium initialization. This i
 </figure>
 <p>This plot is not meant to prove a theorem. It is a way to read the trajectory. The main evidence remains the endpoint classification and the basin plots.</p>
 <h2 id="part-vi-where-k-fac-enters" class="anchored">Part VI: Where K-FAC enters</h2>
-<p>K-FAC is the neural-network analogue of the same idea: replace an expensive Fisher matrix by a structured local approximation. For a linear layer with input activations <span class="math inline">a</span> and preactivation score gradients <span class="math inline">\delta</span>, K-FAC approximates the Fisher block by</p>
+<p>K-FAC belongs to the same local-metric family, but with a structured approximation to the Fisher rather than the exact Fisher. For a linear layer with input activations <span class="math inline">a</span> and preactivation score gradients <span class="math inline">\delta</span>, K-FAC approximates the Fisher block by</p>
 <p><span class="math display">
 F_l
 \approx
@@ -414,7 +417,7 @@ G_l^{-1}(\nabla_{W_l}L)A_l^{-1},
 <p>This is why endpoint classification matters. A low loss, a short Fisher step, or a locally natural direction is not the same thing as reaching the basin one wanted. In non-convex problems, the optimizer is not only solving a local quadratic problem. It is generating a trajectory.</p>
 <p>The practical question is therefore:</p>
 <blockquote>
-<p>Does the local geometry point toward the basin that matters for the task?</p>
+<p>The practical question is not only whether the metric is locally correct. It is whether the induced trajectory enters the basin that matters for the task.</p>
 </blockquote>
 <p>When the answer is yes, Fisher methods can be excellent. When the answer is no, there is no general reason to expect them to dominate AdamW.</p>
 <h2 id="technical-appendix" class="anchored">Technical appendix</h2>

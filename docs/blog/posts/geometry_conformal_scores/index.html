@@ -195,7 +195,8 @@ window.Quarto = {
   }
 }
 </style>
-<p><em>Status: research note; not peer reviewed. The conformal validity claims are standard; the experiments study how score choice changes efficiency and local behavior.</em></p>
+<p><strong>Claim.</strong> Conformal calibration supplies marginal validity; the score supplies the geometry of the prediction set.<br>
+<strong>Scope.</strong> Standard split-conformal validity; experiments illustrating efficiency and local behavior.</p>
 <h2 id="preface" class="anchored">Preface</h2>
 <p>Conformal prediction has a clean promise. If the calibration and test examples are exchangeable, then a split conformal prediction set has finite-sample marginal coverage. The model used to build the score can be wrong. The likelihood can be misspecified. The geometry can be only approximate.</p>
 <p>That is the part I do not want to disturb. The question in this note is different:</p>
@@ -238,7 +239,7 @@ C_\alpha(x)=\{y:S(x,y)\le \widehat q\}.
 <p><span class="math display">
 \mathbb P\{Y_{n+1}\in C_\alpha(X_{n+1})\}\ge 1-\alpha.
 </span></p>
-<p>The important word is <em>any</em>. The score can come from a random forest, a kernel method, a neural network, a quantile model, or a density model. If the calibration and test scores are exchangeable, the marginal guarantee remains.</p>
+<p>The important word is <em>any</em>, after the score has been fixed. In split conformal, the model or score is fitted on a separate training split, and then treated as fixed when calibration and test scores are compared. The score can come from a random forest, a kernel method, a neural network, a quantile model, or a density model. Conditional on the fitted score, if the calibration and test examples are exchangeable, the marginal guarantee remains.</p>
 <p>This is why I do not view information geometry as a new validity proof for conformal prediction. The validity proof is already there. The role of geometry is narrower: a geometric score may rank candidate labels better. Better ranking can mean shorter intervals, smaller sets, or better conditional behavior. But it is not what makes the method valid.</p>
 <h2 id="part-ii-the-score-defines-the-geometry" class="anchored">Part II: The score defines the geometry</h2>
 <p>The simplest regression score is</p>
@@ -547,11 +548,9 @@ S(x,y)=-\log \widehat p(y\mid x).
 </div>
 <p>The earlier diagnostic was partly asking the wrong question. If the score models local scale, bin by local scale. If the score models mixture uncertainty, bin by mixture uncertainty.</p>
 <h2 id="takeaway" class="anchored">Takeaway</h2>
-<p>This experiment is not a theorem about optimal conformal prediction. The claim is smaller:</p>
-<blockquote>
-<p>conformal calibration gives marginal validity, while the score determines the geometry of the set.</p>
-</blockquote>
-<p>That leads to the practical question:</p>
+<p>Conformal calibration and score geometry do different jobs.</p>
+<p>Calibration supplies marginal validity. The score determines which candidate labels look plausible, and therefore determines the shape and efficiency of the prediction set.</p>
+<p>The practical question is:</p>
 <blockquote>
 <p>does the score geometry match the conditional law of <span class="math inline">Y\mid X</span>?</p>
 </blockquote>

@@ -146,7 +146,7 @@ window.Quarto = {
   <li><a href="#part-iii-geometry-noise-has-length" id="toc-part-iii-geometry-noise-has-length">Part III: Geometry: noise has length</a></li>
   <li><a href="#part-iv-a-small-ml-analogue" id="toc-part-iv-a-small-ml-analogue">Part IV: A small ML analogue</a></li>
   <li><a href="#part-v-super-efficiency-at-the-shrinkage-target" id="toc-part-v-super-efficiency-at-the-shrinkage-target">Part V: Super-efficiency at the shrinkage target</a></li>
-  <li><a href="#concluding" id="toc-concluding">Concluding</a></li>
+  <li><a href="#takeaway" id="toc-takeaway">Takeaway</a></li>
   <li><a href="#technical-appendix" id="toc-technical-appendix">Technical appendix</a></li>
   <li><a href="#references" id="toc-references">References</a></li>
   <li><a href="#suggested-citation" id="toc-suggested-citation">Suggested citation</a></li>
@@ -171,7 +171,8 @@ window.Quarto = {
   margin-right: auto;
 }
 </style>
-<p><em>Status: research note; not peer reviewed. The James–Stein risk facts are classical; the simulations and discussion are meant to give a geometric reading of shrinkage and high-dimensional noise.</em></p>
+<p><strong>Claim.</strong> In high dimension, unbiasedness can waste noise length; shrinkage can reduce risk by spending a little bias.<br>
+<strong>Scope.</strong> Classical James–Stein facts; simulations and geometry for intuition.</p>
 <h2 id="preface">Preface</h2>
 <p>This note continues the same theme as the note on Firth’s adjustment: bias is not always a disease.</p>
 <blockquote>
@@ -208,8 +209,8 @@ d.
 <blockquote>
 <p>In high dimension, noise has length. The estimator <span class="math inline">X</span> treats all of that length as signal. Shrinkage deliberately gives up unbiasedness to remove part of the noise length.</p>
 </blockquote>
-<p>There is also a philosophical point running through the note. Classical statistics often treats unbiasedness as a kind of cleanliness condition. The James–Stein phenomenon shows that this is too narrow. Under squared-error loss, risk is the relevant object, and risk contains both bias and variance.</p>
-<p>The lesson is not that bias is good in itself. The lesson is that a small, structured bias can be better than a large variance.</p>
+<p>Classical statistics often treats unbiasedness as a cleanliness condition. James–Stein shows why that is too narrow: under squared-error loss, the relevant object is risk, and risk contains both bias and variance.</p>
+<p>The lesson is not that bias is good. The lesson is that a small, structured bias can be cheaper than a large variance.</p>
 <p>The note has five parts. Part I gives the fixed-shrinkage warm-up. Part II states the James–Stein phenomenon. Part III explains the geometry. Part IV gives a small machine-learning analogue. Part V discusses super-efficiency at the shrinkage target.</p>
 <h2 id="part-i-fixed-shrinkage">Part I: Fixed shrinkage</h2>
 <p>Before James–Stein, consider the simpler rule</p>
@@ -422,7 +423,7 @@ R(\theta,\delta)
 </span></p>
 <p>The penalty introduces bias. But it also shrinks unstable directions, making the inverse problem better behaved.</p>
 <p>The loss is not identical to the James–Stein loss. Here the figure measures prediction error, while James–Stein is about parameter-estimation risk.</p>
-<p>But the mechanism is the same:</p>
+<p>The theorem is different, but the geometry is similar:</p>
 <blockquote>
 <p>Do not trust every noisy direction equally. Shrink the unstable ones.</p>
 </blockquote>
@@ -450,8 +451,7 @@ Best ridge test MSE: 3625.75</code></pre>
 <p>The unregularized estimator is trying to use the entire expanded feature space. In this example, the polynomial expansion creates more directions than the training set can reliably support.</p>
 <p>Ridge changes the problem. It no longer asks for an unpenalized least-squares fit. It asks for a stable fit with smaller coefficient norm. The result is biased, but the prediction error can be much smaller. This is the machine-learning version of the same principle. Shrinkage is not a hack added after statistics fails. It is a way of making estimation well-posed when variance is the real enemy.</p>
 <h2 id="part-v-super-efficiency-at-the-shrinkage-target">Part V: Super-efficiency at the shrinkage target</h2>
-<p>There is also an asymptotic reading of the same phenomenon.</p>
-<p>Write the small-noise model as</p>
+<p>This section is optional. It gives an asymptotic reading of the same shrinkage target phenomenon. Write the small-noise model as</p>
 <p><span class="math display">
 Y_\varepsilon=\theta+\varepsilon Z,
 \qquad
@@ -511,13 +511,11 @@ d\varepsilon^2
 </div>
 <p>This is super-efficiency in a concrete form.</p>
 <p>At the shrinkage target, the estimator beats the usual first-order benchmark. Away from the target, the first-order advantage disappears. This is consistent with the general message. Super-efficiency cannot happen everywhere in a regular problem. The exceptional set must be small. Here the exceptional point is the shrinkage target.</p>
-<h2 id="concluding">Concluding</h2>
-<p>Unbiasedness is a clean property. It is not the same as optimality. In the normal-means problem, the estimator <span class="math inline">X</span> is unbiased and has constant risk <span class="math inline">d</span>. In dimensions <span class="math inline">d\ge3</span>, James–Stein shrinkage improves on it uniformly under total squared-error loss.</p>
-<ul>
-<li>The price is bias.</li>
-<li>The reward is a larger reduction in variance.</li>
-</ul>
-<p>The geometric reason is that high-dimensional noise has length. The usual estimator treats the whole observed length as signal. Shrinkage refuses to do that.</p>
+<h2 id="takeaway">Takeaway</h2>
+<p>Unbiasedness is a clean property. It is not the same as optimality.</p>
+<p>In the normal-means problem, (X) is unbiased and has constant risk (d). But for (d), James–Stein shrinkage improves on it uniformly under total squared-error loss.</p>
+<p>The price is bias. The reward is a larger reduction in variance.</p>
+<p>The geometric reason is that high-dimensional noise has length. The usual estimator treats the whole observed vector as signal. Shrinkage refuses to do that.</p>
 <p>So the lesson is not that bias is good by itself. The lesson is that bias can be a tool.</p>
 <ul>
 <li>In Firth’s adjustment, bias keeps likelihood away from the boundary.</li>

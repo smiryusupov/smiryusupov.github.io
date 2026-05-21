@@ -144,7 +144,7 @@ window.Quarto = {
   <li><a href="#part-i-a-one-signal-coordinate-model" id="toc-part-i-a-one-signal-coordinate-model">Part I: A one-signal-coordinate model</a></li>
   <li><a href="#part-ii-why-distance-loses-the-signal" id="toc-part-ii-why-distance-loses-the-signal">Part II: Why distance loses the signal</a></li>
   <li><a href="#part-iii-accuracy-as-nuisance-dimension-grows" id="toc-part-iii-accuracy-as-nuisance-dimension-grows">Part III: Accuracy as nuisance dimension grows</a></li>
-  <li><a href="#part-iv-nobody-intentionally-adds-noise" id="toc-part-iv-nobody-intentionally-adds-noise">Part IV: Nobody intentionally adds noise</a></li>
+  <li><a href="#part-iv-noise-rarely-looks-like-noise" id="toc-part-iv-noise-rarely-looks-like-noise">Part IV: Noise rarely looks like noise</a></li>
   <li><a href="#part-v-one-hot-nuisance-is-different" id="toc-part-v-one-hot-nuisance-is-different">Part V: One-hot nuisance is different</a></li>
   <li><a href="#part-vi-connection-to-retrieval" id="toc-part-vi-connection-to-retrieval">Part VI: Connection to retrieval</a></li>
   <li><a href="#takeaway" id="toc-takeaway">Takeaway</a></li>
@@ -172,12 +172,13 @@ window.Quarto = {
   margin-right: auto;
 }
 </style>
-<p><em>Status: research note; not peer reviewed. The examples are synthetic diagnostics meant to illustrate how irrelevant coordinates can distort nearest-neighbor geometry and retrieval.</em></p>
+<p><strong>Claim.</strong> Nearest-neighbor retrieval fails when metric closeness and task relevance diverge.<br>
+<strong>Scope.</strong> Synthetic diagnostics for noisy-feature geometry, not a full theory of RAG.</p>
 <h2 id="preface">Preface</h2>
 <p>Nearest-neighbor methods are attractive because the rule is almost embarrassingly simple: find points close to the query, and let those points decide. The weakness is hidden in the word <em>close</em>. A nearest-neighbor method is only as good as the geometry induced by its representation and metric.</p>
 <p>This note studies a deliberately small example. There is one informative coordinate and many nuisance coordinates. The Bayes rule does not change as dimension grows, because it only needs the informative coordinate. Euclidean <span class="math inline">k</span>NN, however, uses all coordinates equally. As nuisance coordinates accumulate, distance rankings become less related to the label.</p>
 <p>The same issue appears in retrieval systems. A retrieval-augmented generation system embeds a query and a collection of document chunks, then retrieves nearby chunks. If the representation makes the right passages close, the language model receives useful context. If irrelevant variation shapes the neighborhood, the model receives plausible but unhelpful context.</p>
-<p>The goal is not to prove a theorem about RAG. The goal is to make a diagnostic picture: nearest-neighbor retrieval works only when distance means relevance.</p>
+<p>This toy model gives a diagnostic for retrieval: nearest-neighbor methods work only when distance tracks relevance.</p>
 <p>I will call this the <strong>relevance gap</strong>: the gap between being close under the retrieval metric and being useful for the task. In the toy model, the gap appears because Euclidean distance listens to nuisance coordinates. In retrieval systems, it appears when embedding similarity retrieves passages that are topically plausible but not actually answer-bearing.</p>
 <h2 id="part-i-a-one-signal-coordinate-model">Part I: A one-signal-coordinate model</h2>
 <p>Let</p>
@@ -260,7 +261,7 @@ Figure&nbsp;1: As nuisance dimension grows, Bayes accuracy stays stable while Eu
 </div>
 <p>The upper panel separates the statistical problem from the metric problem. The Bayes accuracy stays stable because the decision boundary is still <span class="math inline">x_1=0</span>. Euclidean kNN degrades because it uses a distance in which many irrelevant coordinates contribute.</p>
 <p>The lower panel shows a crude distance-concentration diagnostic. As the nearest and farthest distances become less contrasted, the neighborhood becomes less meaningful. This ratio is not a theorem about kNN accuracy, but it tracks the geometry that is causing the failure.</p>
-<h2 id="part-iv-nobody-intentionally-adds-noise">Part IV: Nobody intentionally adds noise</h2>
+<h2 id="part-iv-noise-rarely-looks-like-noise">Part IV: Noise rarely looks like noise</h2>
 <p>A natural objection is that nobody intentionally adds independent Gaussian noise features. But nuisance variation enters real datasets in less obvious ways: irrelevant engineered features, broad metadata, repeated boilerplate, weak proxies, and representation dimensions that are not useful for the specific task.</p>
 <p>To isolate the effect, start with the same one-dimensional signal and append <span class="math inline">m</span> useless coordinates. We compare three rules:</p>
 <ol type="1">
@@ -314,7 +315,7 @@ q
 \qquad
 \mathbb{E}[Z]=4\mu^2.
 </span></p>
-<p>This is the useful caveat. One-hot nuisance does not behave like <span class="math inline">Cm</span> independent Gaussian noise coordinates. The danger is controlled more by the number of categorical fields <span class="math inline">C</span>, the scaling <span class="math inline">\alpha</span>, and the mismatch variance <span class="math inline">q(1-q)</span>.</p>
+<p>This is the caveat that keeps the story from becoming “high dimension is bad.” One-hot nuisance does not behave like <span class="math inline">Cm</span> independent Gaussian noise coordinates. The danger is controlled more by the number of categorical fields <span class="math inline">C</span>, the scaling <span class="math inline">\alpha</span>, and the mismatch variance <span class="math inline">q(1-q)</span>.</p>
 <div id="cell-fig-onehot-diagnostic" class="cell" data-fig-height="4.5" data-fig-width="7" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div id="fig-onehot-diagnostic" class="quarto-float quarto-figure quarto-figure-center">
@@ -377,12 +378,13 @@ Figure&nbsp;3: One-hot nuisance is controlled by fields, scaling, and mismatch v
 </tr>
 </tbody>
 </table>
-<p>This gives a useful picture of a common retrieval failure. The correct passage may exist in the corpus, but if the retriever’s geometry is shaped by irrelevant variation, that passage may not be ranked highly. The generation model then receives a local neighborhood that is topically plausible but not answer-bearing.</p>
+<p>This gives a useful picture of a common retrieval failure. The generation model then receives a local neighborhood that is topically plausible but not answer-bearing.</p>
 <p>The oracle one-dimensional kNN in the toy experiment corresponds to a better retrieval metric: one that ignores nuisance variation and emphasizes the feature that matters for the question. In practical RAG systems, the analogues are better chunking, metadata filters, query rewriting, hybrid lexical–dense retrieval, domain-specific embeddings, and rerankers.</p>
 <p>The claim is not that dense embeddings are bad because they are high-dimensional. Learned embeddings are useful precisely because they try to organize semantic structure. The narrower lesson is that retrieval quality depends on alignment between the representation, the similarity measure, and the user’s query.</p>
 <p>This is the retrieval version of the same relevance gap. The correct passage may exist in the corpus, but the metric may rank nearby passages according to the wrong kind of similarity. The retrieved chunks are close in embedding space, but not relevant in the sense needed by the query.</p>
 <h2 id="takeaway">Takeaway</h2>
-<p>Nearest-neighbor methods fail when closeness stops meaning relevance. In the toy model, closeness is corrupted by independent nuisance coordinates. In one-hot tabular data, the story is more subtle: raw ambient dimension is not the whole issue, but fields, scaling, and mismatch variance can still distort Euclidean neighborhoods. In retrieval systems, analogous nuisance variation can make the top-ranked chunks plausible but not answer-bearing.</p>
+<p>Nearest-neighbor methods fail when closeness stops meaning relevance.</p>
+<p>In the Gaussian toy model, independent nuisance coordinates corrupt Euclidean distance. In one-hot tabular data, the relevant quantity is not raw ambient dimension but the effective geometry induced by fields, scaling, and mismatch variance. In retrieval systems, the same failure appears when top-ranked chunks are plausible but not answer-bearing.</p>
 <p>The practical question is the same in all three settings:</p>
 <blockquote>
 <p>Does the retrieval geometry make the right objects close?</p>
