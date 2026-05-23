@@ -7,6 +7,6 @@ Software and reproducible research projects.
 
 ## [cholrot](./cholrot/)
 
-Rank-one Cholesky updates and downdates, direct modified-factor products, and modified Cholesky solves.
+`cholrot` is an alpha-stage scientific Python package for rank-one Cholesky updates, downdates, modified-factor products, and solves, with C++/pybind11 kernels and pure Python fallbacks.
 
 [Project page](./cholrot/) · [GitHub](https://github.com/smiryusupov/cholrot) · [PyPI](https://pypi.org/project/cholrot/) · [Documentation](https://cholrot.readthedocs.io/)
