@@ -18,7 +18,4 @@ Most posts use small diagnostics, examples, and geometric viewpoints to make tho
 
 ## Independence
 
-This is a personal academic site. The views, writing, examples, code, and experiments published here are my own and do not represent my employer.
-
-Material is produced independently, outside work duties, using public sources, publicly available software, and personal resources. It does not contain
-confidential information, client data, internal materials, or non-public employer know-how.
+This site is written independently and uses only public sources, publicly available software, and personal resources. It does not contain confidential information, client data, internal materials, or non-public employer know-how.
