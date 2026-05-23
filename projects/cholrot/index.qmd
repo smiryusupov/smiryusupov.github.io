@@ -1,0 +1,224 @@
+---
+title: "cholrot"
+description: "Rank-one Cholesky updates, downdates, and direct modified-factor products."
+categories: [projects, numerical-linear-algebra, Python, C++]
+execute:
+  freeze: auto
+  warning: false
+  message: false
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-depth: 2
+    anchor-sections: false
+    smooth-scroll: false
+---
+
+**Claim.** `cholrot` provides rank-one Cholesky update/downdate routines and direct modified-factor products without unnecessary matrix materialization.  
+**Status.** Alpha-stage scientific package; Python API with C++/pybind11 kernels and pure Python fallbacks.
+
+Links: [GitHub](https://github.com/smiryusupov/cholrot) · [PyPI](https://pypi.org/project/cholrot/) · [Documentation](https://cholrot.readthedocs.io/) · License: Apache-2.0
+
+```{python}
+#| eval: false
+python -m pip install cholrot
+```
+
+```{python}
+#| eval: false
+import numpy as np
+from cholrot import downdate, matvec, cholsolve
+
+rng = np.random.default_rng(0)
+n = 6
+
+A = rng.normal(size=(n, n))
+A = A.T @ A + n * np.eye(n)
+
+# Upper Cholesky convention: A = R.T @ R
+R = np.linalg.cholesky(A).T
+z = 0.1 * rng.normal(size=n)
+v = rng.normal(size=n)
+
+D = downdate(R, z)          # D.T @ D = R.T @ R - z z.T
+w = matvec(R, z, v)         # same result as D @ v, without forming D
+x = cholsolve(R, z, v)      # solve (A - z z.T) x = v
+```
+
+## Motivation
+
+Suppose $R$ is an upper triangular Cholesky factor,
+
+$$
+A = R^\top R.
+$$
+
+After a rank-one modification,
+
+$$
+A_{\mathrm{new}} = R^\top R + \alpha z z^\top,
+\qquad
+\alpha \in \{+1,-1\},
+$$
+
+one direct route is to form $A_{\mathrm{new}}$, call a dense Cholesky factorization, and then multiply or solve. This can be unnecessary work.
+
+A full dense Cholesky factorization is $O(n^3)$. A rank-one Cholesky update or downdate is $O(n^2)$ for a dense triangular factor, and some structured cases can be cheaper.
+
+The package is not meant to replace LAPACK or MKL Cholesky factorization. It targets workflows where the matrix changes by rank one and the user does not necessarily need to materialize the modified matrix or even the modified Cholesky factor.
+
+## What the package does
+
+For upper triangular factors,
+
+$$
+A = R^\top R,
+$$
+
+`cholrot` computes modified factors $D$ satisfying
+
+$$
+D^\top D = R^\top R + \alpha z z^\top.
+$$
+
+For lower triangular factors,
+
+$$
+A = L L^\top,
+$$
+
+the modified factor satisfies
+
+$$
+D D^\top = L L^\top + \alpha z z^\top.
+$$
+
+Here $\alpha=+1$ is an update and $\alpha=-1$ is a downdate. In a downdate, the modified matrix must remain positive definite.
+
+## Direct modified-factor products
+
+The most useful distinction in `cholrot` is the direct product API. If
+
+$$
+D^\top D = R^\top R - z z^\top,
+$$
+
+then
+
+```{python}
+#| eval: false
+w = matvec(R, z, v)
+```
+
+computes
+
+$$
+w = Dv
+$$
+
+without explicitly constructing $D$.
+
+This is not the same as computing
+
+$$
+(R^\top R - z z^\top)v.
+$$
+
+It is a Cholesky-factor product, not a product with the modified matrix itself.
+
+## Modified Cholesky solves
+
+`cholrot.cholsolve` solves systems of the form
+
+$$
+(A+\alpha z z^\top)x=b,
+$$
+
+where $A$ is represented by a Cholesky factor.
+
+```{python}
+#| eval: false
+from cholrot import cholsolve
+
+x = cholsolve(R, z, b, alpha=-1)
+```
+
+## Algorithms
+
+The package includes hyperbolic-rotation based update and downdate routines, including HY-style and Chambers-style formulations.
+
+For an upper triangular downdate,
+
+$$
+D^\top D = R^\top R - z z^\top,
+$$
+
+the basic identity is
+
+$$
+\begin{bmatrix} R^\top & z \end{bmatrix}
+\begin{pmatrix}
+I_n & 0 \\
+0 & -1
+\end{pmatrix}
+\begin{bmatrix}
+R \\
+z^\top
+\end{bmatrix}
+=
+R^\top R - z z^\top.
+$$
+
+The downdate uses transformations preserving this indefinite inner product. These transformations are hyperbolic analogues of orthogonal rotations.
+
+## Benchmarks
+
+The main scaling distinction is simple:
+
+- full Cholesky recomputation is $O(n^3)$;
+- rank-one update/downdate is $O(n^2)$ for a dense triangular factor;
+- direct factor-vector products can avoid materializing the modified factor;
+- structured cases such as $D D^\top = I+\alpha z z^\top$ can avoid dense triangular work altogether.
+
+The intended conclusion is not that `cholrot` always beats highly optimized dense Cholesky factorization. On moderate sizes, multithreaded LAPACK or MKL can be very competitive.
+
+The narrower point is:
+
+> avoiding unnecessary work can dominate parallelizing unnecessary work.
+
+For fair local benchmarking, report hardware, operating system, Python version, NumPy version, BLAS/LAPACK thread settings, and `cholrot.backend()`.
+
+```{bash}
+#| eval: false
+python benchmarks/bench_rank1.py --sizes 100 200 400 800 1600 3200 --repeat 5
+python benchmarks/bench_identity.py --sizes 100 200 400 800 1600 3200 6400 --repeat 5
+```
+
+## Development status
+
+`cholrot` is an alpha-stage scientific package. The public release focuses on:
+
+- rank-one Cholesky update/downdate;
+- hyperbolic-rotation based methods;
+- direct modified-factor products;
+- modified Cholesky solves;
+- Python API with C++/pybind11 kernels;
+- pure Python fallback implementations;
+- cross-platform wheels for Python 3.12+.
+
+The algorithms are known numerical linear algebra methods. The package contribution is the implementation, testing, packaging, and API focus on operations that avoid unnecessary materialization.
+
+## References
+
+J. M. Chambers. “Regression Updating.” *Journal of the American Statistical Association* 66(336), 1971.
+
+M. Seeger. “Low Rank Updates for the Cholesky Decomposition.”
+
+LINPACK Cholesky update/downdate routines, including `DCHUD` and `DCHDD`.
+
+MATLAB `cholupdate` documentation.
+
+JAX `jax.lax.linalg.cholesky_update` documentation.
+
+TensorFlow Probability `tfp.math.cholesky_update` documentation.
