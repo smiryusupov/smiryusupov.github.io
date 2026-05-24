@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/blog/posts/prokhorov_continuity_ml/index.html",
       "/blog/posts/linear_readability_bottleneck/index.html",
       "/blog/posts/wasserstein-wrong-geometry/index.html",
       "/blog/posts/power_function_not_error_bar/index.html",
@@ -17,6 +18,7 @@
   {
     "listing": "/blog/index.html",
     "items": [
+      "/blog/posts/prokhorov_continuity_ml/index.html",
       "/blog/posts/linear_readability_bottleneck/index.html",
       "/blog/posts/wasserstein-wrong-geometry/index.html",
       "/blog/posts/power_function_not_error_bar/index.html",
