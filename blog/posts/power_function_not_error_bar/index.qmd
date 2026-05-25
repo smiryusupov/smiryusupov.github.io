@@ -54,9 +54,6 @@ table.dataframe td:first-child {
 }
 </style>
 
-
-*Research note; not peer reviewed. The power-function bound is a standard fact from kernel approximation theory; the experiments below are small diagnostics about why its direct use as a pointwise ML error bar can become vacuous.*
-
 A recurring trap in kernel methods is that a computable geometric quantity can look like an uncertainty estimate.
 
 The power function is such a quantity. It is mathematically meaningful: it measures how well the design points constrain evaluation at a new location, relative to a chosen kernel. But the usual pointwise error bound has a hidden constant:
