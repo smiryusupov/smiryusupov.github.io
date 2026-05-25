@@ -47,275 +47,123 @@ format:
 }
 </style>
 
-**Claim.** Conformal calibration supplies marginal validity; the score supplies the geometry of the prediction set.  
-**Scope.** Standard split-conformal validity; experiments illustrating efficiency and local behavior.
+Conformal prediction has a clean promise: if the calibration and test examples are exchangeable, a split conformal prediction set has finite-sample marginal coverage. The model used to build the score can be wrong. The likelihood can be misspecified. The geometry can be only approximate.
 
-## Preface
+That guarantee I don't want to disturb. The question here is different: if conformal validity is model-free, where can model geometry matter?
 
-Conformal prediction has a clean promise. If the calibration and test examples are exchangeable, then a split conformal prediction set has finite-sample marginal coverage. The model used to build the score can be wrong. The likelihood can be misspecified. The geometry can be only approximate.
+The answer is through the nonconformity score. Geometry doesn't prove coverage — it changes efficiency. Exchangeability gives validity; score geometry affects how small the prediction sets are.
 
-That is the part I do not want to disturb. The question in this note is different:
+## Validity comes from exchangeability
 
-> If conformal validity is model-free, where can model geometry matter?
+Let $Z_i = (X_i, Y_i)$, $i = 1,\ldots,n+1$, be exchangeable observations, and let $S: \mathcal{X} \times \mathcal{Y} \to \mathbb{R}$ be any measurable nonconformity score. On a calibration set, define $R_i = S(X_i, Y_i)$. For target miscoverage $\alpha$, use the conformal quantile
 
-My answer is:
+$$\hat{q} = R_{\left(\lceil (n_{\mathrm{cal}}+1)(1-\alpha) \rceil\right)}.$$
 
-> Geometry enters through the nonconformity score. It does not prove coverage. It changes efficiency.
+The split conformal set is $C_\alpha(x) = \{y : S(x,y) \le \hat{q}\}$, and
 
-So the slogan is
+$$\mathbb{P}\{Y_{n+1} \in C_\alpha(X_{n+1})\} \ge 1 - \alpha.$$
 
-$$
-\boxed{\text{exchangeability gives validity; score geometry affects efficiency.}}
-$$
+The key word is *any* — after the score has been fixed. In split conformal, the score is fitted on a separate training split and treated as fixed when calibration and test scores are compared. The score can come from a random forest, a kernel method, a neural network, a quantile model, or a density model. Conditional on the fitted score, if the calibration and test examples are exchangeable, the marginal guarantee remains.
 
-This note is a small experiment around that slogan. The goal is not to introduce a new conformal method, but to separate two things that are easy to mix together: the validity mechanism and the shape induced by the score. Conformal calibration gives the first. The score gives the second.
+This is why geometry isn't a new validity proof for conformal prediction. The validity proof is already there. The role of geometry is narrower: a geometric score may rank candidate labels better, which can mean shorter intervals, smaller sets, or better conditional behavior — but it's not what makes the method valid.
 
-## Part I: Validity comes from exchangeability
+## The score defines the geometry
 
-Let
+The simplest regression score is $S_{\mathrm{abs}}(x,y) = |y - \hat\mu(x)|$, which creates a global residual interval
 
-$$
-Z_i=(X_i,Y_i), \qquad i=1,\ldots,n+1,
-$$
+$$C_\alpha(x) = [\hat\mu(x) - \hat{q},\; \hat\mu(x) + \hat{q}].$$
 
-be exchangeable observations, and let
-
-$$
-S:\mathcal X\times\mathcal Y\to\mathbb R
-$$
-
-be any measurable nonconformity score. On a calibration set, define
-
-$$
-R_i=S(X_i,Y_i).
-$$
-
-For target miscoverage $\alpha$, use the conformal quantile
-
-$$
-\widehat q
-=
-R_{\left(\lceil (n_{\mathrm{cal}}+1)(1-\alpha)\rceil\right)}.
-$$
-
-The split conformal set is
-
-$$
-C_\alpha(x)=\{y:S(x,y)\le \widehat q\}.
-$$
-
-Then
-
-$$
-\mathbb P\{Y_{n+1}\in C_\alpha(X_{n+1})\}\ge 1-\alpha.
-$$
-
-The important word is *any*, after the score has been fixed. In split conformal, the model or score is fitted on a separate training split, and then treated as fixed when calibration and test scores are compared. The score can come from a random forest, a kernel method, a neural network, a quantile model, or a density model. Conditional on the fitted score, if the calibration and test examples are exchangeable, the marginal guarantee remains.
-
-This is why I do not view information geometry as a new validity proof for conformal prediction. The validity proof is already there. The role of geometry is narrower: a geometric score may rank candidate labels better. Better ranking can mean shorter intervals, smaller sets, or better conditional behavior. But it is not what makes the method valid.
-
-## Part II: The score defines the geometry
-
-The simplest regression score is
-
-$$
-S_{\mathrm{abs}}(x,y)=|y-\widehat\mu(x)|.
-$$
-
-It creates a global residual interval,
-
-$$
-C_\alpha(x)
-=
-[\widehat\mu(x)-\widehat q,\widehat\mu(x)+\widehat q].
-$$
-
-This is a reasonable geometry when the conditional noise is roughly symmetric and has the same scale everywhere. When the noise scale changes with $x$, a global residual threshold tends to be too wide in easy regions and too narrow in hard regions. Marginal coverage can still be right, because the errors average out.
+This is reasonable when conditional noise is roughly symmetric and has the same scale everywhere. When the noise scale changes with $x$, a global threshold tends to be too wide in easy regions and too narrow in hard ones. Marginal coverage can still be right, because the errors average out — but the sets are wasteful.
 
 A local-scale score changes the ruler:
 
-$$
-S_{\mathrm{loc}}(x,y)
-=
-\frac{|y-\widehat\mu(x)|}{\widehat\sigma(x)}.
-$$
+$$S_{\mathrm{loc}}(x,y) = \frac{|y - \hat\mu(x)|}{\hat\sigma(x)},$$
 
-The resulting interval is
+giving intervals $[\hat\mu(x) - \hat{q}\hat\sigma(x),\; \hat\mu(x) + \hat{q}\hat\sigma(x)]$. This is a one-dimensional Mahalanobis idea — the local ruler is $g(x) \approx 1/\hat\sigma^2(x)$. In a Gaussian conditional model, $Y \mid X = x \sim N(\mu(x), \sigma^2(x))$, the negative log-likelihood contains $(y - \mu(x))^2 / 2\sigma^2(x)$, so local normalization measures residual size in the local uncertainty units of the model. Conformal calibration doesn't care whether the Gaussian story is true. It only uses the resulting ranks.
 
-$$
-C_\alpha(x)
-=
-[
-\widehat\mu(x)-\widehat q\widehat\sigma(x),
-\widehat\mu(x)+\widehat q\widehat\sigma(x)
-].
-$$
+Conformalized quantile regression uses lower and upper quantile models $\hat{q}_\ell(x)$, $\hat{q}_u(x)$, with score
 
-This is a one-dimensional Mahalanobis idea. The local ruler is
+$$S_{\mathrm{CQR}}(x,y) = \max\{\hat{q}_\ell(x) - y,\; y - \hat{q}_u(x)\},$$
 
-$$
-g(x)\approx \frac{1}{\widehat\sigma^2(x)}.
-$$
+giving intervals that aren't forced to be symmetric around a mean. For multimodal data, even quantile intervals can be the wrong shape — if two separated labels are plausible and the middle isn't, a single interval wastes volume. A density score
 
-In a Gaussian conditional model,
+$$S_{\mathrm{dens}}(x,y) = -\log \hat{p}(y \mid x)$$
 
-$$
-Y\mid X=x\sim N(\mu(x),\sigma^2(x)),
-$$
+gives the set $C_\alpha(x) = \{y : \hat{p}(y \mid x) \ge e^{-\hat{q}}\}$, which can be disconnected. That's the right geometry for multimodal conditional laws.
 
-the negative log-likelihood contains
+## Geometry has to be estimated
 
-$$
-\frac{(y-\mu(x))^2}{2\sigma^2(x)}.
-$$
+A local metric helps only if it's estimated stably. If $\hat\sigma(x)$ is too small on some calibration points, then $|y - \hat\mu(x)| / \hat\sigma(x)$ can blow up, the conformal quantile can become enormous, and the final intervals can explode.
 
-So local normalization measures residual size in the local uncertainty units of the model. The conformal step does not care whether the Gaussian story is true. It only uses the resulting ranks. But the efficiency can care a lot.
+To make this failure mode visible, I use stabilized local scales
 
-There are other geometries. Conformalized quantile regression uses lower and upper quantile models,
+$$\tilde\sigma(x) = \operatorname{clip}(\hat\sigma(x), s_{\min}, s_{\max}) + \lambda,$$
 
-$$
-\widehat q_\ell(x),\qquad \widehat q_u(x),
-$$
+and a local/global blend
 
-with score
+$$\tilde\sigma_\gamma(x) = (1-\gamma)\tilde\sigma_{\mathrm{local}}(x) + \gamma\tilde\sigma_{\mathrm{global}}.$$
 
-$$
-S_{\mathrm{CQR}}(x,y)
-=
-\max\{\widehat q_\ell(x)-y,\;y-\widehat q_u(x)\}.
-$$
+Here $\gamma = 0$ keeps the score fully local, $\gamma = 1$ moves it back toward a global residual scale. Think of $\gamma$ as a trust parameter: how much estimated local geometry should be allowed into the score?
 
-The resulting interval is no longer forced to be symmetric around a mean. For multimodal data, even quantile intervals can be the wrong shape: if two separated labels are plausible and the middle is implausible, a single interval wastes volume. A density score,
+## The experiment
 
-$$
-S_{\mathrm{dens}}(x,y)=-\log \widehat p(y\mid x),
-$$
-
-instead gives the set
-
-$$
-C_\alpha(x)=\{y:\widehat p(y\mid x)\ge e^{-\widehat q}\},
-$$
-
-which can be disconnected. That is the right geometry for multimodal conditional laws.
-
-## Part III: Geometry has to be estimated
-
-A local metric can help only if it is estimated stably. If $\widehat\sigma(x)$ is too small on some calibration points, then
-
-$$
-\frac{|y-\widehat\mu(x)|}{\widehat\sigma(x)}
-$$
-
-can become huge. The conformal quantile then becomes huge, and the final intervals can explode.
-
-To make this failure mode visible, I use stabilized local scales,
-
-$$
-\widetilde\sigma(x)
-=
-\operatorname{clip}(\widehat\sigma(x),s_{\min},s_{\max})+\lambda,
-$$
-
-and a local/global blend,
-
-$$
-\widetilde\sigma_\gamma(x)
-=
-(1-\gamma)\widetilde\sigma_{\mathrm{local}}(x)
-+
-\gamma\widetilde\sigma_{\mathrm{global}}.
-$$
-
-Here $\gamma=0$ keeps the score fully local, while $\gamma=1$ moves it back toward a global residual scale. The tuning parameter is a trust parameter: how much estimated local geometry should be allowed into the score?
-
-## Part IV: The experiment
-
-I use synthetic regression data with mean
-
-$$
-\mu(x)=\sin(2\pi x_1)+\frac12 x_1.
-$$
-
-The settings are deliberately simple.
+Synthetic regression data with mean $\mu(x) = \sin(2\pi x_1) + \frac{1}{2}x_1$, five settings:
 
 ::: {.wide-table}
 
 | Setting | Data-generating idea | What it tests |
 |---|---|---|
-| Homoskedastic | $Y=\mu(X)+0.25\varepsilon$, $\varepsilon\sim N(0,1)$ | no local scale structure |
-| Heteroskedastic | $Y=\mu(X)+\sigma(X)\varepsilon$, $\sigma(x)=0.10+0.80|x_1|$ | local scale geometry |
-| Heavy-tailed | $\varepsilon\sim t_3/\sqrt3$ | robustness |
-| Skewed | $\varepsilon\sim \mathrm{Exponential}(1)-1$ | asymmetric errors |
-| Multimodal | $Y=\mu(X)+0.8B+\sigma(X)\varepsilon$, $B\in\{-1,+1\}$ | disconnected conditional structure |
+| Homoskedastic | $Y = \mu(X) + 0.25\varepsilon$, $\varepsilon \sim N(0,1)$ | no local scale structure |
+| Heteroskedastic | $Y = \mu(X) + \sigma(X)\varepsilon$, $\sigma(x) = 0.10 + 0.80|x_1|$ | local scale geometry |
+| Heavy-tailed | $\varepsilon \sim t_3/\sqrt{3}$ | robustness |
+| Skewed | $\varepsilon \sim \mathrm{Exponential}(1) - 1$ | asymmetric errors |
+| Multimodal | $Y = \mu(X) + 0.8B + \sigma(X)\varepsilon$, $B \in \{-1,+1\}$ | disconnected conditional structure |
 
 :::
 
-The experiment is ordinary split conformal: split the data into train, calibration, and test sets; fit a model on the training set; build one or more scores; compute the conformal quantile on calibration scores; and evaluate coverage and set length on the test set.
+Ordinary split conformal throughout: split into train, calibration, and test; fit a model on training; build one or more scores; compute conformal quantile on calibration scores; evaluate coverage and set length on test. The score changes. The calibration logic doesn't.
 
-The score changes. The calibration logic does not.
+Four model families: random forests, kernel ridge regression, MLPs, and GBRT-based conformalized quantile regression.
 
-The code lives in `ig_conformal.py`. I ran the full benchmark separately and report the saved summaries below. The benchmark uses four model families: random forests, kernel ridge regression, MLPs, and GBRT-based conformalized quantile regression.
+## Results
 
-## Part V: What happened
+Coverage stays near 90% for most methods — that's the conformal part. Average length changes a lot. That's the score-geometry part.
 
-The results match the small claim. Coverage stays near $90\%$ for most methods. That is the conformal part. The average length changes a lot. That is the score-geometry part.
-
-### Heteroskedastic data
-
-This is the clearest positive case for local geometry.
+**Heteroskedastic data** is the clearest positive case for local geometry.
 
 ::: {.wide-table}
 
 | model | baseline len. | geometric score | geometric len. | reduction | baseline cond. err. | geometric cond. err. |
-|---|---:|---|---:|---:|---:|---:|
+|---|---|---|---|---|---|---|
 | GBRT-CQR | 1.904 | conformalized quantile regression | 1.697 | 10.9% | 0.088 | 0.026 |
-| KRR | 2.579 | blended normalized residual, $\gamma=0.75$ | 2.683 | -4.0% | 0.080 | 0.069 |
+| KRR | 2.579 | blended normalized residual, $\gamma=0.75$ | 2.683 | −4.0% | 0.080 | 0.069 |
 | MLP | 1.988 | stabilized normalized residual | 1.784 | 10.3% | 0.096 | 0.038 |
 | RF | 1.950 | blended normalized residual, $\gamma=0.25$ | 1.676 | 14.1% | 0.086 | 0.047 |
 
 :::
 
-For random forests, the average length drops from about $1.95$ to $1.68$. For MLPs, it drops from about $1.99$ to $1.78$. For GBRT-CQR, it drops from about $1.90$ to $1.70$. The conditional coverage diagnostics also improve.
+Random forests: length drops from 1.95 to 1.68. MLPs: 1.99 to 1.78. GBRT-CQR: 1.90 to 1.70. Conditional coverage diagnostics also improve.
 
-Kernel ridge regression is the warning. In this run, even the best blended geometry is slightly longer than the global residual baseline. In more aggressive local-normalization variants, the intervals can become enormous because the estimated scale is unstable. That is not a conformal failure. Coverage is still protected. It is a score failure.
+Kernel ridge regression is the warning. In this run, even the best blended geometry is slightly longer than the global residual baseline. In more aggressive local-normalization variants, intervals can become enormous because the estimated scale is unstable. That's not a conformal failure — coverage is still protected. It's a score failure. Use only as much geometry as you can estimate stably.
 
-The practical lesson is:
+**Homoskedastic data** is a useful sanity check. The simple residual score is hard to beat; for random forests, the absolute residual interval has average length about 0.856, and oracle local normalization gives essentially the same number. Local geometry has nothing useful to learn when there's no local scale structure.
 
-> use only as much geometry as you can estimate stably.
+**Heavy-tailed and skewed cases** are mixed but informative. Blended local-scale scores give modest gains for RF and MLP in the heavy-tailed setting and often improve conditional balance. In the skewed setting, RF and MLP blended scores work well, while CQR improves conditional balance but isn't uniformly shorter in this run. More flexible geometry isn't automatically better — it helps only when the fitted score ranks labels well.
 
-### Homoskedastic, heavy-tailed, and skewed data
+## The multimodal case
 
-The homoskedastic case is a useful sanity check. The simple residual score is hard to beat; for random forests, the absolute residual interval has average length about $0.856$, and the oracle local normalization gives essentially the same number. Local geometry has nothing useful to learn.
+The multimodal setting is the clearest example. Interval methods have the wrong shape: they must cover the space between modes even when the middle isn't very plausible.
 
-The heavy-tailed and skewed cases are mixed but informative. Blended local-scale scores give modest gains for RF and MLP in the heavy-tailed setting and often improve conditional balance. In the skewed setting, RF and MLP blended scores work well, while CQR improves conditional balance but is not uniformly shorter in this particular run. More flexible geometry is not automatically better. It helps only when the fitted score ranks labels well.
+I fit a simple two-mode conditional density model
 
-## Part VI: The multimodal case
+$$\hat{p}(y \mid x) = \hat\pi(x)\,\mathcal{N}(y;\hat\mu_+(x),\hat\sigma_+^2) + (1-\hat\pi(x))\,\mathcal{N}(y;\hat\mu_-(x),\hat\sigma_-^2),$$
 
-The multimodal setting is the cleanest example. Interval methods have the wrong shape: they must cover the space between modes even when the middle is not very plausible.
-
-The conditional density score uses
-
-$$
-S(x,y)=-\log \widehat p(y\mid x).
-$$
-
-I fit a simple two-mode conditional density model,
-
-$$
-\widehat p(y\mid x)
-=
-\widehat\pi(x)\mathcal N(y;\widehat\mu_+(x),\widehat\sigma_+^2)
-+
-(1-\widehat\pi(x))\mathcal N(y;\widehat\mu_-(x),\widehat\sigma_-^2).
-$$
-
-This is not meant to be a state-of-the-art density estimator. It is just expressive enough to test the geometry. The density-level-set conformal method gives average length about $1.82$ with coverage about $0.904$.
+not as a state-of-the-art density estimator, but just expressive enough to test the geometry. The density-level-set conformal method gives average length about 1.82 with coverage about 0.904.
 
 ::: {.wide-table}
 
 | baseline family | interval baseline len. | density-set len. | reduction |
-|---|---:|---:|---:|
+|---|---|---|---|
 | GBRT-CQR | 2.345 | 1.820 | 22.4% |
 | KRR | 3.803 | 1.820 | 52.1% |
 | MLP | 2.691 | 1.820 | 32.4% |
@@ -323,22 +171,18 @@ This is not meant to be a state-of-the-art density estimator. It is just express
 
 :::
 
-This is the main idea in its most visible form:
+Once the score geometry matches the conditional law, conformal sets become much more efficient.
 
-> once the score geometry matches the conditional law, conformal sets become much more efficient.
+## Diagnostics should match the geometry
 
-## Part VII: Diagnostics should match the geometry
-
-At first, the density method looked less locally balanced when I binned by $\sigma(x)$. The mean conditional error was about $0.0757$. But $\sigma(x)$ is not the right diagnostic for a mixture score. The score models mode structure.
-
-So I also bin by mixture-specific quantities: the estimated upper-mode probability $\widehat\pi(x)$, its entropy $H(\widehat\pi(x))$, the mode margin $|\widehat\pi(x)-0.5|$, and the mode separation $|\widehat\mu_+(x)-\widehat\mu_-(x)|$.
+At first, the density method looked less locally balanced when I binned by $\sigma(x)$. But $\sigma(x)$ isn't the right diagnostic for a mixture score — the score models mode structure, not local scale. Binning instead by mixture-specific quantities:
 
 ::: {.wide-table}
 
 | diagnostic | mean conditional error |
-|---|---:|
+|---|---|
 | $\sigma(x)$ bins | 0.0757 |
-| $\widehat\pi(x)$ bins | 0.0232 |
+| $\hat\pi(x)$ bins | 0.0232 |
 | mode entropy bins | 0.0240 |
 | mode margin bins | 0.0240 |
 | mode separation bins | 0.0248 |
@@ -349,91 +193,33 @@ The earlier diagnostic was partly asking the wrong question. If the score models
 
 ## Takeaway
 
-Conformal calibration and score geometry do different jobs.
+Conformal calibration and score geometry do different jobs. Calibration supplies marginal validity. The score determines which candidate labels look plausible, and therefore determines the shape and efficiency of the prediction set.
 
-Calibration supplies marginal validity. The score determines which candidate labels look plausible, and therefore determines the shape and efficiency of the prediction set.
+Efficiency depends on whether the score ranks candidate labels according to the actual conditional structure of $Y$ given $X$. A rough taxonomy: flat noise calls for a residual score, heteroskedasticity for a local scale score, varying quantiles for CQR, multimodality for a density-level-set score. The conformal layer is the safety net — it turns model-dependent scores into marginally valid prediction sets, but it doesn't make all scores equally good.
 
-Efficiency depends on whether the score ranks candidate labels according to the actual conditional structure of $Y$ given $X$. A well-matched score can shorten the conformal set; a poorly matched one can preserve coverage while wasting volume.
+---
 
-A simple taxonomy is:
+## Appendix
 
-$$
-\boxed{\text{flat noise} \Rightarrow \text{residual score}}
-$$
+### Why monotone score transforms didn't matter
 
-$$
-\boxed{\text{heteroskedasticity} \Rightarrow \text{local scale score}}
-$$
-
-$$
-\boxed{\text{varying quantiles} \Rightarrow \text{CQR}}
-$$
-
-$$
-\boxed{\text{multimodality} \Rightarrow \text{density-level-set score}.}
-$$
-
-The conformal layer is the safety net. It turns model-dependent scores into marginally valid prediction sets. But it does not make all scores equally good.
-
-## Technical appendix
-
-### Why monotone score transforms did not matter
-
-I initially tried Student-$t$ and Huber versions of normalized residual scores. In scalar symmetric regression, these are mostly rank-equivalent to normalized absolute residuals. For example,
-
-$$
-\log\left(1+\frac{r^2}{\nu}\right)
-$$
-
-is monotone in $|r|$, and the Huber loss is also monotone in $|r|$. Since conformal prediction is rank-based, these transformations do not change the prediction set if they use the same scale. They may be useful diagnostics, but they do not create a new scalar interval geometry.
+I tried Student-$t$ and Huber versions of normalized residual scores. In scalar symmetric regression, these are mostly rank-equivalent to normalized absolute residuals — $\log(1 + r^2/\nu)$ is monotone in $|r|$, and the Huber loss is also monotone in $|r|$. Since conformal prediction is rank-based, these transforms don't change the prediction set if they use the same scale.
 
 ### What density-set length means
 
-For density-level-set conformal prediction in one-dimensional regression, I approximate
-
-$$
-|C_\alpha(x)|
-$$
-
-on a grid. The accepted grid points are those satisfying
-
-$$
--\log \widehat p(y\mid x)\le \widehat q.
-$$
-
-If the density has two separated modes, the accepted grid points can form two disconnected intervals. The reported length is the total grid length of the accepted region.
+For density-level-set conformal prediction in one-dimensional regression, I approximate $|C_\alpha(x)|$ on a grid. Accepted grid points are those satisfying $-\log \hat{p}(y \mid x) \le \hat{q}$. If the density has two separated modes, the accepted grid points can form two disconnected intervals. The reported length is the total grid length of the accepted region.
 
 ### A classification analogue
 
-The same idea has a classification analogue. For a neural classifier, ordinary conformal scores use softmax probabilities,
+For a neural classifier, ordinary conformal scores use softmax probabilities, $S(x,y) = 1 - \hat{p}_\theta(y \mid x)$, or cumulative-probability rankings. A more geometric score could use the penultimate-layer representation $\phi_\theta(x)$, fitting class centers $m_y$ and covariances $\Sigma_y$, then
 
-$$
-S(x,y)=1-\widehat p_\theta(y\mid x),
-$$
+$$S(x,y) = (\phi_\theta(x) - m_y)^\top \Sigma_y^{-1} (\phi_\theta(x) - m_y).$$
 
-or cumulative-probability rankings. A more geometric score could use the penultimate-layer representation $\phi_\theta(x)$. For class $y$, fit a class center $m_y$ and covariance $\Sigma_y$, then use
+The network supplies the geometry. Conformal calibration supplies the validity.
 
-$$
-S(x,y)
-=
-(\phi_\theta(x)-m_y)^\top
-\Sigma_y^{-1}
-(\phi_\theta(x)-m_y).
-$$
+### What is and isn't proved here
 
-This is the classification analogue of local metric scores in regression. The network supplies the geometry. Conformal calibration supplies the validity.
-
-### What is, and is not, proved here
-
-The coverage statements used above are the standard split-conformal ones. The new part is empirical and conceptual: different score geometries induce different set shapes and efficiencies.
-
-A formal theorem would need to control excess set size, for example
-
-$$
-\mathbb E|C_\alpha(X)|-\mathbb E|C_\alpha^*(X)|,
-$$
-
-in terms of score-ranking error, density-estimation error, or metric-estimation error. That is not proved here.
+The coverage statements are standard split-conformal ones. The new part is empirical and conceptual: different score geometries induce different set shapes and efficiencies. A formal theorem would need to control excess set size — something like $\mathbb{E}|C_\alpha(X)| - \mathbb{E}|C_\alpha^*(X)|$ in terms of score-ranking error, density-estimation error, or metric-estimation error. That's not proved here.
 
 ### Reproducing the benchmark
 
@@ -441,13 +227,7 @@ The full benchmark can be regenerated from `ig_conformal.py`:
 
 ```python
 raw, summary = ig.run_grid(
-    settings=[
-        "homoskedastic",
-        "heteroskedastic",
-        "heavy_tail",
-        "skewed",
-        "multimodal",
-    ],
+    settings=["homoskedastic", "heteroskedastic", "heavy_tail", "skewed", "multimodal"],
     model_families=["rf", "krr", "mlp", "cqr_gbrt"],
     n=6000,
     d=5,
@@ -461,27 +241,26 @@ compact = ig.summarize_geometry_effect(summary)
 compact.to_csv("ig_conformal_geometry_effect.csv", index=False)
 
 multimodal_diag = ig.summarize_multimodal_density_diagnostics(summary)
-multimodal_diag.to_csv(
-    "ig_conformal_multimodal_density_diagnostics.csv",
-    index=False,
-)
+multimodal_diag.to_csv("ig_conformal_multimodal_density_diagnostics.csv", index=False)
 ```
+
+---
 
 ## References
 
 Vladimir Vovk, Alexander Gammerman, and Glenn Shafer. *Algorithmic Learning in a Random World*. Springer, 2005.
 
-Glenn Shafer and Vladimir Vovk. “A Tutorial on Conformal Prediction.” *Journal of Machine Learning Research* 9, 371–421, 2008.
+Glenn Shafer and Vladimir Vovk. "A Tutorial on Conformal Prediction." *Journal of Machine Learning Research* 9, 2008.
 
-Jing Lei, Max G’Sell, Alessandro Rinaldo, Ryan J. Tibshirani, and Larry Wasserman. “Distribution-Free Predictive Inference for Regression.” *Journal of the American Statistical Association* 113(523), 1094–1111, 2018.
+Jing Lei, Max G'Sell, Alessandro Rinaldo, Ryan J. Tibshirani, and Larry Wasserman. "Distribution-Free Predictive Inference for Regression." *Journal of the American Statistical Association* 113(523), 2018.
 
-Yaniv Romano, Evan Patterson, and Emmanuel Candès. “Conformalized Quantile Regression.” *NeurIPS*, 2019.
+Yaniv Romano, Evan Patterson, and Emmanuel Candès. "Conformalized Quantile Regression." *NeurIPS*, 2019.
 
-Anastasios Angelopoulos and Stephen Bates. “A Gentle Introduction to Conformal Prediction and Distribution-Free Uncertainty Quantification.” arXiv:2107.07511, 2021.
+Anastasios Angelopoulos and Stephen Bates. "A Gentle Introduction to Conformal Prediction and Distribution-Free Uncertainty Quantification." arXiv:2107.07511, 2021.
 
-Rob Hyndman. “Computing and Graphing Highest Density Regions.” *The American Statistician* 50(2), 120–126, 1996.
+Rob Hyndman. "Computing and Graphing Highest Density Regions." *The American Statistician* 50(2), 1996.
 
-Rafael Izbicki, Gilson Shimizu, and Rafael Stern. “Flexible Distribution-Free Conditional Predictive Bands using Density Estimators.” *AISTATS*, 2020.
+Rafael Izbicki, Gilson Shimizu, and Rafael Stern. "Flexible Distribution-Free Conditional Predictive Bands using Density Estimators." *AISTATS*, 2020.
 
 Shun-ichi Amari. *Information Geometry and Its Applications*. Springer, 2016.
 

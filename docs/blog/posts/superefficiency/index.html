@@ -141,14 +141,13 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#preface" id="toc-preface">Preface</a></li>
-  <li><a href="#part-i-fixed-shrinkage" id="toc-part-i-fixed-shrinkage">Part I: Fixed shrinkage</a></li>
-  <li><a href="#part-ii-the-jamesstein-surprise" id="toc-part-ii-the-jamesstein-surprise">Part II: The James–Stein surprise</a></li>
-  <li><a href="#part-iii-geometry-noise-has-length" id="toc-part-iii-geometry-noise-has-length">Part III: Geometry: noise has length</a></li>
-  <li><a href="#part-iv-a-small-ml-analogue" id="toc-part-iv-a-small-ml-analogue">Part IV: A small ML analogue</a></li>
-  <li><a href="#part-v-super-efficiency-at-the-shrinkage-target" id="toc-part-v-super-efficiency-at-the-shrinkage-target">Part V: Super-efficiency at the shrinkage target</a></li>
+  <li><a href="#fixed-shrinkage" id="toc-fixed-shrinkage">Fixed shrinkage</a></li>
+  <li><a href="#the-jamesstein-surprise" id="toc-the-jamesstein-surprise">The James–Stein surprise</a></li>
+  <li><a href="#geometry-noise-has-length" id="toc-geometry-noise-has-length">Geometry: noise has length</a></li>
+  <li><a href="#a-small-ml-analogue" id="toc-a-small-ml-analogue">A small ML analogue</a></li>
+  <li><a href="#super-efficiency-at-the-shrinkage-target" id="toc-super-efficiency-at-the-shrinkage-target">Super-efficiency at the shrinkage target</a></li>
   <li><a href="#takeaway" id="toc-takeaway">Takeaway</a></li>
-  <li><a href="#technical-appendix" id="toc-technical-appendix">Technical appendix</a></li>
+  <li><a href="#appendix" id="toc-appendix">Appendix</a></li>
   <li><a href="#references" id="toc-references">References</a></li>
   <li><a href="#suggested-citation" id="toc-suggested-citation">Suggested citation</a></li>
   </ul>
@@ -172,86 +171,28 @@ window.Quarto = {
   margin-right: auto;
 }
 </style>
-<p><strong>Claim.</strong> In high dimension, unbiasedness can waste noise length; shrinkage can reduce risk by spending a little bias.<br>
-<strong>Scope.</strong> Classical James–Stein facts; simulations and geometry for intuition.</p>
-<h2 id="preface">Preface</h2>
-<p>This note continues the same theme as the note on Firth’s adjustment: bias is not always a disease.</p>
-<blockquote>
-<p>Used carelessly, bias distorts.</p>
-</blockquote>
-<blockquote>
-<p>Used deliberately, with an understanding of the geometry, it can be a remedy.</p>
-</blockquote>
-<p>The setting is the Gaussian normal-means problem</p>
+<p>This note continues the theme from the Firth adjustment note: bias is not always a disease. Used carelessly it distorts; used deliberately, with an understanding of the geometry, it can be a remedy.</p>
+<p>The setting is the Gaussian normal-means problem <span class="math inline">X \sim N_d(\theta, I_d)</span>, <span class="math inline">\theta \in \mathbb{R}^d</span>. The usual estimator is <span class="math inline">\hat\theta_{\mathrm{MLE}}(X) = X</span>. It is unbiased, and its squared-error risk is</p>
 <p><span class="math display">
-X \sim N_d(\theta,I_d),
-\qquad
-\theta\in\mathbb R^d.
+R(\theta, \hat\theta_{\mathrm{MLE}}) = \mathbb{E}_\theta \|X - \theta\|^2 = d.
 </span></p>
-<p>The usual estimator is</p>
+<p>At first sight this looks hard to improve. The estimator is honest coordinate by coordinate: it adds nothing, removes nothing, and has constant risk. But in dimension at least three, this honesty is not optimal.</p>
+<p>James and Stein showed that shrinking <span class="math inline">X</span> toward the origin gives smaller total squared-error risk for every value of <span class="math inline">\theta</span>. The estimator becomes biased, but the reduction in variance more than pays for the bias. In high dimension, noise has length. The estimator <span class="math inline">X</span> treats all of that length as signal. Shrinkage deliberately gives up unbiasedness to remove part of the noise length.</p>
+<p>There is also a philosophical point here. Classical statistics often treats unbiasedness as a kind of cleanliness condition. The James–Stein phenomenon shows that this is too narrow. Under squared-error loss, risk is the relevant object, and risk contains both bias and variance. A small, structured bias can be better than a large variance.</p>
+<h2 id="fixed-shrinkage">Fixed shrinkage</h2>
+<p>Before James–Stein, consider the simpler rule <span class="math inline">\delta_a(X) = aX</span> for <span class="math inline">0 \le a \le 1</span>. With <span class="math inline">X = \theta + \varepsilon</span>, <span class="math inline">\mathbb{E}[\varepsilon] = 0</span>, and <span class="math inline">\operatorname{Cov}(\varepsilon) = \sigma^2 I_d</span>,</p>
 <p><span class="math display">
-\hat\theta_{\mathrm{MLE}}(X)=X.
+\delta_a(X) - \theta = (a-1)\theta + a\varepsilon,
 </span></p>
-<p>It is unbiased, and its squared-error risk is</p>
+<p>so</p>
 <p><span class="math display">
-R(\theta,\hat\theta_{\mathrm{MLE}})
-=
-\mathbb E_\theta
-\|\hat\theta_{\mathrm{MLE}}(X)-\theta\|^2
-=
-\mathbb E_\theta\|X-\theta\|^2
-=
-d.
+R(\theta, \delta_a) = a^2 d\sigma^2 + (1-a)^2\|\theta\|^2.
 </span></p>
-<p>At first sight, this looks hard to improve. The estimator is honest coordinate by coordinate. It adds nothing, removes nothing, and has constant risk.</p>
-<p>But in dimension at least three, this honesty is not optimal.</p>
-<p>James and Stein showed that one can shrink <span class="math inline">X</span> toward the origin and obtain smaller total squared-error risk for every value of <span class="math inline">\theta</span>. The estimator becomes biased, but the reduction in variance more than pays for the bias.</p>
-<p>The slogan is:</p>
-<blockquote>
-<p>In high dimension, noise has length. The estimator <span class="math inline">X</span> treats all of that length as signal. Shrinkage deliberately gives up unbiasedness to remove part of the noise length.</p>
-</blockquote>
-<p>Classical statistics often treats unbiasedness as a cleanliness condition. James–Stein shows why that is too narrow: under squared-error loss, the relevant object is risk, and risk contains both bias and variance.</p>
-<p>Bias helps here only because it buys a larger reduction in variance.</p>
-<p>The note has five parts. Part I gives the fixed-shrinkage warm-up. Part II states the James–Stein phenomenon. Part III explains the geometry. Part IV gives a small machine-learning analogue. Part V discusses super-efficiency at the shrinkage target.</p>
-<h2 id="part-i-fixed-shrinkage">Part I: Fixed shrinkage</h2>
-<p>Before James–Stein, consider the simpler rule</p>
+<p>The first term is variance, which decreases when <span class="math inline">a</span> decreases. The second term is squared bias, which increases when <span class="math inline">a</span> moves away from one. The oracle choice is</p>
 <p><span class="math display">
-\delta_a(X)=aX,
-\qquad
-0\le a\le 1.
+a^\star = \frac{\|\theta\|^2}{\|\theta\|^2 + d\sigma^2},
 </span></p>
-<p>The case <span class="math inline">a=1</span> is the usual estimator. Smaller values of <span class="math inline">a</span> pull the estimate toward the origin.</p>
-<p>Suppose more generally that</p>
-<p><span class="math display">
-X=\theta+\varepsilon,
-\qquad
-\mathbb E[\varepsilon]=0,
-\qquad
-\operatorname{Cov}(\varepsilon)=\sigma^2 I_d.
-</span></p>
-<p>Then</p>
-<p><span class="math display">
-\delta_a(X)-\theta
-=
-a(\theta+\varepsilon)-\theta
-=
-(a-1)\theta+a\varepsilon.
-</span></p>
-<p>Taking squared norms and expectations gives</p>
-<p><span class="math display">
-R(\theta,\delta_a)
-=
-a^2d\sigma^2+(1-a)^2\|\theta\|^2.
-</span></p>
-<p>This formula is the whole bias–variance bargain. The first term is variance. It decreases when <span class="math inline">a</span> decreases. The second term is squared bias. It increases when <span class="math inline">a</span> moves away from one.</p>
-<p>So shrinkage is not magic. It wins only when the variance reduction is larger than the squared bias it creates.</p>
-<p>The oracle choice is</p>
-<p><span class="math display">
-a^\star
-=
-\frac{\|\theta\|^2}{\|\theta\|^2+d\sigma^2}.
-</span></p>
-<p>This cannot be used directly, because it depends on the unknown <span class="math inline">\theta</span>. But it reveals the mechanism. When the signal is small relative to the dimension, the observation contains a large amount of noise length. In that regime, the unbiased estimator is too literal.</p>
+<p>which cannot be used directly because <span class="math inline">\theta</span> is unknown. But it reveals the mechanism. When the signal is small relative to the dimension, the observation contains a large amount of noise length, and the unbiased estimator is too literal.</p>
 <div id="cell-fixed-shrinkage-risk" class="cell" data-fig-height="10" data-fig-width="7" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div id="fixed-shrinkage-risk" class="quarto-figure quarto-figure-center">
@@ -262,58 +203,23 @@ a^\star
 </div>
 </div>
 </div>
-<p>The figure makes the tradeoff visible.</p>
-<ul>
-<li>When <span class="math inline">\|\theta\|</span> is small, the best fixed shrinkage estimator is far from <span class="math inline">a=1</span>. The observation is dominated by noise, and it is useful to pull it inward.</li>
-<li>When <span class="math inline">\|\theta\|</span> is large, the cost of bias is larger, and the oracle moves closer to the usual estimator.</li>
-</ul>
-<p>This is not yet James–Stein. It is only the warm-up. The oracle depends on <span class="math inline">\theta</span>, so it is not an estimator.</p>
-<p>But it tells us what to look for: a data-dependent rule that shrinks more when the observed vector looks mostly like noise, and less when it looks like signal.</p>
-<h2 id="part-ii-the-jamesstein-surprise">Part II: The James–Stein surprise</h2>
-<p>The oracle shrinkage factor uses <span class="math inline">\|\theta\|</span>, which is unknown. James and Stein found a data-dependent rule that does not require it.</p>
-<p>For the model</p>
+<p>When <span class="math inline">\|\theta\|</span> is small, the best fixed shrinkage estimator is far from <span class="math inline">a=1</span>: the observation is dominated by noise, and it is useful to pull it inward. When <span class="math inline">\|\theta\|</span> is large, the cost of bias is larger and the oracle moves back toward the usual estimator. This is not yet James–Stein, because the oracle depends on <span class="math inline">\theta</span>, so it is not an estimator. But it tells us what to look for: a data-dependent rule that shrinks more when the observed vector looks mostly like noise.</p>
+<h2 id="the-jamesstein-surprise">The James–Stein surprise</h2>
+<p>James and Stein found a data-dependent rule that does not require <span class="math inline">\|\theta\|</span>. For <span class="math inline">X \sim N_d(\theta, I_d)</span>,</p>
 <p><span class="math display">
-X\sim N_d(\theta,I_d),
+\hat\theta_{\mathrm{JS}}(X) = \left(1 - \frac{d-2}{\|X\|^2}\right)X.
 </span></p>
-<p>define</p>
+<p>More generally, for <span class="math inline">X \sim N_d(\theta, \sigma^2 I_d)</span>,</p>
 <p><span class="math display">
-\hat\theta_{\mathrm{JS}}(X)
-=
-\left(1-\frac{d-2}{\|X\|^2}\right)X.
+\hat\theta_{\mathrm{JS}}(X) = \left(1 - \frac{(d-2)\sigma^2}{\|X\|^2}\right)X,
 </span></p>
-<p>More generally, if</p>
-<p><span class="math display">
-X\sim N_d(\theta,\sigma^2I_d),
-</span></p>
-<p>the corresponding form is</p>
-<p><span class="math display">
-\hat\theta_{\mathrm{JS}}(X)
-=
-\left(1-\frac{(d-2)\sigma^2}{\|X\|^2}\right)X.
-</span></p>
-<p>The positive-part version is</p>
+<p>with positive-part version</p>
 <p><span class="math display">
 \hat\theta_{\mathrm{JS}}^+(X)
-=
-\max\left\{
-0,
-1-\frac{(d-2)\sigma^2}{\|X\|^2}
-\right\}X.
+= \max\left\{0,\,1 - \frac{(d-2)\sigma^2}{\|X\|^2}\right\}X.
 </span></p>
-<p>The central fact is:</p>
-<div>
-<blockquote>
-<p><strong>Note</strong></p>
-<p>For <span class="math inline">d\ge3</span>, the James–Stein estimator has strictly smaller total squared-error risk than <span class="math inline">X</span> for every <span class="math inline">\theta</span>. The positive-part James–Stein estimator improves further on ordinary James–Stein.</p>
-</blockquote>
-</div>
-<p>The loss matters. The domination is for the total vector loss</p>
-<p><span class="math display">
-L(\theta,\delta)=\|\delta-\theta\|^2,
-</span></p>
-<p>not for every coordinate separately and not for every possible loss function.</p>
-<p>The estimator adapts to the observed length of <span class="math inline">X</span>. When <span class="math inline">\|X\|^2</span> is small, it shrinks strongly. When <span class="math inline">\|X\|^2</span> is large, it shrinks mildly.</p>
-<p>The surprising part is not that shrinkage helps near the origin. That was already visible from the fixed-shrinkage calculation. The surprising part is that the rule can be tuned so that the gain near the origin is not paid for by excess risk elsewhere.</p>
+<p>For <span class="math inline">d \ge 3</span>, the James–Stein estimator has strictly smaller total squared-error risk than <span class="math inline">X</span> for every <span class="math inline">\theta</span>. The positive-part version improves further. The domination is for the total vector loss <span class="math inline">\|\delta - \theta\|^2</span> – not for every coordinate separately, and not for every possible loss function.</p>
+<p>The estimator adapts to the observed length of <span class="math inline">X</span>: strong shrinkage when <span class="math inline">\|X\|^2</span> is small, mild shrinkage when it is large. The surprising part is not that shrinkage helps near the origin; the fixed-shrinkage calculation already showed that. The surprising part is that the rule can be tuned so the gain near the origin is not paid for by excess risk elsewhere.</p>
 <div id="cell-js-risk-signal-size" class="cell" data-fig-height="10" data-fig-width="7" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div id="js-risk-signal-size" class="quarto-figure quarto-figure-center">
@@ -324,27 +230,13 @@ L(\theta,\delta)=\|\delta-\theta\|^2,
 </div>
 </div>
 </div>
-<p>The case <span class="math inline">d=2</span> is included as a warning. There the James–Stein factor is identically one, because <span class="math inline">d-2=0</span>. So the displayed James–Stein estimator reduces to the usual estimator.</p>
-<p>The phenomenon starts at dimension three. For <span class="math inline">d\ge3</span>, the shrinkage rule improves on <span class="math inline">X</span> under total squared-error risk. The improvement is largest near the shrinkage target, but it does not reverse into a loss far away.</p>
-<p>That is the inadmissibility statement: the natural unbiased estimator <span class="math inline">X</span> is dominated.</p>
-<h2 id="part-iii-geometry-noise-has-length">Part III: Geometry: noise has length</h2>
-<p>The geometry is the same high-dimensional effect as in the thin-shell note.</p>
-<p>When <span class="math inline">\theta=0</span>,</p>
+<p>The case <span class="math inline">d=2</span> is a warning. There the James–Stein factor is identically one, since <span class="math inline">d-2=0</span>, so the estimator reduces to <span class="math inline">X</span>. The phenomenon starts at dimension three.</p>
+<h2 id="geometry-noise-has-length">Geometry: noise has length</h2>
+<p>The geometry is the same high-dimensional effect as in the thin-shell note. When <span class="math inline">\theta = 0</span>, <span class="math inline">X = Z \sim N_d(0, I_d)</span>: pure noise. But in high dimension, pure Gaussian noise is not close to the origin. Its norm is typically near <span class="math inline">\sqrt d</span>:</p>
 <p><span class="math display">
-X=Z\sim N_d(0,I_d).
+\|Z\|^2 \sim \chi_d^2, \qquad \mathbb{E}\|Z\|^2 = d, \qquad \operatorname{Var}(\|Z\|^2) = 2d.
 </span></p>
-<p>The observation is pure noise.</p>
-<p>But in high dimension, pure Gaussian noise is not close to the origin. Its norm is typically near <span class="math inline">\sqrt d</span>. Indeed,</p>
-<p><span class="math display">
-\|Z\|^2\sim \chi_d^2,
-\qquad
-\mathbb E\|Z\|^2=d,
-\qquad
-\operatorname{Var}(\|Z\|^2)=2d.
-</span></p>
-<p>So even when the true mean is zero, the observation <span class="math inline">X</span> usually has substantial length.</p>
-<p>That is the geometric reason shrinkage can help. The length of <span class="math inline">X</span> is not pure evidence of signal. Part of it is the ordinary length of high-dimensional noise.</p>
-<p>The usual estimator <span class="math inline">X</span> keeps the whole vector. James–Stein subtracts a data-dependent amount of radial length.</p>
+<p>Even when the true mean is zero, the observation usually has substantial length. The length of <span class="math inline">X</span> is not pure evidence of signal. Part of it is the ordinary length of high-dimensional noise. The usual estimator keeps the whole vector; James–Stein subtracts a data-dependent amount of radial length.</p>
 <div id="cell-gaussian-shells" class="cell" data-fig-height="8" data-fig-width="7" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div id="gaussian-shells" class="quarto-figure quarto-figure-center">
@@ -355,34 +247,14 @@ X=Z\sim N_d(0,I_d).
 </div>
 </div>
 </div>
-<p>This also explains why the shrinkage target matters.</p>
-<p>James–Stein shrinks toward zero. It is most helpful when <span class="math inline">\theta</span> is near zero. It becomes less important when <span class="math inline">\theta</span> is far from zero.</p>
-<p>The theorem says that, in dimension at least three, the rule can make this local advantage without creating a global risk penalty.</p>
-<h3 id="bias-and-variance-in-one-picture">Bias and variance in one picture</h3>
-<p>For a vector estimator, define</p>
+<p>This also explains why the shrinkage target matters. James–Stein shrinks toward zero and is most helpful when <span class="math inline">\theta</span> is near zero. The theorem says that in dimension at least three, the rule gets this local advantage without creating a global risk penalty.</p>
+<p>For a vector estimator,</p>
 <p><span class="math display">
-\operatorname{Bias}(\delta;\theta)
-=
-\mathbb E_\theta[\delta(X)]-\theta
+R(\theta, \delta)
+= \|\operatorname{Bias}(\delta;\theta)\|^2
++ \operatorname{Var}_{\mathrm{tot}}(\delta;\theta).
 </span></p>
-<p>and</p>
-<p><span class="math display">
-\operatorname{Var}_{\mathrm{tot}}(\delta;\theta)
-=
-\mathbb E_\theta
-\left[
-\|\delta(X)-\mathbb E_\theta\delta(X)\|^2
-\right].
-</span></p>
-<p>Then</p>
-<p><span class="math display">
-R(\theta,\delta)
-=
-\|\operatorname{Bias}(\delta;\theta)\|^2
-+
-\operatorname{Var}_{\mathrm{tot}}(\delta;\theta).
-</span></p>
-<p>This identity is the simplest accounting device in the note. Shrinkage deliberately adds bias. It wins when the variance reduction is larger than the added squared bias.</p>
+<p>Shrinkage deliberately adds bias. It wins when the variance reduction is larger than the added squared bias.</p>
 <div id="cell-bias-variance-decomposition" class="cell" data-fig-height="5" data-fig-width="7" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div id="bias-variance-decomposition" class="quarto-figure quarto-figure-center">
@@ -393,41 +265,15 @@ R(\theta,\delta)
 </div>
 </div>
 </div>
-<blockquote>
-<p>The usual estimator has no bias term, but it pays a large variance cost.</p>
-</blockquote>
-<blockquote>
-<p>The shrinkage estimators pay some bias and reduce variance.</p>
-</blockquote>
-<blockquote>
-<p>The total can be smaller.</p>
-</blockquote>
-<p>That is the practical face of the James–Stein result. The estimator is not better because bias is attractive. It is better because the variance reduction is larger.</p>
-<h2 id="part-iv-a-small-ml-analogue">Part IV: A small ML analogue</h2>
-<p>The James–Stein theorem is about estimating a high-dimensional mean vector. A familiar machine-learning analogue appears in regression after feature expansion.</p>
-<p>Start with a modest regression dataset. Expand the features polynomially. The original problem may be low-dimensional, but the expanded problem can have more directions than the training data can reliably support.</p>
-<p>Ordinary least squares tries to use all of those directions. Some directions contain signal. Many mostly contain noise.</p>
+<p>The usual estimator has no bias but pays a large variance cost. The shrinkage estimators pay some bias and reduce variance. The total can be smaller.</p>
+<h2 id="a-small-ml-analogue">A small ML analogue</h2>
+<p>A familiar machine-learning analogue appears in regression after feature expansion. Start with a modest regression dataset, expand features polynomially, and the expanded problem can have more directions than the training data can reliably support. Ordinary least squares tries to use all of them. Some directions contain signal; many mostly contain noise.</p>
 <p>Ridge regression changes the problem:</p>
 <p><span class="math display">
 \hat\beta_{\mathrm{ridge}}
-=
-\arg\min_\beta
-\left\{
-\|y-X\beta\|^2+\lambda\|\beta\|^2
-\right\}.
+= (X^\top X + \lambda I)^{-1}X^\top y.
 </span></p>
-<p>Equivalently,</p>
-<p><span class="math display">
-\hat\beta_{\mathrm{ridge}}
-=
-(X^\top X+\lambda I)^{-1}X^\top y.
-</span></p>
-<p>The penalty introduces bias. But it also shrinks unstable directions, making the inverse problem better behaved.</p>
-<p>The loss is not identical to the James–Stein loss. Here the figure measures prediction error, while James–Stein is about parameter-estimation risk.</p>
-<p>The theorem is different, but the geometry is similar:</p>
-<blockquote>
-<p>Do not trust every noisy direction equally. Shrink the unstable ones.</p>
-</blockquote>
+<p>The penalty introduces bias, but it also shrinks unstable directions, making the inverse problem better behaved. The mechanism is the same as James–Stein: do not trust every noisy direction equally; shrink the unstable ones.</p>
 <div id="cell-ridge-ml-example" class="cell" data-fig-height="5" data-fig-width="7" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div id="ridge-ml-example" class="quarto-figure quarto-figure-center">
@@ -449,57 +295,17 @@ Best ridge lambda: 9434
 Best ridge test MSE: 3625.75</code></pre>
 </div>
 </div>
-<p>The unregularized estimator is trying to use the entire expanded feature space. In this example, the polynomial expansion creates more directions than the training set can reliably support.</p>
-<p>Ridge changes the problem. It no longer asks for an unpenalized least-squares fit. It asks for a stable fit with smaller coefficient norm. The result is biased, but the prediction error can be much smaller. This is the machine-learning version of the same principle. Shrinkage is not a hack added after statistics fails. It is a way of making estimation well-posed when variance is the real enemy.</p>
-<h2 id="part-v-super-efficiency-at-the-shrinkage-target">Part V: Super-efficiency at the shrinkage target</h2>
-<p>This section is optional. It gives an asymptotic reading of the same shrinkage target phenomenon. Write the small-noise model as</p>
+<p>The unregularized estimator is trying to use the entire expanded feature space, which creates more directions than the training set can support. Ridge no longer asks for an unpenalized least-squares fit. It asks for a stable fit with smaller coefficient norm. The result is biased, but the prediction error is much smaller.</p>
+<h2 id="super-efficiency-at-the-shrinkage-target">Super-efficiency at the shrinkage target</h2>
+<p>Write the small-noise model as <span class="math inline">Y_\varepsilon = \theta + \varepsilon Z</span>, with <span class="math inline">Z \sim N_d(0, I_d)</span>. The naive estimator has risk <span class="math inline">d\varepsilon^2</span>. At the shrinkage target <span class="math inline">\theta=0</span>, <span class="math inline">Y_\varepsilon = \varepsilon Z</span>, and for <span class="math inline">d \ge 3</span>,</p>
 <p><span class="math display">
-Y_\varepsilon=\theta+\varepsilon Z,
-\qquad
-Z\sim N_d(0,I_d).
+\mathbb{E}\left[\frac{1}{\|Z\|^2}\right] = \frac{1}{d-2}.
 </span></p>
-<p>The naive estimator <span class="math inline">Y_\varepsilon</span> has risk</p>
+<p>So the James–Stein risk at the origin is <span class="math inline">2\varepsilon^2</span>, giving risk ratio</p>
 <p><span class="math display">
-R_\varepsilon(\theta,Y_\varepsilon)
-=
-d\varepsilon^2.
+\frac{R_\varepsilon(0, \hat\theta_{\mathrm{JS},\varepsilon})}{d\varepsilon^2} = \frac{2}{d}.
 </span></p>
-<p>The James–Stein estimator at noise level <span class="math inline">\varepsilon</span> is</p>
-<p><span class="math display">
-\hat\theta_{\mathrm{JS},\varepsilon}
-=
-\left(
-1-\frac{(d-2)\varepsilon^2}{\|Y_\varepsilon\|^2}
-\right)Y_\varepsilon.
-</span></p>
-<p>At the shrinkage target <span class="math inline">\theta=0</span>,</p>
-<p><span class="math display">
-Y_\varepsilon=\varepsilon Z.
-</span></p>
-<p>For <span class="math inline">d\ge3</span>,</p>
-<p><span class="math display">
-\mathbb E\left[\frac1{\|Z\|^2}\right]
-=
-\frac1{d-2}.
-</span></p>
-<p>So the risk at the origin is</p>
-<p><span class="math display">
-R_\varepsilon(0,\hat\theta_{\mathrm{JS},\varepsilon})
-=
-2\varepsilon^2.
-</span></p>
-<p>The ratio to the naive benchmark is therefore</p>
-<p><span class="math display">
-\frac{
-R_\varepsilon(0,\hat\theta_{\mathrm{JS},\varepsilon})
-}{
-d\varepsilon^2
-}
-=
-\frac2d.
-</span></p>
-<p>For <span class="math inline">d&gt;2</span>, this is strictly below one.</p>
-<p>Away from the origin, the first-order advantage disappears. If <span class="math inline">\theta\ne0</span>, the risk ratio tends to one as <span class="math inline">\varepsilon\to0</span>.</p>
+<p>For <span class="math inline">d&gt;2</span> this is strictly below one. Away from the origin, the first-order advantage disappears: if <span class="math inline">\theta \ne 0</span>, the risk ratio tends to one as <span class="math inline">\varepsilon \to 0</span>.</p>
 <div id="cell-super-efficiency" class="cell" data-fig-height="4" data-fig-width="7" data-execution_count="7">
 <div class="cell-output cell-output-display">
 <div id="super-efficiency" class="quarto-figure quarto-figure-center">
@@ -510,143 +316,45 @@ d\varepsilon^2
 </div>
 </div>
 </div>
-<p>This is super-efficiency in a concrete form.</p>
-<p>At the shrinkage target, the estimator beats the usual first-order benchmark. Away from the target, the first-order advantage disappears. This is consistent with the general message. Super-efficiency cannot happen everywhere in a regular problem. The exceptional set must be small. Here the exceptional point is the shrinkage target.</p>
+<p>This is super-efficiency in a concrete form. The exceptional set is a single point, the shrinkage target, which is consistent with the general message that super-efficiency cannot happen everywhere in a regular problem.</p>
 <h2 id="takeaway">Takeaway</h2>
-<p>Unbiasedness is a clean property. It is not the same as optimality.</p>
-<p>In the normal-means problem, (X) is unbiased and has constant risk (d). But for (d), James–Stein shrinkage improves on it uniformly under total squared-error loss.</p>
-<p>The price is bias. The reward is a larger reduction in variance.</p>
-<p>The geometric reason is that high-dimensional noise has length. The usual estimator treats the whole observed vector as signal. Shrinkage refuses to do that.</p>
-<p>Bias is useful only when it is doing identifiable work: moving an estimator away from a region where variance, boundary behavior, or unsupported directions dominate.</p>
-<ul>
-<li>In Firth’s adjustment, bias keeps likelihood away from the boundary.</li>
-<li>In James–Stein estimation, bias removes part of the length created by noise.</li>
-<li>In ridge regression, bias stabilizes directions that the data cannot support.</li>
-</ul>
-<p>In all three cases, the estimator becomes less literal and more reliable.</p>
-<h2 id="technical-appendix">Technical appendix</h2>
+<p>Unbiasedness is a clean property. It is not the same as optimality. In the normal-means problem, <span class="math inline">X</span> is unbiased and has constant risk <span class="math inline">d</span>; for <span class="math inline">d \ge 3</span>, James–Stein improves on it uniformly under total squared-error loss.</p>
+<p>The geometric reason is that high-dimensional noise has length, and the usual estimator treats the whole observed length as signal. Shrinkage refuses to do that. The same principle appears in Firth’s adjustment, where bias keeps likelihood away from the boundary, and in ridge regression, where bias stabilizes directions the data cannot support. In all three cases, the estimator becomes less literal and more reliable.</p>
+<hr>
+<h2 id="appendix">Appendix</h2>
 <h3 id="steins-risk-identity">Stein’s risk identity</h3>
-<p>One way to see where the James–Stein formula comes from is Stein’s unbiased risk estimate.</p>
-<p>Write an estimator as</p>
+<p>Write an estimator as <span class="math inline">\delta(X)=X+g(X)</span>. Under standard smoothness and integrability conditions, Stein’s identity gives</p>
 <p><span class="math display">
-\delta(X)=X+g(X).
+R(\theta,\delta) = d + \mathbb{E}_\theta\left[\|g(X)\|^2 + 2\operatorname{div} g(X)\right].
 </span></p>
-<p>Under the usual smoothness and integrability conditions, Stein’s identity gives</p>
-<p><span class="math display">
-R(\theta,\delta)
-=
-d+
-\mathbb E_\theta
-\left[
-\|g(X)\|^2+2\operatorname{div}g(X)
-\right].
-</span></p>
-<p>Now take</p>
-<p><span class="math display">
-g(x)=-\frac{a}{\|x\|^2}x.
-</span></p>
-<p>Then</p>
-<p><span class="math display">
-\|g(x)\|^2
-=
-\frac{a^2}{\|x\|^2}.
-</span></p>
-<p>Also,</p>
-<p><span class="math display">
-\operatorname{div}
-\left(
-\frac{x}{\|x\|^2}
-\right)
-=
-\frac{d-2}{\|x\|^2},
-</span></p>
-<p>so</p>
-<p><span class="math display">
-\operatorname{div}g(x)
-=
--\frac{a(d-2)}{\|x\|^2}.
-</span></p>
-<p>Therefore</p>
+<p>Take <span class="math inline">g(x) = -a x/\|x\|^2</span>. Then <span class="math inline">\|g(x)\|^2 = a^2/\|x\|^2</span> and <span class="math inline">\operatorname{div}(x/\|x\|^2) = (d-2)/\|x\|^2</span>, so</p>
 <p><span class="math display">
 R(\theta,\delta)
-=
-d+
-\mathbb E_\theta
-\left[
-\frac{a^2-2a(d-2)}{\|X\|^2}
-\right].
+= d + \mathbb{E}_\theta\left[\frac{a^2 - 2a(d-2)}{\|X\|^2}\right].
 </span></p>
-<p>The quadratic</p>
-<p><span class="math display">
-a^2-2a(d-2)
-</span></p>
-<p>is minimized at</p>
-<p><span class="math display">
-a=d-2.
-</span></p>
-<p>This gives the James–Stein estimator</p>
+<p>The quadratic <span class="math inline">a^2 - 2a(d-2)</span> is minimized at <span class="math inline">a=d-2</span>, giving</p>
 <p><span class="math display">
 \hat\theta_{\mathrm{JS}}(X)
-=
-\left(1-\frac{d-2}{\|X\|^2}\right)X.
-</span></p>
-<p>Its risk is</p>
-<p><span class="math display">
+= \left(1 - \frac{d-2}{\|X\|^2}\right)X,
+\qquad
 R(\theta,\hat\theta_{\mathrm{JS}})
-=
-d-(d-2)^2
-\mathbb E_\theta
-\left[
-\frac1{\|X\|^2}
-\right].
+= d - (d-2)^2\,\mathbb{E}_\theta\left[\frac{1}{\|X\|^2}\right].
 </span></p>
-<p>For <span class="math inline">d\ge3</span>, this expectation is finite, and the risk is strictly below <span class="math inline">d</span>.</p>
-<p>That is the algebra behind the phenomenon.</p>
+<p>For <span class="math inline">d\ge3</span> this expectation is finite and the risk is strictly below <span class="math inline">d</span>.</p>
 <h3 id="why-the-positive-part-rule-improves">Why the positive-part rule improves</h3>
-<p>The ordinary James–Stein factor can be negative when</p>
-<p><span class="math display">
-\|X\|^2 &lt; d-2.
-</span></p>
-<p>Then the estimator does not merely shrink toward zero. It crosses the origin and points in the opposite direction.</p>
-<p>That reversal is hard to justify geometrically. If the observed vector has very small norm, the natural shrinkage estimate is zero, not a vector pointing backward.</p>
-<p>The positive-part estimator enforces this idea:</p>
+<p>The ordinary James–Stein factor can be negative when <span class="math inline">\|X\|^2 &lt; d-2</span>, causing the estimator to cross the origin and point in the opposite direction. The positive-part estimator prevents this:</p>
 <p><span class="math display">
 \hat\theta_{\mathrm{JS}}^+(X)
-=
-\max
-\left\{
-0,
-1-\frac{d-2}{\|X\|^2}
-\right\}X.
+= \max\left\{0,\,1 - \frac{d-2}{\|X\|^2}\right\}X.
 </span></p>
-<p>It dominates ordinary James–Stein.</p>
-<p>The intuition is simple: shrink inward, but do not overshoot. On the region where ordinary James–Stein reverses direction, replacing it by zero removes an unnecessary reversal.</p>
-<p>So the positive-part rule is a second shrinkage correction.</p>
+<p>It dominates ordinary James–Stein. The intuition is simple: shrink inward, but do not overshoot. On the region where ordinary James–Stein reverses direction, replacing it by zero removes an unnecessary reversal.</p>
 <h3 id="a-bayesian-warm-up">A Bayesian warm-up</h3>
-<p>A hierarchical model gives another route to the same intuition.</p>
-<p>Suppose</p>
+<p>The hierarchical model <span class="math inline">\theta_j \sim N(0, \tau^2)</span>, <span class="math inline">X_j \mid \theta_j \sim N(\theta_j, \sigma^2)</span> gives posterior mean</p>
 <p><span class="math display">
-\theta_j\sim N(0,\tau^2),
-\qquad
-X_j\mid\theta_j\sim N(\theta_j,\sigma^2),
-\qquad
-j=1,\ldots,d.
+\mathbb{E}[\theta_j \mid X_j]
+= \frac{\tau^2}{\tau^2 + \sigma^2}X_j,
 </span></p>
-<p>Then the posterior mean is</p>
-<p><span class="math display">
-\mathbb E[\theta_j\mid X_j]
-=
-\frac{\tau^2}{\tau^2+\sigma^2}X_j.
-</span></p>
-<p>Thus the Bayes estimator is a shrinkage rule:</p>
-<p><span class="math display">
-\delta_{\mathrm{Bayes}}(X)=a_BX,
-\qquad
-a_B=\frac{\tau^2}{\tau^2+\sigma^2}.
-</span></p>
-<p>With known <span class="math inline">\tau^2</span>, all coordinates share the same prior scale, so each coordinate is pulled toward the common center.</p>
-<p>In empirical Bayes versions, the scale <span class="math inline">\tau^2</span> is estimated from the ensemble of coordinates. That is where the borrowing-strength interpretation becomes explicit.</p>
-<p>This is the same broad idea that appears in random effects, ridge regression, empirical Bayes, and many modern regularization methods.</p>
+<p>so the Bayes estimator is a shrinkage rule with <span class="math inline">a_B = \tau^2/(\tau^2 + \sigma^2)</span>. In empirical Bayes versions, <span class="math inline">\tau^2</span> is estimated from the ensemble of coordinates. This is the same broad idea that appears in random effects, ridge regression, empirical Bayes, and modern regularization methods: borrowing strength across coordinates to reduce total risk.</p>
 <h2 id="references">References</h2>
 <p>William James and Charles Stein. “Estimation with quadratic loss.” <em>Proceedings of the Fourth Berkeley Symposium on Mathematical Statistics and Probability</em>, 1961.</p>
 <p>Charles Stein. “Estimation of the mean of a multivariate normal distribution.” <em>The Annals of Statistics</em> 9(6), 1981.</p>

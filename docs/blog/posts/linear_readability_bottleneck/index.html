@@ -141,15 +141,14 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#preface" id="toc-preface">Preface</a></li>
   <li><a href="#the-fixed-representation-question" id="toc-the-fixed-representation-question">The fixed-representation question</a></li>
-  <li><a href="#a-linearization-experiment" id="toc-a-linearization-experiment">A linearization experiment</a></li>
-  <li><a href="#what-changes-during-training" id="toc-what-changes-during-training">What changes during training?</a></li>
+  <li><a href="#the-experiment" id="toc-the-experiment">The experiment</a></li>
+  <li><a href="#what-the-backbone-is-actually-doing" id="toc-what-the-backbone-is-actually-doing">What the backbone is actually doing</a></li>
   <li><a href="#pca-is-a-shadow-not-the-proof" id="toc-pca-is-a-shadow-not-the-proof">PCA is a shadow, not the proof</a></li>
-  <li><a href="#the-leaderboard-gain" id="toc-the-leaderboard-gain">The leaderboard gain</a></li>
-  <li><a href="#why-the-late-gain-is-small" id="toc-why-the-late-gain-is-small">Why the late gain is small</a></li>
+  <li><a href="#the-leaderboard-at-the-final-checkpoint" id="toc-the-leaderboard-at-the-final-checkpoint">The leaderboard at the final checkpoint</a></li>
+  <li><a href="#why-the-late-gain-is-so-small" id="toc-why-the-late-gain-is-so-small">Why the late gain is so small</a></li>
   <li><a href="#conformal-prediction-as-an-uncertainty-diagnostic" id="toc-conformal-prediction-as-an-uncertainty-diagnostic">Conformal prediction as an uncertainty diagnostic</a></li>
-  <li><a href="#what-the-experiment-does-not-show" id="toc-what-the-experiment-does-not-show">What the experiment does not show</a></li>
+  <li><a href="#what-this-doesnt-show" id="toc-what-this-doesnt-show">What this doesn’t show</a></li>
   <li><a href="#takeaway" id="toc-takeaway">Takeaway</a></li>
   <li><a href="#reproducibility-notes" id="toc-reproducibility-notes">Reproducibility notes</a></li>
   <li><a href="#references" id="toc-references">References</a></li>
@@ -183,123 +182,32 @@ window.Quarto = {
   text-align: left;
 }
 </style>
-<p><strong>Claim.</strong> Once a frozen representation makes labels linearly readable, nonlinear heads have little geometry left to exploit.</p>
-<p><strong>Scope.</strong> A small MNIST/ViT diagnostic comparing nonlinear heads against the best linear head, not just logistic regression.</p>
-<h2 id="preface">Preface</h2>
-<p>A common recipe in representation learning is</p>
-<p><span class="math display">
-x \longmapsto z=\phi(x)\in\mathbb R^d
-\longmapsto \text{head}(z),
-</span></p>
-<p>where <span class="math inline">\phi</span> is a frozen backbone and the head is replaced by something more expressive: a random forest, an RBF-kernel SVM, a Gaussian process, a <span class="math inline">k</span>-nearest-neighbor rule, or a small MLP. The usual headline is then:</p>
-<blockquote>
-<p>adding a nonlinear head improves accuracy.</p>
-</blockquote>
-<p>The useful comparison is not simply linear versus nonlinear. Once the backbone has made the labels almost linearly readable, a nonlinear head is working in the residual geometry: boundary cases, ambiguous digits, and small regularization differences.</p>
-<p>I use the nonlinear heads as probes of what the frozen representation has not already made linear.</p>
-<p>In the final checkpoint below, nonlinear heads do beat logistic regression. But they do not stably beat the best linear head. That difference is the point of the note.</p>
-<p>If a nonlinear head gives a large and stable gain over the best linear head, the representation still contains useful nonlinear label geometry. If the gain is small, unstable, and concentrated near the remaining boundary errors, then the main bottleneck is no longer the head. It is the linear readability of the representation.</p>
+<p>A common recipe in representation learning is to take a frozen backbone <span class="math inline">\phi</span>, extract features <span class="math inline">z = \phi(x) \in \mathbb{R}^d</span>, and then swap in a more expressive head — a random forest, an RBF-kernel SVM, a Gaussian process, a <span class="math inline">k</span>-nearest-neighbor rule, a small MLP. The usual headline is that the nonlinear head improves accuracy over logistic regression.</p>
+<p>But that comparison is often the wrong one. Once the backbone has made the labels almost linearly readable, a nonlinear head is working in the residual geometry — boundary cases, ambiguous examples, small regularization differences. Whether it actually beats the <em>best</em> linear head, not just logistic regression, is a different and stricter question.</p>
+<p>This note runs that stricter comparison on a small MNIST/ViT experiment. At the final checkpoint, nonlinear heads do beat logistic regression. They don’t stably beat the best linear head. That gap is the point.</p>
 <h2 id="the-fixed-representation-question">The fixed-representation question</h2>
-<p>Let</p>
-<p><span class="math display">
-Z=\phi(X)\in\mathbb R^d,
-</span></p>
-<p>where <span class="math inline">\phi</span> is a representation learned by a backbone. Once <span class="math inline">\phi</span> is frozen, the learning problem changes. We are no longer asking whether the original input <span class="math inline">X</span> is easy. We are asking whether the labels are simple functions of <span class="math inline">Z</span>.</p>
-<p>The linear family is</p>
-<p><span class="math display">
-\mathcal H_{\mathrm{lin}}
-=
-\left\{
-  z\mapsto \arg\max_k\; w_k^\top z+b_k
-\right\}.
-</span></p>
-<p>A richer comparison class can include nonlinear heads:</p>
-<p><span class="math display">
-\mathcal H_{\mathrm{rich}}
-=
-\mathcal H_{\mathrm{lin}}
-\cup
-\{\text{RBF-SVM},\;\text{random forest},\;k\text{NN},\;\text{small MLP},\ldots\}.
-</span></p>
-<p>For a fixed representation <span class="math inline">\phi</span>, define</p>
-<p><span class="math display">
-R^*_{\mathrm{lin}}(\phi)
-=
-\inf_{h\in\mathcal H_{\mathrm{lin}}}
-\mathbb P\{h(\phi(X))\ne Y\},
-</span></p>
-<p>and</p>
-<p><span class="math display">
-R^*_{\mathrm{rich}}(\phi)
-=
-\inf_{h\in\mathcal H_{\mathrm{rich}}}
-\mathbb P\{h(\phi(X))\ne Y\}.
-</span></p>
-<p>The quantity a richer head class can exploit is</p>
-<p><span class="math display">
-G(\phi)
-=
-R^*_{\mathrm{lin}}(\phi)-R^*_{\mathrm{rich}}(\phi).
-</span></p>
-<p>If <span class="math inline">G(\phi)</span> is large, the representation still contains useful nonlinear label geometry. If <span class="math inline">G(\phi)</span> is small, then the representation has already made the task essentially linearly readable.</p>
-<p>Empirically, we do not observe <span class="math inline">G(\phi)</span> directly. We fit several heads on the same frozen features and compare them on the same held-out examples. For a nonlinear head <span class="math inline">h</span> and a linear baseline <span class="math inline">g</span>, define the paired accuracy difference</p>
-<p><span class="math display">
-\widehat\Delta(h,g)
-=
-\frac1n\sum_{i=1}^n
-\left[
-\mathbf 1\{h(z_i)=y_i\}
--
-\mathbf 1\{g(z_i)=y_i\}
-\right].
-</span></p>
-<p>The pairing matters. Two classifiers evaluated on the same examples are not independent. A nonlinear head is meaningfully better only if it wins more disagreements than it loses, not merely if its point estimate is slightly higher. I therefore look at bootstrap confidence intervals for paired differences and at McNemar counts</p>
-<p><span class="math display">
-n_{01}=\#\{g\text{ wrong},\;h\text{ correct}\},
-\qquad
-n_{10}=\#\{g\text{ correct},\;h\text{ wrong}\}.
-</span></p>
-<h2 id="a-linearization-experiment">A linearization experiment</h2>
-<p>The experiment is deliberately small. I trained a compact ViT-style backbone on MNIST and saved checkpoints during training. At each checkpoint <span class="math inline">t</span>, I froze the representation</p>
-<p><span class="math display">
-z=\phi_t(x),
-</span></p>
-<p>extracted features, and trained heads on top of those features only.</p>
-<p>The heads were logistic regression, linear SVM, distance-weighted <span class="math inline">k</span>-nearest neighbors, random forest, RBF-SVM, and a small MLP.</p>
-<p>The key comparison is not only nonlinear heads versus logistic regression. Logistic regression is just one linear probe. The stricter comparison is nonlinear heads versus the <strong>best linear head</strong> at the same checkpoint.</p>
-<h2 id="what-changes-during-training">What changes during training?</h2>
-<p>The geometric diagnostics show the backbone doing the hard work.</p>
-<p>Let <span class="math inline">\mu_k</span> be the class mean in feature space and <span class="math inline">\mu</span> the global mean. A crude but useful diagnostic is the within/between ratio</p>
-<p><span class="math display">
-\rho
-=
-\frac{
-\frac1n\sum_{i=1}^n\|z_i-\mu_{y_i}\|^2
-}{
-\frac1K\sum_{k=1}^K\|\mu_k-\mu\|^2
-}.
-</span></p>
-<p>Low <span class="math inline">\rho</span> means that classes are compact relative to their separation. This is not a proof of linear separability, but it is a good diagnostic for whether the representation is forming separated class clouds.</p>
-<p>I also fit a linear head and measure its multiclass margin</p>
-<p><span class="math display">
-m_i
-=
-s_{y_i}(z_i)-\max_{k\ne y_i}s_k(z_i),
-</span></p>
-<p>where <span class="math inline">s_k(z)=w_k^\top z+b_k</span>. Negative margin means the linear classifier gets the point wrong.</p>
-<p>In the run here, from epoch 1 to epoch 20,</p>
-<p><span class="math display">
-\rho_{\mathrm{test}}: 0.4526\longrightarrow 0.0510,
-</span></p>
-<p>while the fraction of negative linear margins drops from</p>
-<p><span class="math display">
-0.1553\longrightarrow 0.0135.
-</span></p>
-<p>The median linear margin grows from about</p>
-<p><span class="math display">
-3.08\longrightarrow 9.36.
-</span></p>
-<p>So the story is not merely that accuracy goes up. The representation itself is being reshaped into a geometry where a linear rule has a large positive margin on almost all points.</p>
+<p>Once <span class="math inline">\phi</span> is frozen, we’re no longer asking whether the original input <span class="math inline">X</span> is easy. We’re asking whether the labels are simple functions of <span class="math inline">Z = \phi(X)</span>.</p>
+<p>Define the best linear error and the best-over-a-richer-class error:</p>
+<p><span class="math display">R^*_{\mathrm{lin}}(\phi) = \inf_{h \in \mathcal{H}_{\mathrm{lin}}} \mathbb{P}\{h(\phi(X)) \ne Y\}, \qquad R^*_{\mathrm{rich}}(\phi) = \inf_{h \in \mathcal{H}_{\mathrm{rich}}} \mathbb{P}\{h(\phi(X)) \ne Y\}.</span></p>
+<p>The quantity a richer head class can exploit is <span class="math inline">G(\phi) = R^*_{\mathrm{lin}}(\phi) - R^*_{\mathrm{rich}}(\phi)</span>. If <span class="math inline">G(\phi)</span> is large, the representation still contains useful nonlinear label geometry. If it’s small, the backbone has already made the task essentially linearly readable.</p>
+<p>Empirically, we don’t observe <span class="math inline">G(\phi)</span> directly. We fit several heads on the same frozen features and compare them on the same held-out examples. For a nonlinear head <span class="math inline">h</span> and linear baseline <span class="math inline">g</span>, the paired accuracy difference is</p>
+<p><span class="math display">\widehat{\Delta}(h,g) = \frac{1}{n} \sum_{i=1}^n \left[\mathbf{1}\{h(z_i) = y_i\} - \mathbf{1}\{g(z_i) = y_i\}\right].</span></p>
+<p>The pairing matters — two classifiers evaluated on the same examples aren’t independent. A nonlinear head is meaningfully better only if it wins more disagreements than it loses, not merely if its point estimate is slightly higher. I use bootstrap confidence intervals for paired differences and McNemar counts</p>
+<p><span class="math display">n_{01} = \#\{g \text{ wrong},\; h \text{ correct}\}, \qquad n_{10} = \#\{g \text{ correct},\; h \text{ wrong}\}.</span></p>
+<h2 id="the-experiment">The experiment</h2>
+<p>I trained a compact ViT-style backbone on MNIST and saved checkpoints during training. At each checkpoint <span class="math inline">t</span>, I froze the representation <span class="math inline">z = \phi_t(x)</span>, extracted features, and trained heads on top. The heads were logistic regression, linear SVM, distance-weighted <span class="math inline">k</span>-nearest neighbors, random forest, RBF-SVM, and a small MLP.</p>
+<p>The key comparison throughout is not nonlinear heads versus logistic regression. Logistic regression is just one linear probe. The stricter comparison is nonlinear heads versus the best linear head at the same checkpoint.</p>
+<h2 id="what-the-backbone-is-actually-doing">What the backbone is actually doing</h2>
+<p>The geometric diagnostics show the backbone doing the hard work, not the head.</p>
+<p>A crude but useful diagnostic is the within/between ratio</p>
+<p><span class="math display">\rho = \frac{\frac{1}{n}\sum_{i=1}^n \|z_i - \mu_{y_i}\|^2}{\frac{1}{K}\sum_{k=1}^K \|\mu_k - \mu\|^2}.</span></p>
+<p>Low <span class="math inline">\rho</span> means classes are compact relative to their separation — a good sign for linear separability, though not a proof of it. I also tracked the multiclass margin of a fitted linear head,</p>
+<p><span class="math display">m_i = s_{y_i}(z_i) - \max_{k \ne y_i} s_k(z_i),</span></p>
+<p>where <span class="math inline">s_k(z) = w_k^\top z + b_k</span>. Negative margin means the linear classifier gets that point wrong.</p>
+<p>From epoch 1 to epoch 20:</p>
+<p><span class="math display">\rho_{\mathrm{test}}: 0.4526 \longrightarrow 0.0510,</span></p>
+<p>and the fraction of negative linear margins drops from <span class="math inline">0.1553 \to 0.0135</span>. The median linear margin grows from about <span class="math inline">3.08 \to 9.36</span>.</p>
+<p>So the story isn’t just that accuracy goes up. The representation is being reshaped into a geometry where a linear rule has large positive margin on almost all points.</p>
 <div class="narrow-figure">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -309,8 +217,7 @@ s_{y_i}(z_i)-\max_{k\ne y_i}s_k(z_i),
 </div>
 </div>
 <h2 id="pca-is-a-shadow-not-the-proof">PCA is a shadow, not the proof</h2>
-<p>A two-dimensional PCA projection is not a certificate of separability. High-dimensional classes can be linearly separated even when a two-dimensional projection overlaps, and a clean projection can also be misleading.</p>
-<p>Still, PCA is useful as a visual sanity check. If the backbone is really linearizing the task, the PCA shadow should show class clouds becoming more organized over checkpoints. The margins above are the measurement; PCA is only the picture.</p>
+<p>A two-dimensional PCA projection isn’t a certificate of separability. High-dimensional classes can be linearly separated even when a two-dimensional projection overlaps, and a clean-looking projection can be misleading in the other direction too. The margins above are the measurement; PCA is only a sanity check that the representation is organizing itself visually.</p>
 <div id="cell-fig-pca-points" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div id="fig-pca-points" class="quarto-float quarto-figure quarto-figure-center">
@@ -325,32 +232,12 @@ Figure&nbsp;1: PCA projections of frozen test features across checkpoints. This 
 </div>
 </div>
 </div>
-<h2 id="the-leaderboard-gain">The leaderboard gain</h2>
-<p>At the final checkpoint, nonlinear heads do improve over plain logistic regression:</p>
-<p><span class="math display">
-\text{logistic regression}=0.9865,
-\qquad
-\text{best nonlinear heads}\approx 0.9881.
-</span></p>
-<p>That is a gain of about</p>
-<p><span class="math display">
-0.0016,
-</span></p>
-<p>or 16 examples per 10,000. Against logistic regression, some paired tests are significant.</p>
-<p>But this is the weaker comparison. The best linear head at the same checkpoint was a linear SVM:</p>
-<p><span class="math display">
-\text{linear SVM}=0.9875.
-</span></p>
-<p>Against this stronger linear baseline, the nonlinear heads improve by only</p>
-<p><span class="math display">
-0.0005\text{ to }0.0006,
-</span></p>
-<p>with bootstrap confidence intervals crossing zero and McNemar <span class="math inline">p</span>-values around <span class="math inline">0.38</span> to <span class="math inline">0.54</span>.</p>
-<p>So the main conclusion is not that nonlinear heads never help. The conclusion is sharper:</p>
-<blockquote>
-<p>A nonlinear head can beat a weak linear probe while failing to beat the best regularized linear probe in a statistically stable way.</p>
-</blockquote>
-<p>That distinction matters. If the claim is that the backbone has left important nonlinear structure in the features, the right baseline is not just logistic regression. It is the best simple linear decision rule we can reasonably fit.</p>
+<h2 id="the-leaderboard-at-the-final-checkpoint">The leaderboard at the final checkpoint</h2>
+<p>At the final checkpoint, nonlinear heads do improve over logistic regression:</p>
+<p><span class="math display">\text{logistic regression} = 0.9865, \qquad \text{best nonlinear heads} \approx 0.9881.</span></p>
+<p>That’s a gain of about 0.0016, or 16 examples per 10,000. Against logistic regression, some paired tests are significant.</p>
+<p>But the best linear head at the same checkpoint — a linear SVM — scores 0.9875. Against that baseline, the nonlinear heads improve by only 0.0005 to 0.0006, with bootstrap confidence intervals crossing zero and McNemar <span class="math inline">p</span>-values around 0.38 to 0.54.</p>
+<p>A nonlinear head can beat a weak linear probe while failing to beat the best regularized linear probe in a statistically stable way. If the claim is that the backbone left important nonlinear structure in the features, the right baseline isn’t just logistic regression — it’s the best simple linear decision rule you can fit.</p>
 <div class="narrow-figure">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -383,57 +270,15 @@ Figure&nbsp;1: PCA projections of frozen test features across checkpoints. This 
 </figure>
 </div>
 </div>
-<h2 id="why-the-late-gain-is-small">Why the late gain is small</h2>
-<p>Once the representation is nearly linearly separable, most examples are easy for all reasonable heads. The remaining disagreements are concentrated near the boundary or among ambiguous examples.</p>
-<p>A nonlinear head can still change the labels of some of those points. But the size of the possible gain is now controlled by the small remaining error of the best linear head.</p>
-<p>In this run, the best linear head has error about</p>
-<p><span class="math display">
-1-0.9875=0.0125.
-</span></p>
-<p>The nonlinear gain over it is about</p>
-<p><span class="math display">
-0.0006,
-</span></p>
-<p>which is roughly</p>
-<p><span class="math display">
-\frac{0.0006}{0.0125}\approx 4.8\%
-</span></p>
-<p>of the remaining linear error.</p>
-<p>That is not nothing. But it is not a qualitative change in the geometry. It is a small improvement inside a regime where the backbone has already made the task mostly linear.</p>
+<h2 id="why-the-late-gain-is-so-small">Why the late gain is so small</h2>
+<p>Once the representation is nearly linearly separable, most examples are easy for all reasonable heads. The remaining disagreements are concentrated near the boundary or among genuinely ambiguous digits.</p>
+<p>A nonlinear head can still relabel some of those points. But the size of the possible gain is now controlled by the small remaining error of the best linear head. Here, that error is about <span class="math inline">1 - 0.9875 = 0.0125</span>. The nonlinear gain over it is about 0.0006, which is roughly 4.8% of the remaining linear error. Not nothing — but not a qualitative change in the geometry either.</p>
 <h2 id="conformal-prediction-as-an-uncertainty-diagnostic">Conformal prediction as an uncertainty diagnostic</h2>
-<p>Accuracy asks which head wins point prediction. Conformal prediction asks a slightly different question:</p>
-<blockquote>
-<p>At fixed coverage, does the nonlinear head produce smaller prediction sets?</p>
-</blockquote>
-<p>At 90% coverage, this diagnostic is intentionally coarse. Since the final top-1 accuracies are already far above 90%, rank conformal has little room to distinguish the heads. That triviality is itself informative: at this coverage level, uncertainty has already collapsed to singleton predictions.</p>
-<p>For classification, a split-conformal predictor returns a set</p>
-<p><span class="math display">
-C(x)\subseteq\{1,\ldots,K\}
-</span></p>
-<p>rather than a single label. Ideally,</p>
-<p><span class="math display">
-\mathbb P\{Y\in C(X)\}\ge 1-\alpha.
-</span></p>
-<p>The experiment uses a separate selection, calibration, and evaluation protocol, so the head is not selected on the same examples used for the final conformal report.</p>
-<p>For the main run I used a rank score. Let <span class="math inline">S_k(x)</span> be the score assigned to class <span class="math inline">k</span>. Define the rank nonconformity score</p>
-<p><span class="math display">
-r_y(x)
-=
-1+\#\{k:S_k(x)&gt;S_y(x)\}.
-</span></p>
-<p>The true top class has rank <span class="math inline">1</span>, the second class has rank <span class="math inline">2</span>, and so on. On calibration data, compute the conformal quantile <span class="math inline">\widehat q</span>. On a new point,</p>
-<p><span class="math display">
-C(x)=\{y:r_y(x)\le \widehat q\}.
-</span></p>
-<p>With this rank score, singleton conformal sets occur when <span class="math inline">\widehat q=1</span>, meaning the top-ranked label is already sufficient for the desired marginal coverage.</p>
-<p>At the final checkpoint, the answer is yes for every head. With a 90% target, all heads have</p>
-<p><span class="math display">
-\text{average set size}=1.0,
-\qquad
-\text{singleton rate}=1.0,
-</span></p>
-<p>and coverage around <span class="math inline">0.988</span> on the conformal evaluation split.</p>
-<p>This should not be read as calibration evidence. At this checkpoint, the top-ranked class is already enough for a 90% conformal target, so the conformal sets collapse to singletons.</p>
+<p>Accuracy asks which head wins point prediction. Conformal prediction asks something slightly different: at fixed coverage, does the nonlinear head produce smaller prediction sets?</p>
+<p>For classification, a split-conformal predictor returns a set <span class="math inline">C(x) \subseteq \{1,\ldots,K\}</span> satisfying <span class="math inline">\mathbb{P}\{Y \in C(X)\} \ge 1 - \alpha</span>. I used a rank nonconformity score: for scores <span class="math inline">S_k(x)</span>, define</p>
+<p><span class="math display">r_y(x) = 1 + \#\{k : S_k(x) &gt; S_y(x)\}.</span></p>
+<p>The true top class has rank 1, the second class rank 2, and so on. On calibration data, compute the conformal quantile <span class="math inline">\hat{q}</span>, then <span class="math inline">C(x) = \{y : r_y(x) \le \hat{q}\}</span>.</p>
+<p>At the final checkpoint, at 90% coverage, every head gives average set size 1.0 and singleton rate 1.0, with coverage around 0.988. This isn’t a calibration result — it means the top-ranked class is already sufficient for the desired marginal coverage, so conformal sets collapse to singletons.</p>
 <div class="narrow-figure">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -458,30 +303,18 @@ C(x)=\{y:r_y(x)\le \widehat q\}.
 </figure>
 </div>
 </div>
-<p>The early checkpoints are more informative. Around epoch 0, the selected conformal predictor has average set size about <span class="math inline">2.69</span> and singleton rate about <span class="math inline">0.23</span>. Around epoch 1, average set size is already about <span class="math inline">1.19</span> and singleton rate about <span class="math inline">0.82</span>. From epoch 2 onward, singleton sets are enough.</p>
-<p>So the conformal story mirrors the separability story:</p>
-<blockquote>
-<p>As the backbone linearizes the task, conformal sets collapse from multi-label uncertainty to singleton predictions.</p>
-</blockquote>
-<p>The nonlinear head may still win a few point predictions, but it does not buy a qualitatively smaller uncertainty set once the representation is already linearly readable.</p>
-<h2 id="what-the-experiment-does-not-show">What the experiment does not show</h2>
-<p>This is a diagnostic, not a universal theorem.</p>
-<p>First, MNIST is easy. A harder dataset such as CIFAR-10 should leave a longer middle regime where nonlinear heads and conformal set sizes differ more visibly.</p>
-<p>Second, finite-sample separability is not the same as useful separability. In high dimension, many training sets can be separated. The relevant question is whether a regularized linear classifier generalizes with margin.</p>
-<p>Third, rank conformal is coarse. Once top-1 accuracy exceeds the coverage target, rank conformal returns singleton sets. For a finer uncertainty comparison, one should also try higher coverage targets such as <span class="math inline">99\%</span>, or probability-based scores such as LAC, APS, or RAPS.</p>
-<p>But for this note, the coarse diagnostic is useful precisely because it becomes trivial: when top-1 singleton sets already overcover, uncertainty is no longer where the nonlinear head is helping.</p>
+<p>The early checkpoints are more informative. Around epoch 0, average set size is about 2.69 and singleton rate about 0.23. By epoch 1, average set size is already 1.19 and singleton rate 0.82. From epoch 2 onward, singleton sets are enough.</p>
+<p>The conformal story mirrors the separability story: as the backbone linearizes the task, conformal sets collapse from multi-label uncertainty to singleton predictions. The nonlinear head may still win a few point predictions, but it doesn’t buy meaningfully smaller uncertainty sets once the representation is already linearly readable.</p>
+<h2 id="what-this-doesnt-show">What this doesn’t show</h2>
+<p>A few honest caveats. MNIST is easy — a harder dataset like CIFAR-10 should leave a longer middle regime where nonlinear heads and conformal set sizes differ more visibly. Finite-sample separability isn’t the same as useful separability either; in high dimension, many training sets can be separated, and what matters is whether a regularized linear classifier generalizes with margin. And rank conformal is coarse: once top-1 accuracy exceeds the coverage target, it returns singleton sets regardless, so for a finer uncertainty comparison you’d want higher coverage targets (e.g.&nbsp;99%) or probability-based scores like LAC, APS, or RAPS.</p>
+<p>For this note, the coarseness is actually useful — when singleton sets already overcover, uncertainty is no longer where the nonlinear head is helping.</p>
 <h2 id="takeaway">Takeaway</h2>
-<p>The nonlinear head is not magic added after the backbone. It is a test of what geometry the backbone left behind.</p>
-<p>If nonlinear heads help a lot, the representation has not made the task linearly readable. If nonlinear heads help only by a few borderline examples, and if conformal sets are already singleton at the desired coverage, then the backbone has already done the main work.</p>
-<p>In this experiment, the late-checkpoint representation is not merely accurate. It is linearly readable with large margin. Nonlinear heads can slightly reshuffle the boundary, but they do not change the basic picture:</p>
-<p><span class="math display">
-\boxed{
-\text{the bottleneck is linear readability of the representation.}
-}
-</span></p>
+<p>The nonlinear head isn’t magic added after the backbone. It’s a test of what geometry the backbone left behind.</p>
+<p>If nonlinear heads help a lot, the representation hasn’t made the task linearly readable. If they help only by a few borderline examples, and conformal sets are already singleton at the desired coverage, the backbone has done the main work. In this experiment, the late-checkpoint representation is not merely accurate — it’s linearly readable with large margin, and the bottleneck is there, not in the head.</p>
+<hr>
 <h2 id="reproducibility-notes">Reproducibility notes</h2>
-<p>The run used saved checkpoints and posthoc frozen-feature evaluation. For the blog version, the post directory is organized as</p>
-<pre class="text"><code>blog/posts/linear_readability_bottleneck/
+<p>The run used saved checkpoints and post-hoc frozen-feature evaluation. The post directory is organized as:</p>
+<pre><code>blog/posts/linear_readability_bottleneck/
   index.qmd
   figures/
     geometry_diagnostics.png
@@ -500,10 +333,11 @@ C(x)=\{y:r_y(x)\le \widehat q\}.
     pca_points.csv
   config.json
   summary.md</code></pre>
-<p>The PCA panel is generated from <code>data/pca_points.csv</code>. The other figures are loaded from the saved <code>figures/</code> directory. The CSV files are included as resources so that the post remains reproducible without rerunning the training script.</p>
+<p>The PCA panel is generated from <code>data/pca_points.csv</code>. Other figures are loaded from the saved <code>figures/</code> directory. CSV files are included as resources so the post remains reproducible without rerunning the training script.</p>
+<hr>
 <h2 id="references">References</h2>
 <p>Guillaume Alain and Yoshua Bengio. “Understanding Intermediate Layers Using Linear Classifier Probes.” arXiv:1610.01644, 2016.</p>
-<p>Simon Kornblith, Jonathon Shlens, and Quoc V. Le. “Do Better ImageNet Models Transfer Better?” <em>Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition</em>, 2019.</p>
+<p>Simon Kornblith, Jonathon Shlens, and Quoc V. Le. “Do Better ImageNet Models Transfer Better?” <em>CVPR</em>, 2019.</p>
 <p>Vladimir Vovk, Alexander Gammerman, and Glenn Shafer. <em>Algorithmic Learning in a Random World</em>. Springer, 2005.</p>
 <p>Anastasios N. Angelopoulos and Stephen Bates. “A Gentle Introduction to Conformal Prediction and Distribution-Free Uncertainty Quantification.” arXiv:2107.07511, 2021.</p>
 <p>Quinn McNemar. “Note on the Sampling Error of the Difference Between Correlated Proportions or Percentages.” <em>Psychometrika</em> 12, 1947.</p>

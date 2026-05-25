@@ -141,15 +141,14 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#preface" id="toc-preface">Preface</a></li>
-  <li><a href="#part-i-a-one-signal-coordinate-model" id="toc-part-i-a-one-signal-coordinate-model">Part I: A one-signal-coordinate model</a></li>
-  <li><a href="#part-ii-why-distance-loses-the-signal" id="toc-part-ii-why-distance-loses-the-signal">Part II: Why distance loses the signal</a></li>
-  <li><a href="#part-iii-accuracy-as-nuisance-dimension-grows" id="toc-part-iii-accuracy-as-nuisance-dimension-grows">Part III: Accuracy as nuisance dimension grows</a></li>
-  <li><a href="#part-iv-noise-rarely-looks-like-noise" id="toc-part-iv-noise-rarely-looks-like-noise">Part IV: Noise rarely looks like noise</a></li>
-  <li><a href="#part-v-one-hot-nuisance-is-different" id="toc-part-v-one-hot-nuisance-is-different">Part V: One-hot nuisance is different</a></li>
-  <li><a href="#part-vi-connection-to-retrieval" id="toc-part-vi-connection-to-retrieval">Part VI: Connection to retrieval</a></li>
+  <li><a href="#a-one-signal-coordinate-model" id="toc-a-one-signal-coordinate-model">A one-signal-coordinate model</a></li>
+  <li><a href="#why-distance-loses-the-signal" id="toc-why-distance-loses-the-signal">Why distance loses the signal</a></li>
+  <li><a href="#accuracy-as-nuisance-dimension-grows" id="toc-accuracy-as-nuisance-dimension-grows">Accuracy as nuisance dimension grows</a></li>
+  <li><a href="#noise-rarely-looks-like-noise" id="toc-noise-rarely-looks-like-noise">Noise rarely looks like noise</a></li>
+  <li><a href="#one-hot-nuisance-is-different" id="toc-one-hot-nuisance-is-different">One-hot nuisance is different</a></li>
+  <li><a href="#connection-to-retrieval" id="toc-connection-to-retrieval">Connection to retrieval</a></li>
   <li><a href="#takeaway" id="toc-takeaway">Takeaway</a></li>
-  <li><a href="#technical-appendix" id="toc-technical-appendix">Technical appendix</a></li>
+  <li><a href="#appendix" id="toc-appendix">Appendix</a></li>
   <li><a href="#references" id="toc-references">References</a></li>
   <li><a href="#suggested-citation" id="toc-suggested-citation">Suggested citation</a></li>
   </ul>
@@ -173,79 +172,40 @@ window.Quarto = {
   margin-right: auto;
 }
 </style>
-<p><strong>Claim.</strong> Nearest-neighbor retrieval fails when metric closeness and task relevance diverge.<br>
-<strong>Scope.</strong> Synthetic diagnostics for noisy-feature geometry, not a full theory of RAG.</p>
-<h2 id="preface">Preface</h2>
 <p>Nearest-neighbor methods are attractive because the rule is almost embarrassingly simple: find points close to the query, and let those points decide. The weakness is hidden in the word <em>close</em>. A nearest-neighbor method is only as good as the geometry induced by its representation and metric.</p>
 <p>This note studies a deliberately small example. There is one informative coordinate and many nuisance coordinates. The Bayes rule does not change as dimension grows, because it only needs the informative coordinate. Euclidean <span class="math inline">k</span>NN, however, uses all coordinates equally. As nuisance coordinates accumulate, distance rankings become less related to the label.</p>
-<p>The same issue appears in retrieval systems. A retrieval-augmented generation system embeds a query and a collection of document chunks, then retrieves nearby chunks. If the representation makes the right passages close, the language model receives useful context. If irrelevant variation shapes the neighborhood, the model receives plausible but unhelpful context.</p>
-<p>This toy model gives a diagnostic for retrieval: nearest-neighbor methods work only when distance tracks relevance.</p>
-<p>I will call this the <strong>relevance gap</strong>: the gap between being close under the retrieval metric and being useful for the task. In the toy model, the gap appears because Euclidean distance listens to nuisance coordinates. In retrieval systems, it appears when embedding similarity retrieves passages that are topically plausible but not actually answer-bearing.</p>
-<h2 id="part-i-a-one-signal-coordinate-model">Part I: A one-signal-coordinate model</h2>
-<p>Let</p>
+<p>The same issue appears in retrieval systems. A retrieval-augmented generation system embeds a query and a collection of document chunks, then retrieves nearby chunks. If the representation makes the right passages close, the language model receives useful context. If irrelevant variation shapes the neighborhood, the model receives plausible but unhelpful context. I will call this the <strong>relevance gap</strong>: the gap between being close under the retrieval metric and being useful for the task.</p>
+<h2 id="a-one-signal-coordinate-model">A one-signal-coordinate model</h2>
+<p>Let <span class="math inline">Y \sim \mathrm{Bernoulli}(1/2)</span>. Conditional on the label, generate</p>
 <p><span class="math display">
-Y\sim \mathrm{Bernoulli}(1/2),
-\qquad
-Y\in\{0,1\}.
+X \mid Y = y \sim N_d\big((2y-1)\mu e_1,\, I_d\big),
 </span></p>
-<p>Conditional on the label, generate</p>
+<p>where <span class="math inline">e_1 = (1,0,\ldots,0) \in \mathbb{R}^d</span>. Only the first coordinate is informative; the remaining <span class="math inline">d-1</span> are independent noise. With equal priors and common covariance, the Bayes classifier is</p>
 <p><span class="math display">
-X\mid Y=y
-\sim
-N_d\big((2y-1)\mu e_1,I_d\big),
+h^*(x) = \mathbf{1}\{x_1 \ge 0\},
 </span></p>
-<p>where</p>
+<p>with accuracy <span class="math inline">\Phi(\mu)</span>, independent of <span class="math inline">d</span>. The classification problem itself does not get harder as dimension grows. The signal is still there, in the same coordinate, with the same strength.</p>
+<p>Euclidean <span class="math inline">k</span>NN uses a different geometry:</p>
 <p><span class="math display">
-e_1=(1,0,\ldots,0)\in\mathbb{R}^d.
+\|x - x'\|_2^2 = (x_1 - x_1')^2 + \sum_{j=2}^d (x_j - x_j')^2.
 </span></p>
-<p>Only the first coordinate is informative. The remaining <span class="math inline">d-1</span> coordinates are independent noise. With equal priors and common covariance, the Bayes classifier is</p>
+<p>The informative coordinate contributes one term. The nuisance coordinates contribute <span class="math inline">d-1</span> terms. As <span class="math inline">d</span> grows, most of the distance comes from coordinates that carry no label information.</p>
+<h2 id="why-distance-loses-the-signal">Why distance loses the signal</h2>
+<p>Compare two candidate neighbors for a query point: one from the same class and one from the opposite class. Define</p>
 <p><span class="math display">
-h^*(x)=\mathbf{1}\{x_1\ge0\}.
+Z = \|x - X^{(o)}\|_2^2 - \|x - X^{(s)}\|_2^2,
 </span></p>
-<p>Its accuracy is</p>
+<p>where <span class="math inline">X^{(s)}</span> is a same-class candidate and <span class="math inline">X^{(o)}</span> is an opposite-class candidate. If <span class="math inline">Z &gt; 0</span>, the same-class point is closer. In this Gaussian model,</p>
 <p><span class="math display">
-\mathbb{P}\{h^*(X)=Y\}=\Phi(\mu),
+\mathbb{E}[Z] = 4\mu^2, \qquad \operatorname{Var}(Z) = 12d + 32\mu^2.
 </span></p>
-<p>which is independent of <span class="math inline">d</span>. So the classification problem itself does not become harder as dimension grows. The signal is still there, in the same coordinate, with the same strength.</p>
-<p>Euclidean <span class="math inline">k</span>NN uses a different geometry. It compares a query <span class="math inline">x</span> with a training point <span class="math inline">x'</span> using</p>
+<p>The mean advantage of the same-class point is fixed. The variance of the distance comparison grows linearly with dimension. A normal approximation gives</p>
 <p><span class="math display">
-\|x-x'\|_2^2
-=
-(x_1-x_1')^2+\sum_{j=2}^d (x_j-x_j')^2.
+\mathbb{P}(Z &gt; 0) \approx \Phi\!\left(\frac{2\mu^2}{\sqrt{3d + 8\mu^2}}\right),
 </span></p>
-<p>The informative coordinate contributes one term. The nuisance coordinates contribute <span class="math inline">d-1</span> terms. As <span class="math inline">d</span> grows, most of the distance comes from coordinates that contain no label information.</p>
-<h2 id="part-ii-why-distance-loses-the-signal">Part II: Why distance loses the signal</h2>
-<p>A compact way to see the problem is to compare two candidate neighbors for a query point: one from the same class and one from the opposite class. Define</p>
-<p><span class="math display">
-Z
-=
-\|x-X^{(o)}\|_2^2
--
-\|x-X^{(s)}\|_2^2,
-</span></p>
-<p>where <span class="math inline">X^{(s)}</span> is a same-class candidate and <span class="math inline">X^{(o)}</span> is an opposite-class candidate. If <span class="math inline">Z&gt;0</span>, the same-class point is closer.</p>
-<p>In this Gaussian model,</p>
-<p><span class="math display">
-\mathbb{E}[Z]=4\mu^2,
-\qquad
-\operatorname{Var}(Z)=12d+32\mu^2.
-</span></p>
-<p>The mean advantage of the same-class point is fixed. The variance of the distance comparison grows linearly with dimension. A normal approximation therefore gives</p>
-<p><span class="math display">
-\mathbb{P}(Z&gt;0)
-\approx
-\Phi\left(
-\frac{4\mu^2}{\sqrt{12d+32\mu^2}}
-\right)
-=
-\Phi\left(
-\frac{2\mu^2}{\sqrt{3d+8\mu^2}}
-\right).
-</span></p>
-<p>As <span class="math inline">d\to\infty</span>, this probability tends to <span class="math inline">1/2</span>. Pairwise distance ordering becomes nearly label-agnostic, even though the Bayes rule is unchanged.</p>
-<p>This is the mathematical core of the toy example: the signal in the distance comparison stays fixed, but the nuisance fluctuation grows.</p>
-<h2 id="part-iii-accuracy-as-nuisance-dimension-grows">Part III: Accuracy as nuisance dimension grows</h2>
-<p>We now simulate exact Euclidean <span class="math inline">k</span>NN. The Bayes classifier uses only <span class="math inline">x_1</span>. The kNN classifier uses all coordinates.</p>
+<p>which tends to <span class="math inline">1/2</span> as <span class="math inline">d \to \infty</span>. Pairwise distance ordering becomes nearly label-agnostic, even though the Bayes rule is unchanged. The signal in the distance comparison stays fixed; the nuisance fluctuation grows.</p>
+<h2 id="accuracy-as-nuisance-dimension-grows">Accuracy as nuisance dimension grows</h2>
+<p>Simulating exact Euclidean <span class="math inline">k</span>NN against the Bayes classifier:</p>
 <div id="cell-fig-dimension-sweep" class="cell" data-fig-height="8" data-fig-width="7" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div id="fig-dimension-sweep" class="quarto-float quarto-figure quarto-figure-center">
@@ -260,16 +220,10 @@ Figure&nbsp;1: As nuisance dimension grows, Bayes accuracy stays stable while Eu
 </div>
 </div>
 </div>
-<p>The upper panel separates the statistical problem from the metric problem. The Bayes accuracy stays stable because the decision boundary is still <span class="math inline">x_1=0</span>. Euclidean kNN degrades because it uses a distance in which many irrelevant coordinates contribute.</p>
-<p>The lower panel shows a crude distance-concentration diagnostic. As the nearest and farthest distances become less contrasted, the neighborhood becomes less meaningful. This ratio is not a theorem about kNN accuracy, but it tracks the geometry that is causing the failure.</p>
-<h2 id="part-iv-noise-rarely-looks-like-noise">Part IV: Noise rarely looks like noise</h2>
+<p>The upper panel separates the statistical problem from the metric problem. Bayes accuracy stays stable because the decision boundary is still <span class="math inline">x_1 = 0</span>, while Euclidean <span class="math inline">k</span>NN degrades because it uses a distance where many irrelevant coordinates contribute. The lower panel shows a crude distance-concentration diagnostic: as nearest and farthest distances become less contrasted, the neighborhood becomes less meaningful.</p>
+<h2 id="noise-rarely-looks-like-noise">Noise rarely looks like noise</h2>
 <p>A natural objection is that nobody intentionally adds independent Gaussian noise features. But nuisance variation enters real datasets in less obvious ways: irrelevant engineered features, broad metadata, repeated boilerplate, weak proxies, and representation dimensions that are not useful for the specific task.</p>
-<p>To isolate the effect, start with the same one-dimensional signal and append <span class="math inline">m</span> useless coordinates. We compare three rules:</p>
-<ol type="1">
-<li>kNN using all coordinates;</li>
-<li>kNN using only the informative coordinate, an oracle metric;</li>
-<li>the Bayes rule, which also uses only the informative coordinate.</li>
-</ol>
+<p>Starting with the same one-dimensional signal and appending <span class="math inline">m</span> useless coordinates, we compare three rules: <span class="math inline">k</span>NN using all coordinates, <span class="math inline">k</span>NN using only the informative coordinate as an oracle metric, and the Bayes rule.</p>
 <div id="cell-fig-added-noise" class="cell" data-fig-height="4.5" data-fig-width="7" data-execution_count="5">
 <div class="cell-output cell-output-display">
 <div id="fig-added-noise" class="quarto-float quarto-figure quarto-figure-center">
@@ -284,39 +238,18 @@ Figure&nbsp;2: Appending useless features hurts kNN using all coordinates, while
 </div>
 </div>
 </div>
-<p>The oracle one-dimensional kNN is the important comparison. It shows that the deterioration is not caused by a harder classification boundary. The boundary is unchanged. What changes is the geometry used by the nearest-neighbor rule.</p>
-<p>The signal is still present. The metric is simply listening to too many irrelevant directions.</p>
-<h2 id="part-v-one-hot-nuisance-is-different">Part V: One-hot nuisance is different</h2>
-<p>The independent Gaussian nuisance model is useful because the algebra is clean. But it is not the only way nuisance features appear. In tabular data, nuisance often enters through one-hot encoded categorical variables.</p>
-<p>One-hot encoding has different geometry. A categorical field with <span class="math inline">m</span> levels becomes <span class="math inline">m</span> coordinates, but those coordinates are dependent: exactly one entry is equal to one. So the raw one-hot dimension is not the right effective nuisance dimension.</p>
-<p>Suppose we append <span class="math inline">C</span> independent categorical fields. Each field has level probabilities</p>
+<p>The oracle one-dimensional <span class="math inline">k</span>NN is the important comparison. The deterioration is not caused by a harder classification boundary — the boundary is unchanged. What changes is the geometry used by the nearest-neighbor rule. The signal is still present; the metric is just listening to too many irrelevant directions.</p>
+<h2 id="one-hot-nuisance-is-different">One-hot nuisance is different</h2>
+<p>The independent Gaussian nuisance model is useful because the algebra is clean, but it is not the only way nuisance features appear. In tabular data, nuisance often enters through one-hot encoded categorical variables, which have different geometry. A categorical field with <span class="math inline">m</span> levels becomes <span class="math inline">m</span> coordinates that are dependent: exactly one entry equals one.</p>
+<p>Suppose we append <span class="math inline">C</span> independent categorical fields, each with level probabilities <span class="math inline">p = (p_1,\ldots,p_m)</span>, and let</p>
 <p><span class="math display">
-p=(p_1,\ldots,p_m).
+q = 1 - \sum_\ell p_\ell^2
 </span></p>
-<p>Let</p>
+<p>be the mismatch probability between two independent draws. With scaling <span class="math inline">\alpha</span>, one categorical field contributes variance</p>
 <p><span class="math display">
-q
-=
-\mathbb{P}\{Z\ne Z'\}
-=
-1-\sum_{\ell=1}^m p_\ell^2
+\operatorname{Var}(Z_{\text{one-hot}}) = 8\alpha^4 C q(1-q)
 </span></p>
-<p>be the mismatch probability between two independent draws from one categorical field. If the one-hot block is scaled by <span class="math inline">\alpha</span>, then one categorical field contributes either <span class="math inline">0</span> or <span class="math inline">2\alpha^2</span> to squared Euclidean distance.</p>
-<p>In the same pairwise diagnostic as before, the one-hot nuisance contributes mean zero and variance</p>
-<p><span class="math display">
-\operatorname{Var}(Z_{\text{one-hot}})
-=
-8\alpha^4 Cq(1-q).
-</span></p>
-<p>Including the signal coordinate gives</p>
-<p><span class="math display">
-\operatorname{Var}(Z)
-=
-12+32\mu^2+8\alpha^4 Cq(1-q),
-\qquad
-\mathbb{E}[Z]=4\mu^2.
-</span></p>
-<p>This is the caveat that keeps the story from becoming “high dimension is bad.” One-hot nuisance does not behave like <span class="math inline">Cm</span> independent Gaussian noise coordinates. The danger is controlled more by the number of categorical fields <span class="math inline">C</span>, the scaling <span class="math inline">\alpha</span>, and the mismatch variance <span class="math inline">q(1-q)</span>.</p>
+<p>to the pairwise distance diagnostic, while the signal mean stays <span class="math inline">4\mu^2</span>. The danger is controlled by the number of fields <span class="math inline">C</span>, the scaling <span class="math inline">\alpha</span>, and the mismatch variance <span class="math inline">q(1-q)</span> — not raw ambient dimension.</p>
 <div id="cell-fig-onehot-diagnostic" class="cell" data-fig-height="4.5" data-fig-width="7" data-execution_count="6">
 <div class="cell-output cell-output-display">
 <div id="fig-onehot-diagnostic" class="quarto-float quarto-figure quarto-figure-center">
@@ -331,20 +264,15 @@ Figure&nbsp;3: One-hot nuisance is controlled by fields, scaling, and mismatch v
 </div>
 </div>
 </div>
-<p>The message is more nuanced than “high dimension is bad.” A single high-cardinality one-hot column need not act like thousands of independent noise coordinates. But many categorical fields, poor scaling, skewed levels, or missingness patterns can still make Euclidean neighborhoods noisy.</p>
-<p>This distinction is useful in practice. If kNN or retrieval fails, the issue may not be ambient dimension itself. It may be the effective geometry induced by preprocessing and feature weighting.</p>
-<h2 id="part-vi-connection-to-retrieval">Part VI: Connection to retrieval</h2>
-<p>A retrieval-augmented generation system usually begins with nearest-neighbor search. A query is embedded into a vector space, document chunks are embedded into the same space, and the system retrieves chunks that are close to the query under cosine similarity, inner product, or another score.</p>
-<p>Cosine similarity does not change the point of the note. If embeddings are normalized, cosine similarity and Euclidean distance induce the same nearest-neighbor ranking, since</p>
-<p><span class="math display">
-\|u-v\|^2 = 2 - 2\langle u,v\rangle
-</span></p>
-<p>whenever <span class="math inline">\|u\|=\|v\|=1</span>. If embeddings are not normalized, cosine removes variation in vector length, but it still depends on the direction of the vector. Irrelevant directional variation can still dominate the neighborhood. Thus the relevance gap is not specifically a Euclidean problem; it is a metric-alignment problem.</p>
-<p>The analogy is:</p>
+<p>A single high-cardinality one-hot column need not act like thousands of independent noise coordinates. But many categorical fields, poor scaling, skewed levels, or missingness patterns can still make Euclidean neighborhoods noisy. If <span class="math inline">k</span>NN or retrieval fails, the issue may not be ambient dimension itself — it may be the effective geometry induced by preprocessing and feature weighting.</p>
+<h2 id="connection-to-retrieval">Connection to retrieval</h2>
+<p>A retrieval-augmented generation system usually begins with nearest-neighbor search: a query is embedded into a vector space, document chunks are embedded into the same space, and the system retrieves chunks close to the query under cosine similarity or inner product.</p>
+<p>Cosine similarity does not change the point. If embeddings are normalized, cosine similarity and Euclidean distance induce the same nearest-neighbor ranking, since <span class="math inline">\|u - v\|^2 = 2 - 2\langle u,v\rangle</span> when <span class="math inline">\|u\| = \|v\| = 1</span>. If they are not normalized, cosine removes variation in vector length but still depends on direction. Irrelevant directional variation can still dominate the neighborhood. The relevance gap is a metric-alignment problem, not specifically a Euclidean one.</p>
+<p>The analogy is direct:</p>
 <table class="caption-top">
 <thead>
 <tr class="header">
-<th>kNN experiment</th>
+<th><span class="math inline">k</span>NN experiment</th>
 <th>Retrieval system</th>
 </tr>
 </thead>
@@ -379,89 +307,32 @@ Figure&nbsp;3: One-hot nuisance is controlled by fields, scaling, and mismatch v
 </tr>
 </tbody>
 </table>
-<p>This gives a useful picture of a common retrieval failure. The generation model then receives a local neighborhood that is topically plausible but not answer-bearing.</p>
-<p>The oracle one-dimensional kNN in the toy experiment corresponds to a better retrieval metric: one that ignores nuisance variation and emphasizes the feature that matters for the question. In practical RAG systems, the analogues are better chunking, metadata filters, query rewriting, hybrid lexical–dense retrieval, domain-specific embeddings, and rerankers.</p>
-<p>Dense embeddings are not the villain here. They are useful precisely because they organize semantic structure. Retrieval fails when the geometry they impose is misaligned with the feature needed by the query.</p>
-<p>This is the retrieval version of the same relevance gap. The correct passage may exist in the corpus, but the metric may rank nearby passages according to the wrong kind of similarity. The retrieved chunks are close in embedding space, but not relevant in the sense needed by the query.</p>
+<p>The oracle one-dimensional <span class="math inline">k</span>NN corresponds to a better retrieval metric — one that ignores nuisance variation and emphasizes the feature that matters for the question. In practical RAG systems, the analogues are better chunking, metadata filters, query rewriting, hybrid lexical–dense retrieval, domain-specific embeddings, and rerankers.</p>
+<p>Dense embeddings are not the villain. They are useful precisely because they organize semantic structure. Retrieval fails when the geometry they impose is misaligned with the feature needed by the query. The correct passage may exist in the corpus, but the metric ranks nearby passages according to the wrong kind of similarity.</p>
 <h2 id="takeaway">Takeaway</h2>
-<p>Nearest-neighbor methods fail when closeness stops meaning relevance.</p>
-<p>In the Gaussian toy model, independent nuisance coordinates corrupt Euclidean distance. In one-hot tabular data, the relevant quantity is not raw ambient dimension but the effective geometry induced by fields, scaling, and mismatch variance. In retrieval systems, the same failure appears when top-ranked chunks are plausible but not answer-bearing.</p>
-<p>Across the Gaussian toy model, one-hot tabular data, and retrieval, the same failure appears: closeness stops tracking relevance. Once that happens, the local neighborhood may look plausible while becoming useless for the task.</p>
-<p>If the answer is no, increasing the sophistication of the downstream model may not fix the problem. The error has already entered through the retrieved neighborhood.</p>
-<h2 id="technical-appendix">Technical appendix</h2>
+<p>Nearest-neighbor methods fail when closeness stops meaning relevance. In the Gaussian toy model, independent nuisance coordinates corrupt Euclidean distance. In one-hot tabular data, the relevant quantity is the effective geometry induced by fields, scaling, and mismatch variance — not raw ambient dimension. In retrieval systems, the same failure appears when top-ranked chunks are plausible but not answer-bearing.</p>
+<p>Once the neighborhood is noisy, increasing the sophistication of the downstream model may not fix the problem. The error has already entered through the retrieved neighbors.</p>
+<hr>
+<h2 id="appendix">Appendix</h2>
 <h3 id="pairwise-gaussian-calculation">Pairwise Gaussian calculation</h3>
-<p>Write</p>
+<p>Write <span class="math inline">Z = \sum_{j=1}^d Z_j</span> with</p>
 <p><span class="math display">
-Z=\sum_{j=1}^d Z_j,
-\qquad
-Z_j=(x_j-X_j^{(o)})^2-(x_j-X_j^{(s)})^2.
+Z_j = (x_j - X_j^{(o)})^2 - (x_j - X_j^{(s)})^2.
 </span></p>
-<p>The coordinates are independent, so means and variances add. For <span class="math inline">j\ge2</span>, the query coordinate, same-class coordinate, and opposite-class coordinate are all independent <span class="math inline">N(0,1)</span>. Direct expansion gives</p>
+<p>For <span class="math inline">j \ge 2</span>, all three coordinates are independent <span class="math inline">N(0,1)</span>, giving <span class="math inline">\mathbb{E}[Z_j] = 0</span> and <span class="math inline">\operatorname{Var}(Z_j) = 12</span>. For the first coordinate, conditional on the query class,</p>
 <p><span class="math display">
-\mathbb{E}[Z_j]=0,
-\qquad
-\operatorname{Var}(Z_j)=12.
+x_1, X_1^{(s)} \sim N(\mu, 1), \qquad X_1^{(o)} \sim N(-\mu, 1),
 </span></p>
-<p>For the first coordinate, conditional on the query class,</p>
+<p>giving <span class="math inline">\mathbb{E}[Z_1] = 4\mu^2</span> and <span class="math inline">\operatorname{Var}(Z_1) = 12 + 32\mu^2</span>. Summing:</p>
 <p><span class="math display">
-x_1,X_1^{(s)}\sim N(\mu,1),
-\qquad
-X_1^{(o)}\sim N(-\mu,1),
+\mathbb{E}[Z] = 4\mu^2, \qquad \operatorname{Var}(Z) = 12d + 32\mu^2.
 </span></p>
-<p>up to the symmetric case with signs reversed. Direct expansion gives</p>
-<p><span class="math display">
-\mathbb{E}[Z_1]=4\mu^2,
-\qquad
-\operatorname{Var}(Z_1)=12+32\mu^2.
-</span></p>
-<p>Therefore</p>
-<p><span class="math display">
-\mathbb{E}[Z]=4\mu^2,
-\qquad
-\operatorname{Var}(Z)
-=
-(d-1)\cdot12+(12+32\mu^2)
-=
-12d+32\mu^2.
-</span></p>
-<p>This is the source of the diagnostic in Part II.</p>
 <h3 id="one-hot-calculation">One-hot calculation</h3>
-<p>For one categorical field, let</p>
+<p>For one categorical field, let <span class="math inline">M = \mathbf{1}\{Z \ne Z'\}</span> be the mismatch indicator. Then <span class="math inline">\mathbb{P}(M=1) = q</span> and <span class="math inline">\operatorname{Var}(M) = q(1-q)</span>. With scaling <span class="math inline">\alpha</span>, the squared-distance contribution is <span class="math inline">2\alpha^2 M</span>. In the pairwise diagnostic, one field contributes <span class="math inline">2\alpha^2(M_o - M_s)</span> with <span class="math inline">M_o, M_s</span> independent Bernoulli(<span class="math inline">q</span>), so <span class="math inline">\operatorname{Var}(M_o - M_s) = 2q(1-q)</span> and the variance per field is <span class="math inline">8\alpha^4 q(1-q)</span>. Summing over <span class="math inline">C</span> fields:</p>
 <p><span class="math display">
-M=\mathbf{1}\{Z\ne Z'\}
+\operatorname{Var}(Z_{\text{one-hot}}) = 8\alpha^4 C q(1-q).
 </span></p>
-<p>be the mismatch indicator between two independent draws. Then</p>
-<p><span class="math display">
-\mathbb{P}(M=1)=q,
-\qquad
-\operatorname{Var}(M)=q(1-q).
-</span></p>
-<p>With scaling <span class="math inline">\alpha</span>, the squared-distance contribution of one field is</p>
-<p><span class="math display">
-2\alpha^2M.
-</span></p>
-<p>In the pairwise diagnostic, one field contributes</p>
-<p><span class="math display">
-2\alpha^2(M_o-M_s),
-</span></p>
-<p>where <span class="math inline">M_o</span> and <span class="math inline">M_s</span> are independent Bernoulli<span class="math inline">(q)</span> variables. Hence</p>
-<p><span class="math display">
-\operatorname{Var}(M_o-M_s)
-=
-2q(1-q),
-</span></p>
-<p>and the variance contribution per field is</p>
-<p><span class="math display">
-(2\alpha^2)^2\cdot 2q(1-q)
-=
-8\alpha^4q(1-q).
-</span></p>
-<p>Summing over <span class="math inline">C</span> independent categorical fields gives</p>
-<p><span class="math display">
-\operatorname{Var}(Z_{\text{one-hot}})
-=
-8\alpha^4Cq(1-q).
-</span></p>
+<hr>
 <h2 id="references">References</h2>
 <p>Richard Bellman. <em>Dynamic Programming</em>. Princeton University Press, 1957.</p>
 <p>Evelyn Fix and Joseph L. Hodges Jr.&nbsp;<em>Discriminatory Analysis. Nonparametric Discrimination: Consistency Properties</em>. USAF School of Aviation Medicine, 1951.</p>

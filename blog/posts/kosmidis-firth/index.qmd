@@ -38,260 +38,91 @@ format:
 }
 </style>
 
-**Claim.** Firth’s adjustment can be read as a geometric bias that keeps likelihood inference away from the boundary.  
-**Scope.** Standard Firth and Jeffreys-volume facts; examples focused on separation in logistic models.
+A personal motivation sits behind this note. My friend and former professor Andrew P. Mullhaupt opened my eyes to a simple but easily forgotten point: bias is not always a disease. Used carelessly it distorts; used deliberately, with an understanding of the geometry, it can be a remedy.
 
-## Preface
+Firth's adjustment was introduced as a frequentist bias-reduction device — modify the likelihood score so that the leading $O(n^{-1})$ bias of the MLE disappears (Firth 1993). Jeffreys' prior is a geometric volume element: if Fisher information is the metric on a statistical model, then $|i(\beta)|^{1/2}\,d\beta$ is the natural volume form on that model. In canonical-link exponential-family GLMs, these two ideas meet:
 
-A personal motivation sits behind this note. My friend and former professor Andrew P. Mullhaupt opened my eyes to a simple but easily forgotten point: bias is not always a disease. Used carelessly, bias distorts. Used deliberately, with an understanding of the geometry, it can be a remedy.
-
-Firth's adjustment was introduced as a frequentist bias-reduction device: modify the likelihood score so that the leading $O(n^{-1})$ bias of the maximum likelihood estimator disappears (Firth 1993). Jeffreys' prior, on the other hand, is a geometric volume element: if Fisher information is the metric on a statistical model, then $|i(\beta)|^{1/2}\,d\beta$ is the natural volume form on that model. In canonical-link exponential-family GLMs, these two ideas meet:
-
-$$
-\partial_s\left\{\frac12\log |i(\beta)|\right\} = A_s(\beta),
-$$
+$$\partial_s\left\{\tfrac{1}{2}\log |i(\beta)|\right\} = A_s(\beta),$$
 
 where $A_s$ is Firth's adjustment to the $s$th score component.
 
-Kosmidis and Firth's 2009 and 2021 papers can be read as two developments of this same geometric picture (Kosmidis and Firth 2009; Kosmidis and Firth 2021). The 2009 paper extends bias reduction to exponential-family nonlinear models, where the model manifold bends because the predictor itself is nonlinear. The 2021 paper studies binomial-response GLMs, where the important geometric feature is not just curvature but the **boundary**: fitted probabilities can run to 0 or 1, Fisher volume collapses, and ordinary maximum likelihood can fail to exist.
+Kosmidis and Firth's 2009 and 2021 papers develop this geometric picture in two directions. The 2009 paper extends bias reduction to exponential-family nonlinear models, where the model manifold bends because the predictor itself is nonlinear. The 2021 paper studies binomial-response GLMs, where the important feature isn't just curvature but the boundary — fitted probabilities can run to 0 or 1, Fisher volume collapses, and ordinary maximum likelihood can fail to exist.
 
-The geometric reading is:
+The distinction I want to keep visible throughout: curvature explains first-order bias, while the boundary explains non-existence under separation. Firth's adjustment touches both, but the mechanisms are different.
 
-> Firth's adjustment corrects the first-order drift caused by statistical geometry, and in canonical GLMs that correction is exactly the gradient of the Jeffreys volume element. In separated binomial problems, the same volume element becomes a barrier at the boundary.
+## Curvature and volume
 
-There is also a philosophical point running through the note. Classical statistics often treats bias as something to be removed. Firth's approach is subtler. It starts from bias reduction, but the adjustment can also be read as a deliberate geometric regularization: the estimator is nudged away from regions where maximum likelihood behaves badly. In separated binomial GLMs, that nudge is not a cosmetic correction; it restores existence. In separated binomial problems, the principled bias introduced by Firth’s adjustment is the price of keeping the estimator finite.
+**The space of distributions as a landscape.** Think of every probability distribution on a fixed sample space as a point in an abstract space $\mathcal{P}$. A parametric model $\mathcal{M} = \{f(\cdot;\beta) : \beta \in \mathbb{R}^p\}$ is a $p$-dimensional surface inside $\mathcal{P}$. As $\beta$ varies, $f(\cdot;\beta)$ traces out the model manifold.
 
-The note has four parts. Part I gives the geometric intuition. Part II reads the Kosmidis--Firth papers through that lens. Part III gives a small synthetic fraud example. Part IV gives the technical appendix.
+**Fisher information is the ruler.** For nearby parameters $\beta$ and $\beta + d\beta$,
 
-The distinction I want to keep visible is this: curvature explains first-order bias, while the boundary explains non-existence under separation. Firth's adjustment touches both, but the mechanisms are different.
+$$\mathrm{KL}(f_\beta \,\|\, f_{\beta+d\beta}) = \tfrac{1}{2}\, d\beta^\top i(\beta)\, d\beta + o(\|d\beta\|^2),$$
 
-## Part I: Curvature and volume
+so Fisher information is the metric tensor — it tells us the squared length of an infinitesimal step on the model.
 
-### The space of distributions as a landscape
+**The MLE as projection.** A sample $y_1,\ldots,y_n$ defines an empirical distribution $\hat{F}_n$ that is usually not on $\mathcal{M}$. Maximum likelihood chooses the model point closest to $\hat{F}_n$ in KL sense — geometrically, dropping a perpendicular from the empirical distribution to the model manifold.
 
-Fix a sample space. Think of every probability distribution on it as a point in a large abstract space $\mathcal P$. For Bernoulli data with three observations, $\mathcal P$ is a simplex. For richer sample spaces, it may be infinite-dimensional. The picture we need is simple: one distribution, one point.
+**Why curvature creates bias.** Take a curve in the plane, say a parabola. Put a symmetric cloud of noisy points around a target point $P_0$ on that curve and project each point perpendicularly onto the curve. If the curve were a straight line, the projected points would remain symmetric around $P_0$. But if the curve bends, the projections drift. That drift is the geometric intuition behind the $O(n^{-1})$ bias of the MLE. In McCullagh-style notation:
 
-A parametric model
+$$b^s(\beta) = \kappa^{s,a}\kappa^{b,c}\left\{\tfrac{1}{2}\kappa_{a,b,c} + \kappa_{ab,c}\right\} + O(n^{-2}),$$
 
-$$
-\mathcal M = \{ f(\,\cdot\,;\beta) : \beta \in \mathbb R^p \}
-$$
+where $\kappa_{r,s} = E(U_r U_s)$ is Fisher information, $\kappa_{r,s,t} = E(U_r U_s U_t)$, $\kappa_{rs,t} = E(\partial_{rs}\ell\, U_t)$, raised indices denote the inverse of the information matrix, and repeated indices are summed (Cox and Snell 1968).
 
-is a $p$-dimensional surface inside $\mathcal P$. As $\beta$ varies, $f(\,\cdot\,;\beta)$ traces out the model manifold.
+Efron's statistical curvature gives one precise way to measure how much a statistical model bends inside a surrounding exponential family (Efron 1975). A model that is an affine subspace in natural-parameter space has zero Efron curvature — but that doesn't mean every coordinate representation of its MLE is exactly unbiased. For example, $\bar{Y}$ is unbiased for $\pi$ in a Bernoulli model, but $\operatorname{logit}(\bar{Y})$ is biased for $\operatorname{logit}(\pi)$. The curvature statement is about the family as a geometric object; finite-sample bias can also come from nonlinear coordinates and boundary effects.
 
-### Fisher information is the ruler
+**Firth's adjustment undoes the drift.** If the MLE drifts by $b(\beta)$, modify the score in the opposite direction:
 
-To do geometry on $\mathcal M$, we need a local notion of distance. The Kullback--Leibler divergence supplies one. For nearby parameters $\beta$ and $\beta+d\beta$,
+$$\tilde{U}_s(\beta) = U_s(\beta) + A_s(\beta), \qquad A_s(\beta) = -\kappa_{s,a}(\beta)\, b^a(\beta).$$
 
-$$
-\mathrm{KL}\{f_\beta\,\|\,f_{\beta+d\beta}\}
-= \frac12 d\beta^\top i(\beta)d\beta + o(\|d\beta\|^2),
-$$
+The solution of $\tilde{U}(\tilde\beta) = 0$ has bias of order $O(n^{-2})$ under standard regularity conditions (Firth 1993). In the projection picture, the Firth estimator corrects the first-order displacement caused by the geometry of the projection.
 
-where $i(\beta)$ is the Fisher information matrix. Thus Fisher information is the metric tensor: it tells us the squared length of an infinitesimal step on the model.
+**Jeffreys' prior is the Fisher volume element.** The Jeffreys prior $\pi_J(\beta) \propto |i(\beta)|^{1/2}$ is the natural volume element on the manifold — the analogue of $\sqrt{|g|}\,dx$ in Riemannian geometry, invariant under smooth reparametrization.
 
-### The MLE as projection
+**The canonical-link coincidence.** For canonical-link exponential-family GLMs,
 
-A sample $y_1,\dots,y_n$ defines an empirical distribution
+$$\partial_s\left\{\tfrac{1}{2}\log |i(\beta)|\right\} = A_s(\beta).$$
 
-$$
-\hat F_n = \frac1n \sum_i \delta_{y_i},
-$$
+Two seemingly different prescriptions coincide: modify the score to remove the leading bias, or maximize the log-likelihood plus the Jeffreys log-volume penalty. This is the central identity behind the note.
 
-which is usually not itself on the model surface $\mathcal M$. Maximum likelihood chooses the model point closest to $\hat F_n$ in the KL sense:
+## The Kosmidis–Firth program
 
-$$
-\hat\beta
-= \arg\min_\beta \mathrm{KL}\{\hat F_n\,\|\,f_\beta\},
-$$
+**2009: nonlinear predictors and extra curvature.** In an ordinary GLM, the predictor is linear: $\eta_i(\beta) = x_i^\top\beta$. With a canonical link, the model is an affine subspace of the saturated natural-parameter space. With a non-canonical link or a nonlinear predictor, the embedding bends.
 
-up to terms not depending on $\beta$. Geometrically, it is useful to imagine dropping a perpendicular from the empirical distribution to the model manifold.
+Kosmidis and Firth study exponential-family nonlinear models where $\eta_i(\beta)$ need not be linear (Kosmidis and Firth 2009). Let $F_{ir}(\beta) = \partial\eta_i/\partial\beta_r$ and $W$ the diagonal matrix of working weights. The weighted hat matrix is
 
-### Why curvature creates bias
+$$H(\beta) = W^{1/2}F(F^\top W F)^{-1}F^\top W^{1/2}.$$
 
-Now take a curve in the plane, say a parabola. Put a symmetric cloud of noisy points around a target point $P_0$ on that curve. Project each noisy point perpendicularly onto the curve. If the curve were a straight line, the projected points would remain symmetric around $P_0$. But if the curve bends, the projections are no longer symmetric along the curve: the average projected point drifts.
+There are two sources of geometry here: link curvature (from the relationship between $\eta_i$ and the distributional parameter) and predictor curvature (from second derivatives $\partial^2\eta_i/\partial\beta_r\partial\beta_s$). The 2009 paper gives a compact form for the adjusted score,
 
-That drift is the geometric intuition behind the $O(n^{-1})$ bias of the MLE. Cox and Snell's expansion writes that drift in coordinates (Cox and Snell 1968). In McCullagh-style notation,
+$$A(\beta) = F(\beta)^\top W(\beta)\xi(\beta),$$
 
-$$
-b^s(\beta)
-= \kappa^{s,a}\kappa^{b,c}
-\left\{\frac12\kappa_{a,b,c}+\kappa_{ab,c}\right\}
-+ O(n^{-2}),
-$$
+where $\xi_i$ combines the leverage term from the diagonal of $H$ with additional terms involving the second derivatives of $\eta_i(\beta)$. When $\eta_i$ is linear in $\beta$, the predictor-curvature term vanishes and the expression reduces to the familiar GLM adjustment. The method modifies Fisher scoring with a term built from objects already used in GLM fitting:
 
-where $\kappa_{r,s}=E(U_rU_s)$ is Fisher information, $\kappa_{r,s,t}=E(U_rU_sU_t)$, $\kappa_{rs,t}=E(\partial_{rs}\ell\,U_t)$, raised indices denote the inverse of the information matrix, and repeated indices are summed.
+$$\beta^{(k+1)} = \beta^{(k)} + i\{\beta^{(k)}\}^{-1}\left[U\{\beta^{(k)}\} + A\{\beta^{(k)}\}\right].$$
 
-Efron's statistical curvature gives one precise way to measure how much a statistical model bends inside a surrounding exponential family (Efron 1975). A model that is an affine subspace in natural-parameter space has zero Efron curvature. That does **not** mean that every coordinate representation of its MLE is exactly unbiased. For example, the Bernoulli mean MLE $\bar Y$ is unbiased for $\pi$, but $\operatorname{logit}(\bar Y)$ is biased for $\operatorname{logit}(\pi)$. The curvature statement is about the family as a geometric object; finite-sample bias can also be introduced by nonlinear coordinates and boundary effects.
+**2021: binomial GLMs, finiteness, and the boundary.** For binomial GLMs $Y_i \sim \mathrm{Bin}(m_i, \pi_i)/m_i$, $g(\pi_i) = x_i^\top\beta$, the Fisher information is $i(\beta) = X^\top W(\beta)X$ with weights $w_i(\beta) = m_i(d\pi_i/d\eta_i)^2/[\pi_i(1-\pi_i)]$. The model has a boundary: as $\pi_i \to 0$ or $\pi_i \to 1$, the weights collapse and the Fisher volume collapses: $|i(\beta)|^{1/2} \to 0$.
 
-### Firth's adjustment undoes the drift
+Under complete or quasi-complete separation, ordinary maximum likelihood tries to move toward exactly that boundary. Along a separating ray, the log-likelihood approaches a finite ceiling but doesn't attain it at a finite parameter value — the ordinary MLE doesn't exist.
 
-Firth's idea is direct. If the MLE drifts by $b(\beta)$, modify the score in the opposite direction:
+Kosmidis and Firth's 2021 result shows that, for standard binomial links (logit, probit, complementary log-log, log-log, cauchit), the Jeffreys-penalized estimator
 
-$$
-\tilde U_s(\beta) = U_s(\beta) + A_s(\beta),
-\qquad
-A_s(\beta) = -\kappa_{s,a}(\beta)b^a(\beta).
-$$
+$$\hat\beta_J = \arg\max_\beta \left\{\ell(\beta) + \tfrac{1}{2}\log\det X^\top W(\beta)X\right\}$$
 
-The solution of $\tilde U(\tilde\beta)=0$ has bias of order $O(n^{-2})$ under standard regularity conditions (Firth 1993). In the projection picture, Firth's estimator corrects the first-order displacement caused by the geometry of the projection.
+is finite for every realized sample (Kosmidis and Firth 2021). The proof idea is geometric: separation lets $\ell(\beta)$ plateau as $\|\beta\| \to \infty$, but the same motion drives $|i(\beta)|^{1/2} \to 0$, so $\frac{1}{2}\log\det i(\beta) \to -\infty$ and the penalized objective turns downward. The Jeffreys term acts as an infinite wall at the boundary.
 
-### Jeffreys' prior is the Fisher volume element
+## A small synthetic fraud example
 
-The Jeffreys prior is
+A useful applied instance is rare-event fraud classification. Imagine a binary feature $z = \mathbf{1}\{\text{new device and foreign IP}\}$. In a small training set, this rare flag might occur only among fraudulent transactions — not because it's truly deterministic, but because the sample is quasi-completely separated.
 
-$$
-\pi_J(\beta) \propto |i(\beta)|^{1/2}.
-$$
+In the logistic GLM $\Pr(Y=1\mid x,z) = \operatorname{logit}^{-1}(\beta_0 + \beta_1 x_1 + \beta_2 x_2 + \gamma z)$, if all observations with $z=1$ have $Y=1$, the ordinary likelihood is increased by sending $\gamma \to +\infty$ and the MLE doesn't exist. The Firth/Kosmidis estimator keeps $\gamma$ finite because, along the same direction, $I_{\gamma\gamma}(\beta) = \sum_i \pi_i(1-\pi_i)z_i^2 \to 0$ — the information in the rare-flag direction disappears at the boundary, so the Jeffreys term penalizes the escape.
 
-Geometrically, this is not mysterious. If $i(\beta)$ is the metric tensor, then
+For canonical logistic regression the Firth adjusted score is
 
-$$
-|i(\beta)|^{1/2}\,d\beta
-$$
+$$U^*(\beta) = X^\top\{y - p + h(\tfrac{1}{2} - p)\},$$
 
-is the natural volume element on the manifold. It is the analogue of $\sqrt{|g|}\,dx$ in Riemannian geometry and is invariant under smooth reparametrization.
+where $h_i$ are the diagonal elements of the weighted hat matrix $H = W^{1/2}X(X^\top W X)^{-1}X^\top W^{1/2}$.
 
-### The canonical-link coincidence
-
-For canonical-link exponential-family GLMs, the gradient of the log-volume equals Firth's adjustment:
-
-$$
-\partial_s\left\{\frac12\log |i(\beta)|\right\}
-= A_s(\beta).
-$$
-
-So two seemingly different prescriptions coincide:
-
-1. modify the score to remove the leading bias;
-2. maximize the log-likelihood plus the Jeffreys log-volume penalty.
-
-This is the central identity behind the note.
-
-## Part II: The Kosmidis--Firth program
-
-### 2009: nonlinear predictors and extra curvature
-
-In an ordinary GLM, the predictor is linear in the regression parameters:
-
-$$
-\eta_i(\beta)=x_i^\top\beta.
-$$
-
-With a canonical link, the model is an affine subspace of the saturated natural-parameter space. With a non-canonical link, or with a nonlinear predictor, the embedding of $\beta$ into the surrounding exponential family bends.
-
-Kosmidis and Firth study exponential-family nonlinear models, where $\eta_i(\beta)$ need not be linear (Kosmidis and Firth 2009). Let
-
-$$
-F_{ir}(\beta)=\frac{\partial \eta_i}{\partial \beta_r},
-$$
-
-and let $W$ be the usual diagonal matrix of working weights. The weighted hat matrix is
-
-$$
-H(\beta)
-= W^{1/2}F(F^\top W F)^{-1}F^\top W^{1/2}.
-$$
-
-There are now two sources of geometry:
-
-- **link curvature**, coming from the relationship between $\eta_i$ and the distributional parameter;
-- **predictor curvature**, coming from second derivatives $\partial^2\eta_i/\partial\beta_r\partial\beta_s$.
-
-The 2009 paper gives a compact form for the adjusted score,
-
-$$
-A(\beta) = F(\beta)^\top W(\beta)\xi(\beta),
-$$
-
-where $\xi_i$ combines the leverage term from the diagonal of $H$ with additional terms involving the second derivatives of $\eta_i(\beta)$. When $\eta_i$ is linear in $\beta$, the predictor-curvature term vanishes and the expression reduces to the familiar GLM adjustment.
-
-The computational point is important: the method modifies Fisher scoring with a term built from the same objects already used in GLM fitting.
-
-$$
-\beta^{(k+1)}
-= \beta^{(k)}
-+ i\{\beta^{(k)}\}^{-1}
-\left[U\{\beta^{(k)}\}+A\{\beta^{(k)}\}\right].
-$$
-
-The geometric reading is: the 2009 paper provides the bookkeeping needed when the model manifold bends because the predictor map itself bends.
-
-### 2021: binomial GLMs, finiteness, and the boundary
-
-For binomial GLMs,
-
-$$
-Y_i\sim \mathrm{Bin}(m_i,\pi_i)/m_i,
-\qquad
- g(\pi_i)=x_i^\top\beta,
-$$
-
-the Fisher information has the form
-
-$$
-i(\beta)=X^\top W(\beta)X,
-\qquad
-w_i(\beta)
-= m_i\frac{(d\pi_i/d\eta_i)^2}{\pi_i(1-\pi_i)}.
-$$
-
-The model has a boundary. As $\pi_i\to 0$ or $\pi_i\to 1$, the Bernoulli distribution degenerates to a point mass. For standard links, the corresponding weights collapse, so the Fisher volume collapses:
-
-$$
-|i(\beta)|^{1/2}\to 0.
-$$
-
-Under complete or quasi-complete separation, ordinary maximum likelihood tries to move toward exactly that boundary. Along a separating ray, the log-likelihood approaches a finite ceiling but does not attain it at a finite parameter value. Thus the ordinary MLE does not exist.
-
-Kosmidis and Firth's 2021 result shows that, for standard binomial links such as logit, probit, complementary log--log, log--log, and cauchit, the Jeffreys-penalized estimator
-
-$$
-\hat\beta_J
-= \arg\max_\beta
-\left\{
-\ell(\beta)+\frac12\log\det X^\top W(\beta)X
-\right\}
-$$
-
-is finite for every realized sample (Kosmidis and Firth 2021).
-
-The proof idea is geometric. Separation lets $\ell(\beta)$ plateau as $\|\beta\|\to\infty$. But the same motion drives $|i(\beta)|^{1/2}$ to zero. Hence
-
-$$
-\frac12\log\det i(\beta)\to -\infty,
-$$
-
-and the penalized objective turns downward. The Jeffreys term acts like an infinite wall at the boundary of the binomial manifold.
-
-## Part III: A small synthetic fraud example
-
-A useful applied example is rare-event fraud classification. Imagine a binary feature
-
-$$
-z = \mathbf 1\{\text{new device and foreign IP}\}.
-$$
-
-In a small training set, this rare flag might occur only among fraudulent transactions. That does not mean the flag is truly deterministic. It only means that, in this training sample, the data are quasi-completely separated.
-
-Consider the logistic GLM
-
-$$
-\Pr(Y=1\mid x,z)
-= \operatorname{logit}^{-1}(\beta_0+\beta_1x_1+\beta_2x_2+\gamma z).
-$$
-
-If all observations with $z=1$ have $Y=1$, the ordinary likelihood is increased by sending $\gamma\to+\infty$. The MLE does not exist. The Firth/Kosmidis estimator keeps $\gamma$ finite because, along the same direction,
-
-$$
-I_{\gamma\gamma}(\beta)
-= \sum_i \pi_i(1-\pi_i)z_i^2
-\to 0.
-$$
-
-The information in the rare-flag direction disappears at the boundary, so the Jeffreys term penalizes the escape.
-
-To make the example concrete, I generate a small synthetic fraud dataset, define the logistic likelihood and Fisher information, and compare the ordinary Newton path with the Firth/Jeffreys path. The setup code is hidden in the rendered post; the important object is the coefficient path and the Fisher-volume barrier.
+To make the example concrete, the post generates a small synthetic fraud dataset and compares the ordinary Newton path with the Firth/Jeffreys path. The setup code is hidden; the visible object is the coefficient path, the Fisher-volume barrier, and the two fitted probability surfaces.
 
 ```{python}
 #| label: setup
@@ -373,23 +204,6 @@ def penalized_objective(beta):
     return loglik(beta) + jeffreys_penalty(beta)
 ```
 
-### Ordinary logistic escapes; Firth stays finite
-
-The ordinary Newton iterations are shown only to display the direction of escape. Under quasi-complete separation they should not be interpreted as converging to an MLE. They move toward the direction where the likelihood has its supremum, not toward a finite maximizer.
-
-For canonical logistic regression, the Firth adjusted score can be written as
-
-$$
-U^*(\beta)
-= X^\top\{y-p+h(1/2-p)\},
-$$
-
-where $h_i$ are the diagonal elements of the weighted hat matrix
-
-$$
-H = W^{1/2}X(X^\top W X)^{-1}X^\top W^{1/2}.
-$$
-
 ```{python}
 #| label: fraud-fitters
 #| include: false
@@ -453,10 +267,6 @@ def firth_logistic(max_iter=200, tol=1e-10):
 path_mle = ordinary_logistic_path()
 beta_firth, path_firth = firth_logistic()
 ```
-
-### Visualize the boundary, the Fisher-volume barrier, and the effect of the flag
-
-The last two panels separate the baseline surface for unflagged transactions from the shifted surface for flagged transactions. This makes the role of the rare flag visually explicit: under the Firth fit, the flag raises fraud probability substantially, but by a finite amount.
 
 ```{python}
 #| label: fraud-geometry
@@ -574,255 +384,73 @@ plt.tight_layout()
 plt.show()
 ```
 
-Each point is a transaction. Blue points are legitimate transactions $(Y=0,z=0)$, orange points are fraudulent but unflagged transactions $(Y=1,z=0)$, and green stars are fraudulent transactions with the rare flag $(Y=1,z=1)$. The training sample contains no legitimate flagged transaction $(Y=0,z=1)$, so the rare flag perfectly separates part of the data.
+Each point is a transaction. Blue points are legitimate (Y=0, z=0), orange are fraudulent but unflagged (Y=1, z=0), green stars are fraudulent with the rare flag (Y=1, z=1). The training sample contains no legitimate flagged transaction, so the rare flag perfectly separates part of the data.
 
-Panel C is the geometric story in one picture. The likelihood likes large $\gamma$: it wants to declare the rare flag deterministically fraudulent. But the Fisher-volume term goes to $-\infty$, because the model is approaching a boundary point where the flagged Bernoulli distributions become point masses. The penalized objective turns over and has a finite maximum.
+Panel C is the geometric story in one picture: the likelihood likes large $\gamma$, but the Fisher-volume term goes to $-\infty$ as the model approaches a boundary point where the flagged Bernoulli distributions become point masses. The penalized objective turns over and has a finite maximum.
 
-Panels D and E show the fitted Firth probabilities under two hypothetical settings of the rare flag. Panel D sets $z=0$ everywhere, so it shows the baseline fraud surface for unflagged transactions. Panel E sets $z=1$ everywhere, so it shows how transactions at those same $(x_1,x_2)$ locations would be scored if the rare flag were present. The rare flag shifts the surface upward by the finite Firth estimate $\hat\gamma$: it is strong evidence of fraud, but not an infinite rule.
+Panels D and E show fitted Firth probabilities under $z=0$ and $z=1$ respectively. The rare flag shifts the log-odds surface upward by the finite Firth estimate $\hat\gamma$ — strong evidence of fraud, but not an infinite rule. Firth doesn't merely find a separating line. It gives a finite probabilistic decision boundary, and the estimator stays inside the finite part of the statistical manifold.
 
-Firth does not merely find a separating line. Under separation, the ordinary logistic separating direction corresponds to an infinite coefficient and no finite MLE. Firth instead gives a finite probabilistic decision boundary: the rare flag shifts the log-odds by a large but finite amount, so the model treats it as strong evidence rather than a deterministic rule.
+---
 
-That is the practical face of the 2021 theorem: the estimator is not merely numerically stabilized; it is prevented from leaving the finite part of the statistical manifold.
-
-## Part IV: Technical appendix
+## Appendix
 
 ### Jeffreys' score equals Firth's adjustment for canonical GLMs
 
-Consider a canonical exponential-family GLM with fixed dispersion $\phi$ and
+Consider a canonical exponential-family GLM with fixed dispersion $\phi$ and $\theta_i = \eta_i = x_i^\top\beta$. The density is
 
-$$
-\theta_i = \eta_i = x_i^\top\beta.
-$$
+$$f(y_i;\theta_i,\phi) = \exp\left\{\frac{y_i\theta_i - b(\theta_i)}{\phi} + c(y_i,\phi)\right\},$$
 
-The density is
+with $\mu_i = b'(\theta_i)$, $\operatorname{Var}(Y_i) = \phi b''(\theta_i)$, score $U_r(\beta) = \phi^{-1}\sum_i(y_i-\mu_i)x_{ir}$, and information $i_{rs}(\beta) = \phi^{-1}\sum_i b''(\theta_i)x_{ir}x_{is}$.
 
-$$
-f(y_i;\theta_i,\phi)
-= \exp\left\{
-\frac{y_i\theta_i-b(\theta_i)}{\phi}+c(y_i,\phi)
-\right\}.
-$$
+Differentiating the information gives the canonical-link identity:
 
-Then
+$$\partial_t i_{rs}(\beta) = \phi^{-1}\sum_i b'''(\theta_i)x_{it}x_{ir}x_{is} = \kappa_{t,r,s}(\beta). \tag{1}$$
 
-$$
-\mu_i=b'(\theta_i),
-\qquad
-\mathrm{Var}(Y_i)=\phi b''(\theta_i),
-$$
+For canonical GLMs the Cox–Snell bias reduces to $b^s(\beta) = -\frac{1}{2}i^{sa}i^{bc}\kappa_{a,b,c}(\beta)$, so Firth's adjustment is
 
-and
+$$A_s(\beta) = \tfrac{1}{2}i^{cd}\kappa_{s,c,d}(\beta).$$
 
-$$
-\ell(\beta)
-= \frac1\phi\sum_i\{y_i x_i^\top\beta-b(x_i^\top\beta)\}+\text{const},
-$$
+By Jacobi's formula, $\partial_s P(\beta) = \frac{1}{2}\mathrm{tr}\{i(\beta)^{-1}\partial_s i(\beta)\} = \frac{1}{2}i^{cd}\partial_s i_{cd}$, and using (1):
 
-with score component
-
-$$
-U_r(\beta)
-= \frac1\phi\sum_i(y_i-\mu_i)x_{ir}.
-$$
-
-The information matrix is
-
-$$
-i_{rs}(\beta)
-= \frac1\phi\sum_i b''(\theta_i)x_{ir}x_{is}.
-$$
-
-The third score cumulant is
-
-$$
-\kappa_{r,s,t}
-= E(U_rU_sU_t)
-= \frac1\phi\sum_i b'''(\theta_i)x_{ir}x_{is}x_{it}.
-$$
-
-Differentiating the information gives
-
-$$
-\partial_t i_{rs}(\beta)
-= \frac1\phi\sum_i b'''(\theta_i)x_{it}x_{ir}x_{is}
-= \kappa_{t,r,s}(\beta).
-\tag{1}
-$$
-
-This is the canonical-link identity: the derivative of the metric is the third cumulant of the score.
-
-For canonical GLMs, the relevant Cox--Snell term reduces, under the sign convention used here, to
-
-$$
-b^s(\beta)
-= -\frac12 i^{sa}i^{bc}\kappa_{a,b,c}(\beta).
-$$
-
-Firth's adjustment is therefore
-
-$$
-A_s(\beta)
-= -i_{sa}b^a(\beta)
-= \frac12 i^{cd}\kappa_{s,c,d}(\beta).
-$$
-
-Now consider the Jeffreys penalty
-
-$$
-P(\beta)=\frac12\log\det i(\beta).
-$$
-
-By Jacobi's formula,
-
-$$
-\partial_s P(\beta)
-= \frac12\mathrm{tr}\{i(\beta)^{-1}\partial_s i(\beta)\}
-= \frac12 i^{cd}\partial_s i_{cd}.
-$$
-
-Using (1),
-
-$$
-\partial_s P(\beta)
-= \frac12 i^{cd}\kappa_{s,c,d}(\beta)
-= A_s(\beta).
-$$
-
-Thus
-
-$$
-\boxed{
-\partial_s\left\{\frac12\log\det i(\beta)\right\}
-= A_s(\beta)
-= -i_{sa}(\beta)b^a(\beta).
-}
-$$
+$$\partial_s\left\{\tfrac{1}{2}\log\det i(\beta)\right\} = \tfrac{1}{2}i^{cd}\kappa_{s,c,d}(\beta) = A_s(\beta) = -i_{sa}(\beta)b^a(\beta).$$
 
 Adding the Jeffreys score is exactly Firth's first-order bias correction in canonical-link GLMs.
 
 ### Intercept-only Bernoulli check
 
-Let $Y_i\sim\mathrm{Bernoulli}(\pi)$ and $\beta=\operatorname{logit}(\pi)$. Then
+Let $Y_i \sim \mathrm{Bernoulli}(\pi)$ and $\beta = \operatorname{logit}(\pi)$. Then $i(\beta) = n\pi(1-\pi)$ and $\kappa_{\beta,\beta,\beta} = n\pi(1-\pi)(1-2\pi)$. The Cox–Snell bias is
 
-$$
-i(\beta)=n\pi(1-\pi),
-\qquad
-\kappa_{\beta,\beta,\beta}=n\pi(1-\pi)(1-2\pi).
-$$
+$$b^\beta = \frac{2\pi-1}{2n\pi(1-\pi)},$$
 
-The Cox--Snell bias is
+agreeing with the delta method applied to $\hat\beta = \operatorname{logit}(\bar{Y})$. The Jeffreys adjustment is $\partial_\beta\{\frac{1}{2}\log i(\beta)\} = \frac{1}{2}(1-2\pi)$, giving adjusted score equation
 
-$$
-b^\beta
-= -\frac{\kappa_{\beta,\beta,\beta}}{2i(\beta)^2}
-= \frac{2\pi-1}{2n\pi(1-\pi)}.
-$$
+$$\sum_i y_i - n\pi + \tfrac{1}{2}(1-2\pi) = 0,$$
 
-The same result follows from the delta method applied to $\hat\beta=\operatorname{logit}(\bar Y)$:
-
-$$
-E(\hat\beta-\beta)
-\approx
-\frac12 g''(\pi)\mathrm{Var}(\bar Y)
-= \frac{2\pi-1}{2n\pi(1-\pi)}.
-$$
-
-The Jeffreys adjustment is
-
-$$
-\partial_\beta\left\{\frac12\log i(\beta)\right\}
-= \frac12(1-2\pi),
-$$
-
-so the adjusted score equation is
-
-$$
-\sum_i y_i - n\pi + \frac12(1-2\pi)=0.
-$$
-
-Writing $S=\sum_i y_i$, this gives
-
-$$
-\tilde\pi = \frac{S+1/2}{n+1},
-$$
-
-the familiar "add half a success and half a failure" form.
+which solves to $\tilde\pi = (S + 1/2)/(n+1)$ — the familiar "add half a success and half a failure" form.
 
 ### Efron's statistical curvature: logistic versus probit
 
-For a one-parameter curved exponential family embedded in an $n$-dimensional Bernoulli natural-parameter space, write
+For a one-parameter curved exponential family embedded in the Bernoulli natural-parameter space, with $\dot\theta = \partial\theta/\partial\beta$ and $\ddot\theta = \partial^2\theta/\partial\beta^2$, Efron's curvature is
 
-$$
-\theta(\beta)=(\theta_1(\beta),\dots,\theta_n(\beta)),
-$$
+$$\gamma^2(\beta) = \frac{(\ddot\theta^\top W\ddot\theta)(\dot\theta^\top W\dot\theta) - (\dot\theta^\top W\ddot\theta)^2}{(\dot\theta^\top W\dot\theta)^3}.$$
 
-and let $\dot\theta=\partial\theta/\partial\beta$ and $\ddot\theta=\partial^2\theta/\partial\beta^2$. With
+For scalar logistic regression, $\theta_i = \beta x_i$ so $\ddot\theta_i = 0$ and $\gamma^2(\beta) = 0$ — the model is a straight line in natural-parameter space. For scalar probit regression, $\theta_i = \log(\Phi(\beta x_i)/(1-\Phi(\beta x_i)))$ is nonlinear, $\ddot\theta$ is generally not proportional to $\dot\theta$, and curvature is positive. The probit model is a curved submodel.
 
-$$
-W=\mathrm{diag}\{\pi_i(1-\pi_i)\},
-$$
-
-the scalar Fisher information is
-
-$$
-i(\beta)=\dot\theta^\top W\dot\theta.
-$$
-
-Efron's curvature is
-
-$$
-\gamma^2(\beta)
-= \frac{
-(\ddot\theta^\top W\ddot\theta)(\dot\theta^\top W\dot\theta)
--(\dot\theta^\top W\ddot\theta)^2
-}{(\dot\theta^\top W\dot\theta)^3}.
-$$
-
-For scalar logistic regression with canonical link,
-
-$$
-\pi_i=\operatorname{expit}(\beta x_i),
-\qquad
-\theta_i=\beta x_i.
-$$
-
-Hence $\dot\theta_i=x_i$ and $\ddot\theta_i=0$, so
-
-$$
-\gamma^2(\beta)=0.
-$$
-
-The image of the model in natural-parameter space is a straight line.
-
-For scalar probit regression,
-
-$$
-\pi_i=\Phi(\beta x_i),
-\qquad
-\theta_i=\log\frac{\Phi(\beta x_i)}{1-\Phi(\beta x_i)}.
-$$
-
-Now $\theta_i(\beta)$ is nonlinear. In general $\ddot\theta$ is not proportional to $\dot\theta$, and the curvature is positive. The probit model is a curved submodel of the Bernoulli natural-parameter space.
-
-The takeaway is that different pathologies in likelihood estimation have different geometric signatures:
-
-- nonlinear links and nonlinear predictors bend the model manifold;
-- separation sends the estimator toward the boundary;
-- Firth/Kosmidis adjustments correct the first-order drift and, in binomial GLMs, use Fisher volume to keep estimates finite.
+---
 
 ## References
 
-D. R. Cox and E. J. Snell. “A general definition of residuals.” *Journal of the Royal Statistical Society: Series B* 30(2), 1968.
+D. R. Cox and E. J. Snell. "A general definition of residuals." *Journal of the Royal Statistical Society: Series B* 30(2), 1968.
 
-Bradley Efron. “Defining the curvature of a statistical problem, with applications to second order efficiency.” *The Annals of Statistics* 3(6), 1975.
+Bradley Efron. "Defining the curvature of a statistical problem, with applications to second order efficiency." *The Annals of Statistics* 3(6), 1975.
 
-David Firth. “Bias reduction of maximum likelihood estimates.” *Biometrika* 80(1), 1993.
+David Firth. "Bias reduction of maximum likelihood estimates." *Biometrika* 80(1), 1993.
 
-Harold Jeffreys. *Theory of Probability*. Oxford University Press, 3rd edition, 1961.
+Harold Jeffreys. *Theory of Probability*. Oxford University Press, 3rd ed., 1961.
 
-Ioannis Kosmidis and David Firth. “Bias reduction in exponential family nonlinear models.” *Biometrika* 96(4), 2009.
+Ioannis Kosmidis and David Firth. "Bias reduction in exponential family nonlinear models." *Biometrika* 96(4), 2009.
 
-Ioannis Kosmidis and David Firth. “Jeffreys-prior penalty, finiteness and shrinkage in binomial-response generalized linear models.” *Biometrika* 108(1), 2021.
+Ioannis Kosmidis and David Firth. "Jeffreys-prior penalty, finiteness and shrinkage in binomial-response generalized linear models." *Biometrika* 108(1), 2021.
 
 Peter McCullagh. *Tensor Methods in Statistics*. Chapman and Hall, 1987.
 

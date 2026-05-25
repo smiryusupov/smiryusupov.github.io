@@ -157,32 +157,17 @@ window.Quarto = {
   margin-right: auto;
 }
 </style>
-<p><strong>Claim.</strong> In high dimensions, radial structure and visible low-dimensional structure can decouple. A cloud may concentrate on a thin shell while every random 2D view looks ordinary.</p>
-<p><strong>Scope.</strong> Standard Gaussian/projection facts with small visual diagnostics.</p>
-<p>A high-dimensional cloud can have strong ambient geometry and still look ordinary in a low-dimensional plot.</p>
-<p>Two examples expose the failure mode.</p>
-<ul>
-<li>For a standard Gaussian, the full cloud concentrates near a thin shell, even though every fixed 2D projection is again an ordinary Gaussian cloud.</li>
-<li>For a symmetric Gaussian mixture, shell concentration still occurs, but the bimodality is directional rather than radial. A random 2D projection may hide it, while PCA can recover it.</li>
-</ul>
+<p>A recurring trap in high-dimensional exploratory data analysis is that a dataset can have strong geometric structure in the ambient space and still look ordinary in a low-dimensional plot.</p>
+<p>Two examples below. For a standard Gaussian, the full cloud concentrates near a thin shell, even though every fixed 2D projection is again an ordinary Gaussian cloud. For a symmetric Gaussian mixture, shell concentration still occurs, but the bimodality is directional rather than radial — a random 2D projection may hide it, while PCA can recover it.</p>
 <h2 id="two-models">Two models</h2>
 <p>First, the isotropic Gaussian <span class="math inline">X \sim \mathcal{N}(0, I_d)</span>.</p>
-<p>Second, the symmetric Gaussian mixture <span class="math inline">X = S \Delta e_1 + Z</span>, where <span class="math inline">S \in \{-1,+1\}</span> is a Rademacher sign with equal probability and <span class="math inline">Z \sim \mathcal{N}(0, I_d)</span>.</p>
-<p>Here <span class="math inline">\Delta &gt; 0</span> is the separation parameter: the two mixture components are centered at <span class="math inline">\pm \Delta e_1</span>. In the simulations below, we fix <span class="math inline">\Delta = 4</span>.</p>
-<p>Equivalently, <span class="math display">
-X \sim \frac{1}{2}\mathcal{N}(+\Delta e_1, I_d)
-  + \frac{1}{2}\mathcal{N}(-\Delta e_1, I_d).
-</span></p>
+<p>Second, the symmetric Gaussian mixture <span class="math inline">X = S\Delta e_1 + Z</span>, where <span class="math inline">S \in \{-1,+1\}</span> is a Rademacher sign with equal probability and <span class="math inline">Z \sim \mathcal{N}(0, I_d)</span>. Here <span class="math inline">\Delta &gt; 0</span> is the separation parameter, with the two mixture components centered at <span class="math inline">\pm\Delta e_1</span>. In the simulations below, <span class="math inline">\Delta = 4</span>. Equivalently,</p>
+<p><span class="math display">X \sim \tfrac{1}{2}\mathcal{N}(+\Delta e_1, I_d) + \tfrac{1}{2}\mathcal{N}(-\Delta e_1, I_d).</span></p>
 <h2 id="gaussian-warm-up-shell-in-the-full-space-gaussian-in-every-fixed-2d-view">Gaussian warm-up: shell in the full space, Gaussian in every fixed 2D view</h2>
-<p>If <span class="math inline">X \sim \mathcal{N}(0, I_d)</span>, then <span class="math inline">\|X\|^2 \sim \chi_d^2</span>, so <span class="math display">
-\mathbb{E}\|X\|^2 = d,
-\qquad
-\operatorname{Var}(\|X\|^2) = 2d.
-</span></p>
-<p>Hence the typical radius is about <span class="math inline">\sqrt d</span>, while the relative shell thickness shrinks with dimension.</p>
-<p>At the same time, if <span class="math inline">U \in \mathbb{R}^{d \times 2}</span> has orthonormal columns, then <span class="math inline">Y = U^\top X \sim \mathcal{N}(0, I_2)</span>.</p>
-<p><strong>The shell is a property of the full ambient-space norm, not of any single 2D projection.</strong></p>
-<p>In the shell panels below, each point is placed at radius <span class="math inline">\|X\|/\sqrt d</span> with a random angle. This is not a true projection; it is only a visualization of radial concentration.</p>
+<p>If <span class="math inline">X \sim \mathcal{N}(0, I_d)</span>, then <span class="math inline">\|X\|^2 \sim \chi_d^2</span>, so</p>
+<p><span class="math display">\mathbb{E}\|X\|^2 = d, \qquad \operatorname{Var}(\|X\|^2) = 2d.</span></p>
+<p>The typical radius is about <span class="math inline">\sqrt{d}</span>, while the relative shell thickness shrinks with dimension. At the same time, if <span class="math inline">U \in \mathbb{R}^{d \times 2}</span> has orthonormal columns, then <span class="math inline">Y = U^\top X \sim \mathcal{N}(0, I_2)</span>. The shell is a property of the full ambient-space norm, not of any single 2D projection.</p>
+<p>In the shell panels below, each point is placed at radius <span class="math inline">\|X\|/\sqrt{d}</span> with a random angle. This is not a true projection — it only visualizes radial concentration.</p>
 <div class="narrow-figure">
 <div id="cell-fig-gaussian-shell-small" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
@@ -215,9 +200,7 @@ Figure&nbsp;2: Gaussian warm-up for dimensions 50 and 200. The top row is a radi
 </div>
 </div>
 </div>
-<p>A direct check of the normalized radius <span class="math display">
-R_d = \frac{\|X\|}{\sqrt d}
-</span> shows the same effect quantitatively.</p>
+<p>A direct check of the normalized radius <span class="math inline">R_d = \|X\|/\sqrt{d}</span> shows the same effect quantitatively.</p>
 <div class="narrow-figure">
 <div id="cell-fig-gaussian-radius-check" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
@@ -234,32 +217,10 @@ Figure&nbsp;3: The normalized Gaussian radius <span class="math inline">\|X\|/\s
 </div>
 </div>
 </div>
-<h2 id="the-shell-can-survive-while-the-signal-disappears">The shell can survive while the signal disappears</h2>
-<p>In the mixture, radial concentration remains visible in the norm, but the class structure lives in a direction. Now consider <span class="math display">
-X = S \Delta e_1 + Z.
-</span></p>
-<p>This distribution is bimodal, but the bimodality is not primarily a radial phenomenon.</p>
-<p>Indeed, <span class="math display">
-\|X\|^2
-= \|S\Delta e_1 + Z\|^2
-= \Delta^2 + \|Z\|^2 + 2S\Delta\, e_1^\top Z.
-</span> Therefore <span class="math display">
-\mathbb{E}\|X\|^2 = d + \Delta^2,
-\qquad
-\operatorname{Var}(\|X\|^2) = 2d + 4\Delta^2.
-</span></p>
-<p>So the norm still concentrates, and the cloud still lives near a shell of radius on the order of <span class="math inline">\sqrt{d+\Delta^2}</span>.</p>
-<p>But the mixture separation lies along a specific direction, namely <span class="math inline">e_1</span>. That is the central distinction:</p>
-<ul>
-<li>shell concentration is <strong>radial</strong></li>
-<li>mixture separation is <strong>directional</strong></li>
-</ul>
-<p>The next figures compare three views:</p>
-<ul>
-<li><strong>Row 1:</strong> the actual cloud when <span class="math inline">d=2</span>, and a radius-only shell proxy when <span class="math inline">d&gt;2</span></li>
-<li><strong>Row 2:</strong> a random 2D projection</li>
-<li><strong>Row 3:</strong> the 2D PCA projection</li>
-</ul>
+<h2 id="symmetric-mixture-shell-concentration-is-radial-separation-is-directional">Symmetric mixture: shell concentration is radial, separation is directional</h2>
+<p>For <span class="math inline">X = S\Delta e_1 + Z</span>, the distribution is bimodal, but the bimodality is not primarily radial. Since</p>
+<p><span class="math display">\|X\|^2 = \Delta^2 + \|Z\|^2 + 2S\Delta\, e_1^\top Z,</span></p>
+<p>we get <span class="math inline">\mathbb{E}\|X\|^2 = d + \Delta^2</span> and <span class="math inline">\operatorname{Var}(\|X\|^2) = 2d + 4\Delta^2</span>. The norm still concentrates, and the cloud still lives near a shell of radius <span class="math inline">\sim\sqrt{d+\Delta^2}</span>. But the mixture separation lies along a specific direction, <span class="math inline">e_1</span>. That is the central distinction: shell concentration is radial, mixture separation is directional.</p>
 <div class="narrow-figure">
 <div id="cell-fig-mixture-small" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display">
@@ -292,22 +253,13 @@ Figure&nbsp;5: Symmetric Gaussian mixture in dimensions 50 and 200. The cloud re
 </div>
 </div>
 </div>
-<p>The mixed first row is deliberate. In two dimensions, the true cloud should show the two blobs directly. In higher dimensions, the shell proxy isolates radial concentration and therefore suppresses directional information by construction.</p>
+<p>The mixed first row is deliberate: in two dimensions the true cloud shows the two blobs directly; in higher dimensions the shell proxy isolates radial concentration and therefore suppresses directional information by construction.</p>
 <h2 id="why-random-projections-hide-the-mixture">Why random projections hide the mixture</h2>
-<p>Under a 2D projection with orthonormal columns <span class="math inline">U</span>, <span class="math display">
-Y = U^\top X
-\sim
-\frac{1}{2}\mathcal{N}(+\Delta U^\top e_1, I_2)
-+
-\frac{1}{2}\mathcal{N}(-\Delta U^\top e_1, I_2).
-</span></p>
-<p>So the visible separation is controlled by <span class="math display">
-\Delta \|U^\top e_1\|.
-</span></p>
-<p>For a random 2D subspace, <span class="math display">
-\mathbb{E}\|U^\top e_1\|^2 = \frac{2}{d},
-</span> so the apparent signal is typically of order <span class="math inline">\Delta \sqrt{2/d}</span>.</p>
-<p>That decay explains why the random projections become less informative as the ambient dimension grows. The signal has not disappeared from the data; it has disappeared from the random view.</p>
+<p>Under a 2D projection with orthonormal columns <span class="math inline">U</span>,</p>
+<p><span class="math display">Y = U^\top X \sim \tfrac{1}{2}\mathcal{N}(+\Delta U^\top e_1, I_2) + \tfrac{1}{2}\mathcal{N}(-\Delta U^\top e_1, I_2).</span></p>
+<p>The visible separation is controlled by <span class="math inline">\Delta\|U^\top e_1\|</span>. For a random 2D subspace,</p>
+<p><span class="math display">\mathbb{E}\|U^\top e_1\|^2 = \frac{2}{d},</span></p>
+<p>so the apparent signal is typically of order <span class="math inline">\Delta\sqrt{2/d}</span> — which decays as dimension grows.</p>
 <div class="narrow-figure">
 <div id="cell-fig-random-projection-signal" class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display">
@@ -325,13 +277,7 @@ Figure&nbsp;6: Repeated random 2D projections of the mixture. The visible projec
 </div>
 </div>
 <h2 id="why-pca-helps-in-this-model">Why PCA helps in this model</h2>
-<p>For this mixture, <span class="math display">
-\mathbb{E}[X] = 0,
-\qquad
-\operatorname{Cov}(X) = I_d + \Delta^2 e_1 e_1^\top.
-</span></p>
-<p>So the leading population principal component is exactly <span class="math inline">e_1</span>, with top eigenvalue <span class="math inline">1+\Delta^2</span>. In this model, PCA aligns with the signal because the signal direction is also the dominant variance direction.</p>
-<p>A one-dimensional comparison makes this especially clear. Projection onto the signal coordinate remains bimodal, while projection onto a random direction becomes less informative in high dimension.</p>
+<p>For this mixture, <span class="math inline">\mathbb{E}[X] = 0</span> and <span class="math inline">\operatorname{Cov}(X) = I_d + \Delta^2 e_1 e_1^\top</span>. The leading population principal component is exactly <span class="math inline">e_1</span>, with top eigenvalue <span class="math inline">1+\Delta^2</span>. PCA aligns with the signal because the signal direction is also the dominant variance direction.</p>
 <div class="narrow-figure">
 <div id="cell-fig-signal-vs-random-1d" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
@@ -349,9 +295,8 @@ Figure&nbsp;7: One-dimensional projections of the mixture. Projection onto the s
 </div>
 </div>
 <h2 id="takeaway">Takeaway</h2>
-<p>Low-dimensional plots do not merely compress high-dimensional geometry; they choose which geometry survives.</p>
-<p>A high-dimensional dataset can concentrate radially, look featureless in a random 2D view, and still contain strong directional structure recoverable by an adaptive projection.</p>
-<p>The lesson is not that 2D plots are useless. The lesson is that their geometry must be named.</p>
+<p>A high-dimensional dataset can be shell-concentrated in full space, look structureless in a random 2D projection, and reveal strong structure under a data-adaptive projection — all at once. That’s why 2D plots in high dimension need interpretation, not just inspection.</p>
+<hr>
 <h2 id="references">References</h2>
 <p>Roman Vershynin. <em>High-Dimensional Probability: An Introduction with Applications in Data Science</em>. Cambridge University Press, 2018.</p>
 <p>Persi Diaconis and David Freedman. “Asymptotics of Graphical Projection Pursuit.” <em>The Annals of Statistics</em> 12(3), 1984.</p>

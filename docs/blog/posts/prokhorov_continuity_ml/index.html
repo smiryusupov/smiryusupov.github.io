@@ -141,16 +141,15 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#preface" id="toc-preface">Preface</a></li>
-  <li><a href="#part-i-prokhorov-continuity" id="toc-part-i-prokhorov-continuity">Part I: Prokhorov continuity</a></li>
-  <li><a href="#part-ii-why-this-matters-in-ml" id="toc-part-ii-why-this-matters-in-ml">Part II: Why this matters in ML</a></li>
-  <li><a href="#part-iii-dangerous-patterns" id="toc-part-iii-dangerous-patterns">Part III: Dangerous patterns</a></li>
-  <li><a href="#part-iv-a-minimal-counterexample" id="toc-part-iv-a-minimal-counterexample">Part IV: A minimal counterexample</a></li>
-  <li><a href="#part-v-a-small-numerical-diagnostic" id="toc-part-v-a-small-numerical-diagnostic">Part V: A small numerical diagnostic</a></li>
-  <li><a href="#part-vi-mmd-as-diagnostic-not-cure" id="toc-part-vi-mmd-as-diagnostic-not-cure">Part VI: MMD as diagnostic, not cure</a></li>
-  <li><a href="#part-vii-svm-as-a-contrast-case" id="toc-part-vii-svm-as-a-contrast-case">Part VII: SVM as a contrast case</a></li>
+  <li><a href="#prokhorov-continuity" id="toc-prokhorov-continuity">Prokhorov continuity</a></li>
+  <li><a href="#why-this-matters-in-ml" id="toc-why-this-matters-in-ml">Why this matters in ML</a></li>
+  <li><a href="#dangerous-patterns" id="toc-dangerous-patterns">Dangerous patterns</a></li>
+  <li><a href="#a-minimal-counterexample" id="toc-a-minimal-counterexample">A minimal counterexample</a></li>
+  <li><a href="#a-small-numerical-diagnostic" id="toc-a-small-numerical-diagnostic">A small numerical diagnostic</a></li>
+  <li><a href="#mmd-as-diagnostic-not-cure" id="toc-mmd-as-diagnostic-not-cure">MMD as diagnostic, not cure</a></li>
+  <li><a href="#svms-as-a-contrast" id="toc-svms-as-a-contrast">SVMs as a contrast</a></li>
   <li><a href="#takeaway" id="toc-takeaway">Takeaway</a></li>
-  <li><a href="#technical-appendix" id="toc-technical-appendix">Technical appendix</a></li>
+  <li><a href="#appendix" id="toc-appendix">Appendix</a></li>
   <li><a href="#references" id="toc-references">References</a></li>
   <li><a href="#suggested-citation" id="toc-suggested-citation">Suggested citation</a></li>
   </ul>
@@ -176,36 +175,28 @@ window.Quarto = {
   text-align: left;
 }
 </style>
-<p><strong>Claim.</strong> A learning rule that is discontinuous under small Prokhorov perturbations can amplify vanishing contamination into arbitrarily large model movement.<br>
-<strong>Scope.</strong> Prokhorov continuity as a robustness sanity check; counterexamples for tail-sensitive and argmin-sensitive learning methods.</p>
-<h2 id="preface">Preface</h2>
 <p>Many machine-learning failures are not caused by obvious outliers. A corrupted point may not be far away in Euclidean distance. A mislabeled example may look perfectly typical. A rare sensor glitch may be indistinguishable from a legitimate observation.</p>
-<p>This suggests a robustness question that is more distributional than geometric:</p>
+<p>This pushes toward a robustness question that is more distributional than geometric. If <span class="math inline">P</span> is the clean data-generating distribution, <span class="math inline">Q</span> is a corrupted version of it, and <span class="math inline">A(P)</span> is the model learned from <span class="math inline">P</span>, then what we want is roughly:</p>
 <p><span class="math display">
 P \approx Q
-\quad \text{but do we also have} \quad
-A(P) \approx A(Q)?
+\quad \Longrightarrow \quad
+A(P) \approx A(Q).
 </span></p>
-<p>Here <span class="math inline">P</span> is the clean data-generating distribution, <span class="math inline">Q</span> is the corrupted distribution, and <span class="math inline">A(P)</span> is the model, estimator, predictor, clustering, or representation learned from <span class="math inline">P</span>.</p>
-<p>The point of this note is narrow:</p>
-<blockquote>
-<p>A learning rule should not amplify a vanishing amount of hidden distributional contamination into an arbitrarily large model movement.</p>
-</blockquote>
-<p>This is not a claim that Prokhorov distance is always the right metric. It is a claim about alignment between the uncertainty model and the learning rule. If the practical uncertainty is small-mass contamination, then a robust learner should be stable under small-mass contamination.</p>
-<h2 id="part-i-prokhorov-continuity">Part I: Prokhorov continuity</h2>
-<p>Let <span class="math inline">\mathcal Z</span> be the data space, for example <span class="math inline">\mathcal Z=\mathcal X\times\mathcal Y</span>. Let <span class="math inline">\mathcal P(\mathcal Z)</span> denote probability measures on <span class="math inline">\mathcal Z</span>. A learning method can be viewed abstractly as a map</p>
+<p>The scope of this note is narrow. I want to argue that a learning rule should not amplify a vanishing amount of hidden distributional contamination into an arbitrarily large model movement. This is not a claim that Prokhorov distance is always the right metric. It is a claim about alignment: if the practical uncertainty looks like small-mass contamination, then a robust learner should be stable under small-mass contamination.</p>
+<h2 id="prokhorov-continuity">Prokhorov continuity</h2>
+<p>Let <span class="math inline">\mathcal Z</span> be the data space, for example <span class="math inline">\mathcal Z=\mathcal X\times\mathcal Y</span>, and let <span class="math inline">\mathcal P(\mathcal Z)</span> be the space of probability measures on it. A learning method can be viewed abstractly as a map</p>
 <p><span class="math display">
 A:\mathcal P(\mathcal Z)\to\mathcal H,
 </span></p>
-<p>where <span class="math inline">\mathcal H</span> may be a parameter space, an RKHS, a set of classifiers, a set of cluster centers, or a space of predictive distributions.</p>
+<p>where <span class="math inline">\mathcal H</span> might be a parameter space, an RKHS, a set of classifiers, a set of cluster centers, a space of predictive distributions, or whatever object the method produces.</p>
 <p>We say that <span class="math inline">A</span> is Prokhorov-continuous at <span class="math inline">P</span> if</p>
 <p><span class="math display">
 \rho_{\mathrm{Pr}}(Q_n,P)\to0
 \quad\Rightarrow\quad
 d_{\mathcal H}\{A(Q_n),A(P)\}\to0.
 </span></p>
-<p>In words, when another data distribution is close to the clean distribution in Prokhorov distance, the fitted object should also be close.</p>
-<p>This is closely related to Hampel’s qualitative robustness: robust statistical procedures are tied to continuity of the statistical functional under weak convergence. The Prokhorov metric is one standard way to metrize weak convergence on Polish spaces.</p>
+<p>In words: when another data distribution is close to the clean distribution in Prokhorov distance, the fitted object should also be close.</p>
+<p>This is closely related to Hampel’s qualitative robustness. Robust statistical procedures are tied to continuity of the statistical functional under weak convergence, and the Prokhorov metric is one standard way to metrize weak convergence on Polish spaces.</p>
 <p>A useful contamination model is</p>
 <p><span class="math display">
 Q_\varepsilon=(1-\varepsilon)P+\varepsilon R,
@@ -214,34 +205,11 @@ Q_\varepsilon=(1-\varepsilon)P+\varepsilon R,
 <p><span class="math display">
 \rho_{\mathrm{Pr}}(P,Q_\varepsilon)\leq\varepsilon.
 </span></p>
-<p>So <span class="math inline">Q_\varepsilon\to P</span> in Prokhorov distance as <span class="math inline">\varepsilon\to0</span>, even when the corrupted values are huge.</p>
-<p>The tension is the whole story:</p>
-<p><span class="math display">
-\boxed{
-\text{Prokhorov sees small mass; squared-loss methods may see huge magnitude.}
-}
-</span></p>
-<h2 id="part-ii-why-this-matters-in-ml">Part II: Why this matters in ML</h2>
-<p>In clean mathematical models, bad data are often represented as visible outliers. In real ML systems, bad data can be more subtle:</p>
-<ul>
-<li>missing observations in a stream;</li>
-<li>rare corrupted sensor readings;</li>
-<li>label noise near the decision boundary;</li>
-<li>duplicated or stale records;</li>
-<li>covariate shift affecting only a small subpopulation;</li>
-<li>hidden contamination that does not look far away under pairwise distances;</li>
-<li>adversarially chosen but low-mass data errors.</li>
-</ul>
-<p>Pairwise-distance outlier detection asks:</p>
-<p><span class="math display">
-\text{Can I identify the bad points geometrically?}
-</span></p>
-<p>Prokhorov continuity asks a different question:</p>
-<p><span class="math display">
-\text{Even if I fail to identify them, can they strongly damage the model?}
-</span></p>
-<p>That second question is often more important.</p>
-<p>The same issue appears in computer vision. Consider a trained ResNet, OCR system, or document model receiving images with glare, occlusion, motion blur, missing text, or sensor corruption. The desired behavior is not always to recover the clean label. Sometimes the clean label is no longer identifiable.</p>
+<p>So <span class="math inline">Q_\varepsilon\to P</span> in Prokhorov distance as <span class="math inline">\varepsilon\to0</span>, even when the corrupted values are huge. The tension is simple: Prokhorov sees small mass, but squared-loss methods may see huge magnitude.</p>
+<h2 id="why-this-matters-in-ml">Why this matters in ML</h2>
+<p>In clean mathematical models, bad data often look like visible outliers. In real ML systems, bad data can be much more subtle: missing observations in a stream, rare corrupted sensor readings, label noise near the decision boundary, duplicated or stale records, covariate shift affecting only a small subpopulation, or adversarially chosen low-mass errors.</p>
+<p>Pairwise-distance outlier detection asks whether you can identify the bad points geometrically. Prokhorov continuity asks a different question: even if you fail to identify them, can they strongly damage the model? That second question is often more important.</p>
+<p>The same issue appears in computer vision. A trained ResNet, OCR system, or document model receiving images with glare, occlusion, motion blur, missing text, or sensor corruption does not always need to recover the clean label. Sometimes the clean label is no longer identifiable.</p>
 <p>In that case, robustness should not mean blind invariance. If the evidence needed for prediction has disappeared, the model should not confidently preserve its old answer. A better behavior is to treat the corrupted region as unreliable evidence: lower confidence, abstain, or defer to a human.</p>
 <p>So robustness has two sides. A model should be insensitive to irrelevant corruption, but sensitive enough to recognize when prediction-relevant evidence has been damaged. In this sense, robustness is controlled sensitivity, not just invariance.</p>
 <p>Prokhorov continuity gives one distributional language for this requirement. A small amount of corrupted visual mass should not cause an arbitrary confident jump in the output distribution. If the prediction changes, it should change in a controlled way: toward uncertainty, abstention, or a justified alternative prediction.</p>
@@ -249,8 +217,8 @@ Q_\varepsilon=(1-\varepsilon)P+\varepsilon R,
 <p><span class="math display">
 \text{Is the prediction map continuous under the perturbations the system should tolerate?}
 </span></p>
-<h2 id="part-iii-dangerous-patterns">Part III: Dangerous patterns</h2>
-<p>The following methods are not Prokhorov-continuous in full generality. The qualification matters. With bounded data, clipping, robust losses, compactness, fixed regularization, or stronger topologies, some of these methods can behave well.</p>
+<h2 id="dangerous-patterns">Dangerous patterns</h2>
+<p>The following methods are not Prokhorov-continuous in full generality. The qualification matters: with bounded data, clipping, robust losses, compactness, fixed regularization, or stronger topologies, some of these methods can behave well.</p>
 <table class="caption-top">
 <colgroup>
 <col style="width: 50%">
@@ -269,7 +237,7 @@ Q_\varepsilon=(1-\varepsilon)P+\varepsilon R,
 </tr>
 <tr class="even">
 <td>OLS linear regression</td>
-<td>Coefficients depend on first and second moments. Rare high-leverage points can dominate.</td>
+<td>Coefficients depend on first and second moments; rare high-leverage points can dominate.</td>
 </tr>
 <tr class="odd">
 <td>Ridge regression with squared loss</td>
@@ -289,7 +257,7 @@ Q_\varepsilon=(1-\varepsilon)P+\varepsilon R,
 </tr>
 <tr class="odd">
 <td><span class="math inline">k</span>-means</td>
-<td>A tiny far-away mass can steal a centroid. For <span class="math inline">k=1</span>, <span class="math inline">k</span>-means is the mean.</td>
+<td>A tiny far-away mass can steal a centroid; for <span class="math inline">k=1</span>, <span class="math inline">k</span>-means is the mean.</td>
 </tr>
 <tr class="even">
 <td>Gaussian mixture MLE</td>
@@ -317,25 +285,16 @@ Q_\varepsilon=(1-\varepsilon)P+\varepsilon R,
 </tr>
 </tbody>
 </table>
-<p>The common pattern is:</p>
-<p><span class="math display">
-\boxed{
-\text{tails, moments, hard thresholds, or unstable argmins}
-\quad\Rightarrow\quad
-\text{possible Prokhorov discontinuity.}
-}
-</span></p>
-<h2 id="part-iv-a-minimal-counterexample">Part IV: A minimal counterexample</h2>
+<p>The common thread is tails, moments, hard thresholds, and unstable argmins. These are the places where a tiny amount of distributional mass can have a large downstream effect.</p>
+<h2 id="a-minimal-counterexample">A minimal counterexample</h2>
 <p>Let</p>
 <p><span class="math display">
 P=\delta_0
 </span></p>
 <p>and contaminate it by</p>
 <p><span class="math display">
-Q_\varepsilon=(1-\varepsilon)\delta_0+\varepsilon\delta_{M_\varepsilon}.
-</span></p>
-<p>Choose</p>
-<p><span class="math display">
+Q_\varepsilon=(1-\varepsilon)\delta_0+\varepsilon\delta_{M_\varepsilon},
+\qquad
 M_\varepsilon=\frac{1}{\varepsilon^2}.
 </span></p>
 <p>Then</p>
@@ -351,18 +310,13 @@ M_\varepsilon=\frac{1}{\varepsilon^2}.
 \frac{1}{\varepsilon}
 \to\infty.
 </span></p>
-<p>So the mean is not Prokhorov-continuous. This example is not only about the mean. It is a template. Any method that secretly depends on uncontrolled first or second moments can inherit the same pathology.</p>
-<h2 id="part-v-a-small-numerical-diagnostic">Part V: A small numerical diagnostic</h2>
-<p>The empirical version of the construction is simple. For sample size <span class="math inline">n</span>, define:</p>
-<ul>
-<li>the clean sample: all labels are zero;</li>
-<li>the contaminated sample: one label equals <span class="math inline">n^2</span>, all others are zero.</li>
-</ul>
-<p>The contamination mass is</p>
+<p>So the mean is not Prokhorov-continuous. This example is not only about the mean. It is a template: any method that secretly depends on uncontrolled first or second moments can inherit the same pathology.</p>
+<h2 id="a-small-numerical-diagnostic">A small numerical diagnostic</h2>
+<p>The empirical version of the construction is simple. For sample size <span class="math inline">n</span>, define the clean sample as all-zero labels, and define the contaminated sample as having one label equal to <span class="math inline">n^2</span> while all other labels remain zero. The contamination mass is</p>
 <p><span class="math display">
 \varepsilon_n=\frac1n\to0.
 </span></p>
-<p>The empirical contaminated distribution is close to the clean one in Prokhorov distance. For a bounded RBF kernel applied to the label marginal, the MMD between the clean and contaminated label distributions is also of order <span class="math inline">1/n</span>.</p>
+<p>The empirical contaminated distribution is close to the clean one in Prokhorov distance. For a bounded RBF kernel applied to the label marginal, the MMD between the clean and contaminated label distributions is also of order <span class="math inline">1/n</span>. Meanwhile the mean, KRR prediction, and GP posterior mean all grow with <span class="math inline">n</span>.</p>
 <figure class="article-figure">
 <img src="figures/prokhorov_contamination_movement.png" alt="Small distributional contamination, large model movement.">
 <figcaption>
@@ -381,30 +335,23 @@ Small distributional contamination, large model movement. The contamination mass
 <p><span class="math display">
 \text{RBF-MMD}\approx\frac{\sqrt2}{n}.
 </span></p>
-<p>This experiment is intentionally simple. It is not meant to be a realistic benchmark. It is a diagnostic counterexample. It shows that a learner can become worse as the contamination mass goes to zero.</p>
-<h2 id="part-vi-mmd-as-diagnostic-not-cure">Part VI: MMD as diagnostic, not cure</h2>
+<p>This experiment is intentionally simple. It is not meant to be a realistic benchmark. It is a diagnostic counterexample showing that a learner can become worse as the contamination mass goes to zero.</p>
+<h2 id="mmd-as-diagnostic-not-cure">MMD as diagnostic, not cure</h2>
 <p>MMD should be treated carefully. It is not itself a learning method. It is a discrepancy between distributions:</p>
 <p><span class="math display">
 \operatorname{MMD}_k(P,Q)
 =
 \|\mu_P-\mu_Q\|_{\mathcal H}.
 </span></p>
-<p>For many bounded continuous kernels, MMD is continuous under weak or Prokhorov convergence. For some kernels and spaces, MMD even metrizes weak convergence. But this depends on the kernel and the underlying space.</p>
-<p>The warning is not:</p>
-<blockquote>
-<p>MMD is Prokhorov-discontinuous.</p>
-</blockquote>
-<p>The better warning is:</p>
-<blockquote>
-<p>MMD can correctly report weak distributional closeness while a downstream learner is discontinuous in that weak topology.</p>
-</blockquote>
+<p>For many bounded continuous kernels, MMD is continuous under weak or Prokhorov convergence. For some kernels and spaces, MMD even metrizes weak convergence. So the warning is not that MMD is Prokhorov-discontinuous.</p>
+<p>The subtler warning is that MMD can correctly report weak distributional closeness while a downstream learner is discontinuous in that weak topology.</p>
 <p>Using the earlier example,</p>
 <p><span class="math display">
 P=\delta_0,
 \qquad
-Q_\varepsilon=(1-\varepsilon)\delta_0+\varepsilon\delta_{1/\varepsilon^2}.
+Q_\varepsilon=(1-\varepsilon)\delta_0+\varepsilon\delta_{1/\varepsilon^2},
 </span></p>
-<p>For a bounded kernel with <span class="math inline">k(x,x)\leq K</span>,</p>
+<p>we have, for a bounded kernel with <span class="math inline">k(x,x)\leq K</span>,</p>
 <p><span class="math display">
 \operatorname{MMD}_k(P,Q_\varepsilon)
 \leq
@@ -415,266 +362,45 @@ Q_\varepsilon=(1-\varepsilon)\delta_0+\varepsilon\delta_{1/\varepsilon^2}.
 <p><span class="math display">
 \mathbb E_{Q_\varepsilon}[X]\to\infty.
 </span></p>
-<p>This is not a contradiction. It means the metric and the downstream task use different notions of closeness.</p>
-<p><span class="math display">
-\boxed{
-\text{Small MMD does not imply small downstream ML damage.}
-}
-</span></p>
-<p>The missing assumption is continuity of the downstream learning map.</p>
-<h2 id="part-vii-svm-as-a-contrast-case">Part VII: SVM as a contrast case</h2>
-<p>SVMs are subtle and should not be put unconditionally on the bad list.</p>
-<p>Fixed-regularization SVMs with bounded kernels and suitable Lipschitz losses can be qualitatively robust. In that setting, the SVM can be represented as a functional on probability measures and continuity under weak convergence can be proven.</p>
-<p>However, this robustness is not automatic. It can fail for:</p>
-<ul>
-<li>hard-margin SVMs;</li>
-<li>vanishing regularization <span class="math inline">\lambda_n\to0</span>;</li>
-<li>unstable hyperparameter selection;</li>
-<li>unsuitable unbounded losses;</li>
-<li>settings where the output metric is too strong.</li>
-</ul>
-<p>So the correct lesson is:</p>
-<p><span class="math display">
-\boxed{
-\text{SVMs show that regularization and loss choice can create Prokhorov stability.}
-}
-</span></p>
-<p>They should not be used as a blanket example of failure. They are better used as a contrast between robust and non-robust learning maps.</p>
+<p>This is not a contradiction. It means the metric and the downstream task are using different notions of closeness. Small MMD does not imply small downstream ML damage. The missing ingredient is continuity of the downstream learning map itself.</p>
+<h2 id="svms-as-a-contrast">SVMs as a contrast</h2>
+<p>SVMs are subtle here and should not be put unconditionally on the bad list.</p>
+<p>Fixed-regularization soft-margin SVMs with bounded kernels and suitable Lipschitz losses can be qualitatively robust. In that setting, the SVM can be represented as a functional on probability measures and continuity under weak convergence can be proven.</p>
+<p>But this robustness is not automatic. It can fail for hard-margin SVMs, vanishing regularization <span class="math inline">\lambda_n\to0</span>, unstable hyperparameter selection, unsuitable unbounded losses, or settings where the output metric is too strong.</p>
+<p>The right lesson is that regularization and loss choice can create Prokhorov stability. SVMs are useful here as a contrast case rather than a blanket example of failure.</p>
 <h2 id="takeaway">Takeaway</h2>
-<p>Prokhorov continuity is a robustness sanity check. It asks whether a learning method respects the scale at which the data distribution is reliable.</p>
-<p>If a small amount of hidden contamination can move the fitted model arbitrarily far, then the method may be inappropriate for data streams, noisy measurements, hidden label errors, and high-dimensional pipelines where outliers are hard to detect.</p>
-<p>The central lesson is:</p>
+<p>Prokhorov continuity is a sanity check, not a guarantee. It asks whether a learning method respects the scale at which the data distribution is reliable.</p>
+<p>If a small amount of hidden contamination can move the fitted model arbitrarily far, the method may be inappropriate for noisy data streams, sensor errors, hidden label noise, and high-dimensional pipelines where outliers are hard to detect. The useful pair of questions is not only “are the distributions close?” but also “is the learner continuous under that notion of closeness?” Many standard methods need bounded data, clipping, robust losses, or stable regularization before they are safe to use without thinking about this.</p>
+<h2 id="appendix">Appendix</h2>
+<p>The goal here is minimal examples showing that learning maps are not Prokhorov-continuous in general.</p>
+<p><strong>Contamination lemma.</strong> For <span class="math inline">Q_\varepsilon = (1-\varepsilon)P + \varepsilon R</span> and any Borel set <span class="math inline">B</span>:</p>
 <p><span class="math display">
-\boxed{
-\text{Do not only ask whether the distributions are close.}
-}
+Q_\varepsilon(B) \leq P(B) + \varepsilon \leq P(B^\varepsilon) + \varepsilon, \quad P(B) \leq Q_\varepsilon(B^\varepsilon) + \varepsilon.
 </span></p>
-<p>Ask also:</p>
+<p>Hence <span class="math inline">\rho_{\mathrm{Pr}}(P, Q_\varepsilon) \leq \varepsilon</span> whenever contamination mass is small.</p>
+<p><strong>Kernel ridge regression.</strong> Take <span class="math inline">X = 0</span> always and <span class="math inline">k(0,0) = 1</span>. Population KRR solves</p>
 <p><span class="math display">
-\boxed{
-\text{Is the learner continuous under that notion of closeness?}
-}
-</span></p>
-<p>Many familiar ML methods should therefore be applied with care. In some settings, they should not be used without bounded data, clipping, robust losses, stable regularization, or a stronger topology that controls the quantities the method actually uses.</p>
-<h2 id="technical-appendix">Technical appendix</h2>
-<p>This appendix gives minimal examples. The goal is not to model realistic datasets. The goal is to show that the learning maps are not Prokhorov-continuous in general.</p>
-<h3 id="contamination-lemma">Contamination lemma</h3>
-<p>Let</p>
-<p><span class="math display">
-Q_\varepsilon=(1-\varepsilon)P+\varepsilon R.
-</span></p>
-<p>Then</p>
-<p><span class="math display">
-\rho_{\mathrm{Pr}}(P,Q_\varepsilon)\leq\varepsilon.
-</span></p>
-<p>Indeed, for any Borel set <span class="math inline">B</span>,</p>
-<p><span class="math display">
-Q_\varepsilon(B)
-=(1-\varepsilon)P(B)+\varepsilon R(B)
-\leq P(B)+\varepsilon
-\leq P(B^\varepsilon)+\varepsilon.
-</span></p>
-<p>Similarly,</p>
-<p><span class="math display">
-P(B)
-\leq Q_\varepsilon(B^\varepsilon)+\varepsilon.
-</span></p>
-<p>Hence the two measures are close in Prokhorov distance whenever the contamination mass is small.</p>
-<h3 id="kernel-ridge-regression">Kernel ridge regression</h3>
-<p>Consider the simplest regression problem. The input is always the same point:</p>
-<p><span class="math display">
-X=0.
-</span></p>
-<p>Let the kernel satisfy <span class="math inline">k(0,0)=1</span>. Then every fitted function is determined by the single value</p>
-<p><span class="math display">
-a=f(0).
-</span></p>
-<p>Population KRR solves</p>
-<p><span class="math display">
-\min_a\ \mathbb E[(Y-a)^2]+\lambda a^2.
-</span></p>
-<p>The minimizer is</p>
-<p><span class="math display">
-a_Q=\frac{\mathbb E_Q[Y]}{1+\lambda}.
-</span></p>
-<p>Let</p>
-<p><span class="math display">
-P=\delta_{(0,0)}
-</span></p>
-<p>and</p>
-<p><span class="math display">
-Q_\varepsilon
-=
-(1-\varepsilon)\delta_{(0,0)}
-+
-\varepsilon\delta_{(0,1/\varepsilon^2)}.
-</span></p>
-<p>Then</p>
-<p><span class="math display">
-\rho_{\mathrm{Pr}}(P,Q_\varepsilon)\leq\varepsilon\to0,
-</span></p>
-<p>but</p>
-<p><span class="math display">
-\mathbb E_{Q_\varepsilon}[Y]
-=
-\frac1\varepsilon
-\to\infty.
-</span></p>
-<p>Therefore</p>
-<p><span class="math display">
-a_{Q_\varepsilon}
-=
-\frac{1}{(1+\lambda)\varepsilon}
-\to\infty,
-</span></p>
-<p>whereas <span class="math inline">a_P=0</span>. Thus standard KRR with squared loss is not Prokhorov-continuous on unrestricted distributions.</p>
-<h3 id="gaussian-process-regression">Gaussian-process regression</h3>
-<p>Standard GP regression with Gaussian likelihood has the same weakness in a finite-sample empirical sequence.</p>
-<p>Take repeated input</p>
-<p><span class="math display">
-x_1=\cdots=x_n=0.
-</span></p>
-<p>Use a zero-mean GP prior with</p>
-<p><span class="math display">
-k(0,0)=\tau^2
-</span></p>
-<p>and Gaussian noise variance <span class="math inline">\sigma^2</span>. The covariance matrix is</p>
-<p><span class="math display">
-K=\tau^2\mathbf 1\mathbf 1^\top.
-</span></p>
-<p>The posterior mean at <span class="math inline">0</span> is</p>
-<p><span class="math display">
-m(0)
-=
-\tau^2\mathbf 1^\top(K+\sigma^2I)^{-1}y
-=
-\frac{\tau^2}{\sigma^2+n\tau^2}\sum_{i=1}^n y_i.
-</span></p>
-<p>For clean labels, <span class="math inline">y_i=0</span>, so <span class="math inline">m(0)=0</span>.</p>
-<p>Now corrupt only one label:</p>
-<p><span class="math display">
-y_1=\cdots=y_{n-1}=0,
+\min_a \;\mathbb{E}[(Y-a)^2] + \lambda a^2,
 \qquad
-y_n=n^2.
+a_Q = \frac{\mathbb{E}_Q[Y]}{1+\lambda}.
 </span></p>
-<p>The empirical measure changed by only <span class="math inline">1/n</span> mass, so its Prokhorov distance from the clean empirical measure is at most <span class="math inline">1/n</span>. But</p>
+<p>With <span class="math inline">P = \delta_{(0,0)}</span> and <span class="math inline">Q_\varepsilon = (1-\varepsilon)\delta_{(0,0)} + \varepsilon\delta_{(0,1/\varepsilon^2)}</span>, we get <span class="math inline">\rho_{\mathrm{Pr}}(P,Q_\varepsilon) \leq \varepsilon \to 0</span> but <span class="math inline">a_{Q_\varepsilon} = 1/[(1+\lambda)\varepsilon] \to \infty</span> while <span class="math inline">a_P = 0</span>.</p>
+<p><strong>Gaussian-process regression.</strong> With repeated input <span class="math inline">x_1 = \cdots = x_n = 0</span>, zero-mean GP prior with <span class="math inline">k(0,0) = \tau^2</span>, and Gaussian noise <span class="math inline">\sigma^2</span>, the posterior mean is</p>
 <p><span class="math display">
-m_{\mathrm{bad}}(0)
-=
-\frac{\tau^2 n^2}{\sigma^2+n\tau^2}
-\sim n.
+m(0) = \frac{\tau^2}{\sigma^2 + n\tau^2} \sum_{i=1}^n y_i.
 </span></p>
-<p>Thus ordinary GP regression with Gaussian likelihood is not stable under this unrestricted empirical contamination sequence. The issue is not the GP prior alone. The issue is Gaussian likelihood plus unbounded labels, which produces squared-loss behavior.</p>
-<h3 id="k-means"><span class="math inline">k</span>-means</h3>
-<p>For <span class="math inline">k=1</span>, <span class="math inline">k</span>-means is exactly the mean, so it already fails.</p>
-<p>For <span class="math inline">k=2</span>, consider</p>
+<p>With one corrupted label <span class="math inline">y_n = n^2</span> and the rest zero, the empirical measure is shifted by only <span class="math inline">1/n</span> in Prokhorov distance, but <span class="math inline">m_{\text{bad}}(0) \sim n</span>. The issue is not the GP prior; it is the Gaussian likelihood plus unbounded labels.</p>
+<p><strong>k-means.</strong> For <span class="math inline">k=1</span>, k-means is the mean. For <span class="math inline">k=2</span> with</p>
+<p><span class="math display">P = \frac{1}{2}\delta_{-1} + \frac{1}{2}\delta_1 \quad \text{and} \quad Q_\varepsilon = (1-\varepsilon)P + \varepsilon\delta_{1/\varepsilon^2},
+</span></p>
+<p>keeping centers near <span class="math inline">\pm 1</span> costs roughly <span class="math inline">\varepsilon M_\varepsilon^2 = 1/\varepsilon^3 \to \infty</span>. So one center moves to the far-away mass.</p>
+<p><strong>PCA.</strong> With <span class="math inline">P = \frac{1}{2}\delta_{(-1,0)} + \frac{1}{2}\delta_{(1,0)}</span> (leading direction horizontal) and <span class="math inline">Q_\varepsilon = (1-\varepsilon)P + \varepsilon\delta_{(0,1/\varepsilon)}</span>, the vertical variance becomes <span class="math inline">1/\varepsilon - 1 \to \infty</span>, and the top PCA direction flips from horizontal to vertical.</p>
+<p><strong>Hard-margin SVM.</strong> <span class="math inline">P = \frac{1}{2}\delta_{(-1,-1)} + \frac{1}{2}\delta_{(1,+1)}</span> is perfectly separable. Adding <span class="math inline">\varepsilon\delta_{(1,-1)}</span> makes <span class="math inline">x=1</span> carry both labels, so an arbitrarily small Prokhorov perturbation makes the hard-margin problem infeasible.</p>
+<p><strong>MMD calculation.</strong> For bounded <span class="math inline">k(x,x) \leq K</span> and <span class="math inline">Q_\varepsilon = (1-\varepsilon)\delta_0 + \varepsilon\delta_{1/\varepsilon^2}</span>:</p>
 <p><span class="math display">
-P=\frac12\delta_{-1}+\frac12\delta_1.
+\operatorname{MMD}_k(P, Q_\varepsilon) = \varepsilon\|k(1/\varepsilon^2, \cdot) - k(0,\cdot)\|_{\mathcal{H}} \leq 2\varepsilon\sqrt{K} \to 0.
 </span></p>
-<p>The optimal centers are <span class="math inline">\{-1,1\}</span>, with zero distortion.</p>
-<p>Now contaminate by</p>
-<p><span class="math display">
-Q_\varepsilon
-=
-(1-\varepsilon)P
-+
-\varepsilon\delta_{M_\varepsilon},
-\qquad
-M_\varepsilon=\frac1{\varepsilon^2}.
-</span></p>
-<p>Again,</p>
-<p><span class="math display">
-\rho_{\mathrm{Pr}}(P,Q_\varepsilon)\leq\varepsilon\to0.
-</span></p>
-<p>If we keep centers near <span class="math inline">-1</span> and <span class="math inline">1</span>, the outlier contributes approximately</p>
-<p><span class="math display">
-\varepsilon M_\varepsilon^2
-=
-\varepsilon\cdot\frac1{\varepsilon^4}
-=
-\frac1{\varepsilon^3},
-</span></p>
-<p>which diverges.</p>
-<p>But if one center moves to <span class="math inline">M_\varepsilon</span>, the outlier is fitted almost perfectly, while the original mass pays only finite cost. So a tiny far-away mass can steal a centroid.</p>
-<h3 id="pca-and-covariance-methods">PCA and covariance methods</h3>
-<p>Let the clean distribution in <span class="math inline">\mathbb R^2</span> be</p>
-<p><span class="math display">
-P=\frac12\delta_{(-1,0)}+\frac12\delta_{(1,0)}.
-</span></p>
-<p>The leading principal direction is horizontal:</p>
-<p><span class="math display">
-e_1=(1,0).
-</span></p>
-<p>Now contaminate by</p>
-<p><span class="math display">
-Q_\varepsilon
-=
-(1-\varepsilon)P
-+\varepsilon\delta_{(0,M_\varepsilon)},
-\qquad
-M_\varepsilon=\frac1\varepsilon.
-</span></p>
-<p>Then</p>
-<p><span class="math display">
-\rho_{\mathrm{Pr}}(P,Q_\varepsilon)\leq\varepsilon\to0.
-</span></p>
-<p>The vertical variance is</p>
-<p><span class="math display">
-\varepsilon M_\varepsilon^2-(\varepsilon M_\varepsilon)^2
-=
-\frac1\varepsilon-1,
-</span></p>
-<p>which diverges. So the top PCA direction flips from horizontal to vertical. Therefore PCA is not Prokhorov-continuous without moment control.</p>
-<h3 id="hard-margin-svm">Hard-margin SVM</h3>
-<p>SVMs require nuance. Fixed-regularization soft-margin SVMs can be robust under suitable assumptions. Hard-margin SVMs fail immediately.</p>
-<p>Let</p>
-<p><span class="math display">
-P=\frac12\delta_{(-1,-1)}+\frac12\delta_{(1,+1)}.
-</span></p>
-<p>This is perfectly separable.</p>
-<p>Now contaminate by</p>
-<p><span class="math display">
-Q_\varepsilon
-=(1-\varepsilon)P+\varepsilon\delta_{(1,-1)}.
-</span></p>
-<p>Then</p>
-<p><span class="math display">
-\rho_{\mathrm{Pr}}(P,Q_\varepsilon)\leq\varepsilon.
-</span></p>
-<p>But under <span class="math inline">Q_\varepsilon</span>, the same input <span class="math inline">x=1</span> has both labels <span class="math inline">+1</span> and <span class="math inline">-1</span>. The data are no longer hard-margin separable. An arbitrarily small Prokhorov perturbation changes the problem from feasible to infeasible.</p>
-<h3 id="mmd-calculation">MMD calculation</h3>
-<p>Let</p>
-<p><span class="math display">
-P=\delta_0,
-\qquad
-Q_\varepsilon=(1-\varepsilon)\delta_0+\varepsilon\delta_{1/\varepsilon^2}.
-</span></p>
-<p>For a bounded kernel <span class="math inline">k(x,x)\leq K</span>,</p>
-<p><span class="math display">
-\operatorname{MMD}_k(P,Q_\varepsilon)
-=
-\varepsilon
-\left\|k(1/\varepsilon^2,\cdot)-k(0,\cdot)\right\|_{\mathcal H}
-\leq
-2\varepsilon\sqrt K.
-</span></p>
-<p>So</p>
-<p><span class="math display">
-\operatorname{MMD}_k(P,Q_\varepsilon)\to0.
-</span></p>
-<p>But the mean explodes:</p>
-<p><span class="math display">
-\mathbb E_{Q_\varepsilon}[X]
-=
-\frac1\varepsilon
-\to\infty.
-</span></p>
-<p>Therefore small MMD does not guarantee small downstream error for a discontinuous learner. The problem is a mismatch:</p>
-<p><span class="math display">
-\boxed{
-\text{distributional discrepancy is weak, while the learner is tail-sensitive.}
-}
-</span></p>
+<p>Meanwhile <span class="math inline">\mathbb{E}_{Q_\varepsilon}[X] = 1/\varepsilon \to \infty</span>. The discrepancy is weak; the learner is tail-sensitive.</p>
 <h2 id="references">References</h2>
 <p>F. R. Hampel. “A General Qualitative Definition of Robustness.” <em>The Annals of Mathematical Statistics</em>, 1971. <a href="https://doi.org/10.1214/aoms/1177693054" class="uri">https://doi.org/10.1214/aoms/1177693054</a></p>
 <p>R. Hable and A. Christmann. “Qualitative Robustness of Support Vector Machines.” <em>Journal of Multivariate Analysis</em>, 2011. <a href="https://doi.org/10.1016/j.jmva.2011.02.008" class="uri">https://doi.org/10.1016/j.jmva.2011.02.008</a></p>

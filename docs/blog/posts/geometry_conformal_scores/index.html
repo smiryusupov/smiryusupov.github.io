@@ -143,25 +143,20 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#preface" id="toc-preface">Preface</a></li>
-  <li><a href="#part-i-validity-comes-from-exchangeability" id="toc-part-i-validity-comes-from-exchangeability">Part I: Validity comes from exchangeability</a></li>
-  <li><a href="#part-ii-the-score-defines-the-geometry" id="toc-part-ii-the-score-defines-the-geometry">Part II: The score defines the geometry</a></li>
-  <li><a href="#part-iii-geometry-has-to-be-estimated" id="toc-part-iii-geometry-has-to-be-estimated">Part III: Geometry has to be estimated</a></li>
-  <li><a href="#part-iv-the-experiment" id="toc-part-iv-the-experiment">Part IV: The experiment</a></li>
-  <li><a href="#part-v-what-happened" id="toc-part-v-what-happened">Part V: What happened</a>
-  <ul>
-  <li><a href="#heteroskedastic-data" id="toc-heteroskedastic-data">Heteroskedastic data</a></li>
-  <li><a href="#homoskedastic-heavy-tailed-and-skewed-data" id="toc-homoskedastic-heavy-tailed-and-skewed-data">Homoskedastic, heavy-tailed, and skewed data</a></li>
-  </ul></li>
-  <li><a href="#part-vi-the-multimodal-case" id="toc-part-vi-the-multimodal-case">Part VI: The multimodal case</a></li>
-  <li><a href="#part-vii-diagnostics-should-match-the-geometry" id="toc-part-vii-diagnostics-should-match-the-geometry">Part VII: Diagnostics should match the geometry</a></li>
+  <li><a href="#validity-comes-from-exchangeability" id="toc-validity-comes-from-exchangeability">Validity comes from exchangeability</a></li>
+  <li><a href="#the-score-defines-the-geometry" id="toc-the-score-defines-the-geometry">The score defines the geometry</a></li>
+  <li><a href="#geometry-has-to-be-estimated" id="toc-geometry-has-to-be-estimated">Geometry has to be estimated</a></li>
+  <li><a href="#the-experiment" id="toc-the-experiment">The experiment</a></li>
+  <li><a href="#results" id="toc-results">Results</a></li>
+  <li><a href="#the-multimodal-case" id="toc-the-multimodal-case">The multimodal case</a></li>
+  <li><a href="#diagnostics-should-match-the-geometry" id="toc-diagnostics-should-match-the-geometry">Diagnostics should match the geometry</a></li>
   <li><a href="#takeaway" id="toc-takeaway">Takeaway</a></li>
-  <li><a href="#technical-appendix" id="toc-technical-appendix">Technical appendix</a>
+  <li><a href="#appendix" id="toc-appendix">Appendix</a>
   <ul>
-  <li><a href="#why-monotone-score-transforms-did-not-matter" id="toc-why-monotone-score-transforms-did-not-matter">Why monotone score transforms did not matter</a></li>
+  <li><a href="#why-monotone-score-transforms-didnt-matter" id="toc-why-monotone-score-transforms-didnt-matter">Why monotone score transforms didn’t matter</a></li>
   <li><a href="#what-density-set-length-means" id="toc-what-density-set-length-means">What density-set length means</a></li>
   <li><a href="#a-classification-analogue" id="toc-a-classification-analogue">A classification analogue</a></li>
-  <li><a href="#what-is-and-is-not-proved-here" id="toc-what-is-and-is-not-proved-here">What is, and is not, proved here</a></li>
+  <li><a href="#what-is-and-isnt-proved-here" id="toc-what-is-and-isnt-proved-here">What is and isn’t proved here</a></li>
   <li><a href="#reproducing-the-benchmark" id="toc-reproducing-the-benchmark">Reproducing the benchmark</a></li>
   </ul></li>
   <li><a href="#references" id="toc-references">References</a></li>
@@ -196,138 +191,37 @@ window.Quarto = {
   }
 }
 </style>
-<p><strong>Claim.</strong> Conformal calibration supplies marginal validity; the score supplies the geometry of the prediction set.<br>
-<strong>Scope.</strong> Standard split-conformal validity; experiments illustrating efficiency and local behavior.</p>
-<h2 id="preface" class="anchored">Preface</h2>
-<p>Conformal prediction has a clean promise. If the calibration and test examples are exchangeable, then a split conformal prediction set has finite-sample marginal coverage. The model used to build the score can be wrong. The likelihood can be misspecified. The geometry can be only approximate.</p>
-<p>That is the part I do not want to disturb. The question in this note is different:</p>
-<blockquote>
-<p>If conformal validity is model-free, where can model geometry matter?</p>
-</blockquote>
-<p>My answer is:</p>
-<blockquote>
-<p>Geometry enters through the nonconformity score. It does not prove coverage. It changes efficiency.</p>
-</blockquote>
-<p>So the slogan is</p>
-<p><span class="math display">
-\boxed{\text{exchangeability gives validity; score geometry affects efficiency.}}
-</span></p>
-<p>This note is a small experiment around that slogan. The goal is not to introduce a new conformal method, but to separate two things that are easy to mix together: the validity mechanism and the shape induced by the score. Conformal calibration gives the first. The score gives the second.</p>
-<h2 id="part-i-validity-comes-from-exchangeability" class="anchored">Part I: Validity comes from exchangeability</h2>
-<p>Let</p>
-<p><span class="math display">
-Z_i=(X_i,Y_i), \qquad i=1,\ldots,n+1,
-</span></p>
-<p>be exchangeable observations, and let</p>
-<p><span class="math display">
-S:\mathcal X\times\mathcal Y\to\mathbb R
-</span></p>
-<p>be any measurable nonconformity score. On a calibration set, define</p>
-<p><span class="math display">
-R_i=S(X_i,Y_i).
-</span></p>
-<p>For target miscoverage <span class="math inline">\alpha</span>, use the conformal quantile</p>
-<p><span class="math display">
-\widehat q
-=
-R_{\left(\lceil (n_{\mathrm{cal}}+1)(1-\alpha)\rceil\right)}.
-</span></p>
-<p>The split conformal set is</p>
-<p><span class="math display">
-C_\alpha(x)=\{y:S(x,y)\le \widehat q\}.
-</span></p>
-<p>Then</p>
-<p><span class="math display">
-\mathbb P\{Y_{n+1}\in C_\alpha(X_{n+1})\}\ge 1-\alpha.
-</span></p>
-<p>The important word is <em>any</em>, after the score has been fixed. In split conformal, the model or score is fitted on a separate training split, and then treated as fixed when calibration and test scores are compared. The score can come from a random forest, a kernel method, a neural network, a quantile model, or a density model. Conditional on the fitted score, if the calibration and test examples are exchangeable, the marginal guarantee remains.</p>
-<p>This is why I do not view information geometry as a new validity proof for conformal prediction. The validity proof is already there. The role of geometry is narrower: a geometric score may rank candidate labels better. Better ranking can mean shorter intervals, smaller sets, or better conditional behavior. But it is not what makes the method valid.</p>
-<h2 id="part-ii-the-score-defines-the-geometry" class="anchored">Part II: The score defines the geometry</h2>
-<p>The simplest regression score is</p>
-<p><span class="math display">
-S_{\mathrm{abs}}(x,y)=|y-\widehat\mu(x)|.
-</span></p>
-<p>It creates a global residual interval,</p>
-<p><span class="math display">
-C_\alpha(x)
-=
-[\widehat\mu(x)-\widehat q,\widehat\mu(x)+\widehat q].
-</span></p>
-<p>This is a reasonable geometry when the conditional noise is roughly symmetric and has the same scale everywhere. When the noise scale changes with <span class="math inline">x</span>, a global residual threshold tends to be too wide in easy regions and too narrow in hard regions. Marginal coverage can still be right, because the errors average out.</p>
+<p>Conformal prediction has a clean promise: if the calibration and test examples are exchangeable, a split conformal prediction set has finite-sample marginal coverage. The model used to build the score can be wrong. The likelihood can be misspecified. The geometry can be only approximate.</p>
+<p>That guarantee I don’t want to disturb. The question here is different: if conformal validity is model-free, where can model geometry matter?</p>
+<p>The answer is through the nonconformity score. Geometry doesn’t prove coverage — it changes efficiency. Exchangeability gives validity; score geometry affects how small the prediction sets are.</p>
+<h2 id="validity-comes-from-exchangeability" class="anchored">Validity comes from exchangeability</h2>
+<p>Let <span class="math inline">Z_i = (X_i, Y_i)</span>, <span class="math inline">i = 1,\ldots,n+1</span>, be exchangeable observations, and let <span class="math inline">S: \mathcal{X} \times \mathcal{Y} \to \mathbb{R}</span> be any measurable nonconformity score. On a calibration set, define <span class="math inline">R_i = S(X_i, Y_i)</span>. For target miscoverage <span class="math inline">\alpha</span>, use the conformal quantile</p>
+<p><span class="math display">\hat{q} = R_{\left(\lceil (n_{\mathrm{cal}}+1)(1-\alpha) \rceil\right)}.</span></p>
+<p>The split conformal set is <span class="math inline">C_\alpha(x) = \{y : S(x,y) \le \hat{q}\}</span>, and</p>
+<p><span class="math display">\mathbb{P}\{Y_{n+1} \in C_\alpha(X_{n+1})\} \ge 1 - \alpha.</span></p>
+<p>The key word is <em>any</em> — after the score has been fixed. In split conformal, the score is fitted on a separate training split and treated as fixed when calibration and test scores are compared. The score can come from a random forest, a kernel method, a neural network, a quantile model, or a density model. Conditional on the fitted score, if the calibration and test examples are exchangeable, the marginal guarantee remains.</p>
+<p>This is why geometry isn’t a new validity proof for conformal prediction. The validity proof is already there. The role of geometry is narrower: a geometric score may rank candidate labels better, which can mean shorter intervals, smaller sets, or better conditional behavior — but it’s not what makes the method valid.</p>
+<h2 id="the-score-defines-the-geometry" class="anchored">The score defines the geometry</h2>
+<p>The simplest regression score is <span class="math inline">S_{\mathrm{abs}}(x,y) = |y - \hat\mu(x)|</span>, which creates a global residual interval</p>
+<p><span class="math display">C_\alpha(x) = [\hat\mu(x) - \hat{q},\; \hat\mu(x) + \hat{q}].</span></p>
+<p>This is reasonable when conditional noise is roughly symmetric and has the same scale everywhere. When the noise scale changes with <span class="math inline">x</span>, a global threshold tends to be too wide in easy regions and too narrow in hard ones. Marginal coverage can still be right, because the errors average out — but the sets are wasteful.</p>
 <p>A local-scale score changes the ruler:</p>
-<p><span class="math display">
-S_{\mathrm{loc}}(x,y)
-=
-\frac{|y-\widehat\mu(x)|}{\widehat\sigma(x)}.
-</span></p>
-<p>The resulting interval is</p>
-<p><span class="math display">
-C_\alpha(x)
-=
-[
-\widehat\mu(x)-\widehat q\widehat\sigma(x),
-\widehat\mu(x)+\widehat q\widehat\sigma(x)
-].
-</span></p>
-<p>This is a one-dimensional Mahalanobis idea. The local ruler is</p>
-<p><span class="math display">
-g(x)\approx \frac{1}{\widehat\sigma^2(x)}.
-</span></p>
-<p>In a Gaussian conditional model,</p>
-<p><span class="math display">
-Y\mid X=x\sim N(\mu(x),\sigma^2(x)),
-</span></p>
-<p>the negative log-likelihood contains</p>
-<p><span class="math display">
-\frac{(y-\mu(x))^2}{2\sigma^2(x)}.
-</span></p>
-<p>So local normalization measures residual size in the local uncertainty units of the model. The conformal step does not care whether the Gaussian story is true. It only uses the resulting ranks. But the efficiency can care a lot.</p>
-<p>There are other geometries. Conformalized quantile regression uses lower and upper quantile models,</p>
-<p><span class="math display">
-\widehat q_\ell(x),\qquad \widehat q_u(x),
-</span></p>
-<p>with score</p>
-<p><span class="math display">
-S_{\mathrm{CQR}}(x,y)
-=
-\max\{\widehat q_\ell(x)-y,\;y-\widehat q_u(x)\}.
-</span></p>
-<p>The resulting interval is no longer forced to be symmetric around a mean. For multimodal data, even quantile intervals can be the wrong shape: if two separated labels are plausible and the middle is implausible, a single interval wastes volume. A density score,</p>
-<p><span class="math display">
-S_{\mathrm{dens}}(x,y)=-\log \widehat p(y\mid x),
-</span></p>
-<p>instead gives the set</p>
-<p><span class="math display">
-C_\alpha(x)=\{y:\widehat p(y\mid x)\ge e^{-\widehat q}\},
-</span></p>
-<p>which can be disconnected. That is the right geometry for multimodal conditional laws.</p>
-<h2 id="part-iii-geometry-has-to-be-estimated" class="anchored">Part III: Geometry has to be estimated</h2>
-<p>A local metric can help only if it is estimated stably. If <span class="math inline">\widehat\sigma(x)</span> is too small on some calibration points, then</p>
-<p><span class="math display">
-\frac{|y-\widehat\mu(x)|}{\widehat\sigma(x)}
-</span></p>
-<p>can become huge. The conformal quantile then becomes huge, and the final intervals can explode.</p>
-<p>To make this failure mode visible, I use stabilized local scales,</p>
-<p><span class="math display">
-\widetilde\sigma(x)
-=
-\operatorname{clip}(\widehat\sigma(x),s_{\min},s_{\max})+\lambda,
-</span></p>
-<p>and a local/global blend,</p>
-<p><span class="math display">
-\widetilde\sigma_\gamma(x)
-=
-(1-\gamma)\widetilde\sigma_{\mathrm{local}}(x)
-+
-\gamma\widetilde\sigma_{\mathrm{global}}.
-</span></p>
-<p>Here <span class="math inline">\gamma=0</span> keeps the score fully local, while <span class="math inline">\gamma=1</span> moves it back toward a global residual scale. The tuning parameter is a trust parameter: how much estimated local geometry should be allowed into the score?</p>
-<h2 id="part-iv-the-experiment" class="anchored">Part IV: The experiment</h2>
-<p>I use synthetic regression data with mean</p>
-<p><span class="math display">
-\mu(x)=\sin(2\pi x_1)+\frac12 x_1.
-</span></p>
-<p>The settings are deliberately simple.</p>
+<p><span class="math display">S_{\mathrm{loc}}(x,y) = \frac{|y - \hat\mu(x)|}{\hat\sigma(x)},</span></p>
+<p>giving intervals <span class="math inline">[\hat\mu(x) - \hat{q}\hat\sigma(x),\; \hat\mu(x) + \hat{q}\hat\sigma(x)]</span>. This is a one-dimensional Mahalanobis idea — the local ruler is <span class="math inline">g(x) \approx 1/\hat\sigma^2(x)</span>. In a Gaussian conditional model, <span class="math inline">Y \mid X = x \sim N(\mu(x), \sigma^2(x))</span>, the negative log-likelihood contains <span class="math inline">(y - \mu(x))^2 / 2\sigma^2(x)</span>, so local normalization measures residual size in the local uncertainty units of the model. Conformal calibration doesn’t care whether the Gaussian story is true. It only uses the resulting ranks.</p>
+<p>Conformalized quantile regression uses lower and upper quantile models <span class="math inline">\hat{q}_\ell(x)</span>, <span class="math inline">\hat{q}_u(x)</span>, with score</p>
+<p><span class="math display">S_{\mathrm{CQR}}(x,y) = \max\{\hat{q}_\ell(x) - y,\; y - \hat{q}_u(x)\},</span></p>
+<p>giving intervals that aren’t forced to be symmetric around a mean. For multimodal data, even quantile intervals can be the wrong shape — if two separated labels are plausible and the middle isn’t, a single interval wastes volume. A density score</p>
+<p><span class="math display">S_{\mathrm{dens}}(x,y) = -\log \hat{p}(y \mid x)</span></p>
+<p>gives the set <span class="math inline">C_\alpha(x) = \{y : \hat{p}(y \mid x) \ge e^{-\hat{q}}\}</span>, which can be disconnected. That’s the right geometry for multimodal conditional laws.</p>
+<h2 id="geometry-has-to-be-estimated" class="anchored">Geometry has to be estimated</h2>
+<p>A local metric helps only if it’s estimated stably. If <span class="math inline">\hat\sigma(x)</span> is too small on some calibration points, then <span class="math inline">|y - \hat\mu(x)| / \hat\sigma(x)</span> can blow up, the conformal quantile can become enormous, and the final intervals can explode.</p>
+<p>To make this failure mode visible, I use stabilized local scales</p>
+<p><span class="math display">\tilde\sigma(x) = \operatorname{clip}(\hat\sigma(x), s_{\min}, s_{\max}) + \lambda,</span></p>
+<p>and a local/global blend</p>
+<p><span class="math display">\tilde\sigma_\gamma(x) = (1-\gamma)\tilde\sigma_{\mathrm{local}}(x) + \gamma\tilde\sigma_{\mathrm{global}}.</span></p>
+<p>Here <span class="math inline">\gamma = 0</span> keeps the score fully local, <span class="math inline">\gamma = 1</span> moves it back toward a global residual scale. Think of <span class="math inline">\gamma</span> as a trust parameter: how much estimated local geometry should be allowed into the score?</p>
+<h2 id="the-experiment" class="anchored">The experiment</h2>
+<p>Synthetic regression data with mean <span class="math inline">\mu(x) = \sin(2\pi x_1) + \frac{1}{2}x_1</span>, five settings:</p>
 <div class="wide-table">
 <table class="caption-top">
 <colgroup>
@@ -345,299 +239,229 @@ C_\alpha(x)=\{y:\widehat p(y\mid x)\ge e^{-\widehat q}\},
 <tbody>
 <tr class="odd">
 <td>Homoskedastic</td>
-<td><span class="math inline">Y=\mu(X)+0.25\varepsilon</span>, <span class="math inline">\varepsilon\sim N(0,1)</span></td>
+<td><span class="math inline">Y = \mu(X) + 0.25\varepsilon</span>, <span class="math inline">\varepsilon \sim N(0,1)</span></td>
 <td>no local scale structure</td>
 </tr>
 <tr class="even">
 <td>Heteroskedastic</td>
-<td><span class="math inline">Y=\mu(X)+\sigma(X)\varepsilon</span>, <span class="math inline">\sigma(x)=0.10+0.80|x_1|</span></td>
+<td><span class="math inline">Y = \mu(X) + \sigma(X)\varepsilon</span>, <span class="math inline">\sigma(x) = 0.10 + 0.80|x_1|</span></td>
 <td>local scale geometry</td>
 </tr>
 <tr class="odd">
 <td>Heavy-tailed</td>
-<td><span class="math inline">\varepsilon\sim t_3/\sqrt3</span></td>
+<td><span class="math inline">\varepsilon \sim t_3/\sqrt{3}</span></td>
 <td>robustness</td>
 </tr>
 <tr class="even">
 <td>Skewed</td>
-<td><span class="math inline">\varepsilon\sim \mathrm{Exponential}(1)-1</span></td>
+<td><span class="math inline">\varepsilon \sim \mathrm{Exponential}(1) - 1</span></td>
 <td>asymmetric errors</td>
 </tr>
 <tr class="odd">
 <td>Multimodal</td>
-<td><span class="math inline">Y=\mu(X)+0.8B+\sigma(X)\varepsilon</span>, <span class="math inline">B\in\{-1,+1\}</span></td>
+<td><span class="math inline">Y = \mu(X) + 0.8B + \sigma(X)\varepsilon</span>, <span class="math inline">B \in \{-1,+1\}</span></td>
 <td>disconnected conditional structure</td>
 </tr>
 </tbody>
 </table>
 </div>
-<p>The experiment is ordinary split conformal: split the data into train, calibration, and test sets; fit a model on the training set; build one or more scores; compute the conformal quantile on calibration scores; and evaluate coverage and set length on the test set.</p>
-<p>The score changes. The calibration logic does not.</p>
-<p>The code lives in <code>ig_conformal.py</code>. I ran the full benchmark separately and report the saved summaries below. The benchmark uses four model families: random forests, kernel ridge regression, MLPs, and GBRT-based conformalized quantile regression.</p>
-<h2 id="part-v-what-happened" class="anchored">Part V: What happened</h2>
-<p>The results match the small claim. Coverage stays near <span class="math inline">90\%</span> for most methods. That is the conformal part. The average length changes a lot. That is the score-geometry part.</p>
-<h3 id="heteroskedastic-data" class="anchored">Heteroskedastic data</h3>
-<p>This is the clearest positive case for local geometry.</p>
+<p>Ordinary split conformal throughout: split into train, calibration, and test; fit a model on training; build one or more scores; compute conformal quantile on calibration scores; evaluate coverage and set length on test. The score changes. The calibration logic doesn’t.</p>
+<p>Four model families: random forests, kernel ridge regression, MLPs, and GBRT-based conformalized quantile regression.</p>
+<h2 id="results" class="anchored">Results</h2>
+<p>Coverage stays near 90% for most methods — that’s the conformal part. Average length changes a lot. That’s the score-geometry part.</p>
+<p><strong>Heteroskedastic data</strong> is the clearest positive case for local geometry.</p>
 <div class="wide-table">
-<table class="caption-top">
+<table class="caption-top" style="width:100%;">
 <colgroup>
-<col style="width: 11%">
-<col style="width: 15%">
-<col style="width: 11%">
-<col style="width: 15%">
-<col style="width: 15%">
-<col style="width: 15%">
-<col style="width: 15%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
 </colgroup>
 <thead>
 <tr class="header">
 <th>model</th>
-<th style="text-align: right;">baseline len.</th>
+<th>baseline len.</th>
 <th>geometric score</th>
-<th style="text-align: right;">geometric len.</th>
-<th style="text-align: right;">reduction</th>
-<th style="text-align: right;">baseline cond. err.</th>
-<th style="text-align: right;">geometric cond. err.</th>
+<th>geometric len.</th>
+<th>reduction</th>
+<th>baseline cond. err.</th>
+<th>geometric cond. err.</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td>GBRT-CQR</td>
-<td style="text-align: right;">1.904</td>
+<td>1.904</td>
 <td>conformalized quantile regression</td>
-<td style="text-align: right;">1.697</td>
-<td style="text-align: right;">10.9%</td>
-<td style="text-align: right;">0.088</td>
-<td style="text-align: right;">0.026</td>
+<td>1.697</td>
+<td>10.9%</td>
+<td>0.088</td>
+<td>0.026</td>
 </tr>
 <tr class="even">
 <td>KRR</td>
-<td style="text-align: right;">2.579</td>
+<td>2.579</td>
 <td>blended normalized residual, <span class="math inline">\gamma=0.75</span></td>
-<td style="text-align: right;">2.683</td>
-<td style="text-align: right;">-4.0%</td>
-<td style="text-align: right;">0.080</td>
-<td style="text-align: right;">0.069</td>
+<td>2.683</td>
+<td>−4.0%</td>
+<td>0.080</td>
+<td>0.069</td>
 </tr>
 <tr class="odd">
 <td>MLP</td>
-<td style="text-align: right;">1.988</td>
+<td>1.988</td>
 <td>stabilized normalized residual</td>
-<td style="text-align: right;">1.784</td>
-<td style="text-align: right;">10.3%</td>
-<td style="text-align: right;">0.096</td>
-<td style="text-align: right;">0.038</td>
+<td>1.784</td>
+<td>10.3%</td>
+<td>0.096</td>
+<td>0.038</td>
 </tr>
 <tr class="even">
 <td>RF</td>
-<td style="text-align: right;">1.950</td>
+<td>1.950</td>
 <td>blended normalized residual, <span class="math inline">\gamma=0.25</span></td>
-<td style="text-align: right;">1.676</td>
-<td style="text-align: right;">14.1%</td>
-<td style="text-align: right;">0.086</td>
-<td style="text-align: right;">0.047</td>
+<td>1.676</td>
+<td>14.1%</td>
+<td>0.086</td>
+<td>0.047</td>
 </tr>
 </tbody>
 </table>
 </div>
-<p>For random forests, the average length drops from about <span class="math inline">1.95</span> to <span class="math inline">1.68</span>. For MLPs, it drops from about <span class="math inline">1.99</span> to <span class="math inline">1.78</span>. For GBRT-CQR, it drops from about <span class="math inline">1.90</span> to <span class="math inline">1.70</span>. The conditional coverage diagnostics also improve.</p>
-<p>Kernel ridge regression is the warning. In this run, even the best blended geometry is slightly longer than the global residual baseline. In more aggressive local-normalization variants, the intervals can become enormous because the estimated scale is unstable. That is not a conformal failure. Coverage is still protected. It is a score failure.</p>
-<p>The practical lesson is:</p>
-<blockquote>
-<p>use only as much geometry as you can estimate stably.</p>
-</blockquote>
-<h3 id="homoskedastic-heavy-tailed-and-skewed-data" class="anchored">Homoskedastic, heavy-tailed, and skewed data</h3>
-<p>The homoskedastic case is a useful sanity check. The simple residual score is hard to beat; for random forests, the absolute residual interval has average length about <span class="math inline">0.856</span>, and the oracle local normalization gives essentially the same number. Local geometry has nothing useful to learn.</p>
-<p>The heavy-tailed and skewed cases are mixed but informative. Blended local-scale scores give modest gains for RF and MLP in the heavy-tailed setting and often improve conditional balance. In the skewed setting, RF and MLP blended scores work well, while CQR improves conditional balance but is not uniformly shorter in this particular run. More flexible geometry is not automatically better. It helps only when the fitted score ranks labels well.</p>
-<h2 id="part-vi-the-multimodal-case" class="anchored">Part VI: The multimodal case</h2>
-<p>The multimodal setting is the cleanest example. Interval methods have the wrong shape: they must cover the space between modes even when the middle is not very plausible.</p>
-<p>The conditional density score uses</p>
-<p><span class="math display">
-S(x,y)=-\log \widehat p(y\mid x).
-</span></p>
-<p>I fit a simple two-mode conditional density model,</p>
-<p><span class="math display">
-\widehat p(y\mid x)
-=
-\widehat\pi(x)\mathcal N(y;\widehat\mu_+(x),\widehat\sigma_+^2)
-+
-(1-\widehat\pi(x))\mathcal N(y;\widehat\mu_-(x),\widehat\sigma_-^2).
-</span></p>
-<p>This is not meant to be a state-of-the-art density estimator. It is just expressive enough to test the geometry. The density-level-set conformal method gives average length about <span class="math inline">1.82</span> with coverage about <span class="math inline">0.904</span>.</p>
+<p>Random forests: length drops from 1.95 to 1.68. MLPs: 1.99 to 1.78. GBRT-CQR: 1.90 to 1.70. Conditional coverage diagnostics also improve.</p>
+<p>Kernel ridge regression is the warning. In this run, even the best blended geometry is slightly longer than the global residual baseline. In more aggressive local-normalization variants, intervals can become enormous because the estimated scale is unstable. That’s not a conformal failure — coverage is still protected. It’s a score failure. Use only as much geometry as you can estimate stably.</p>
+<p><strong>Homoskedastic data</strong> is a useful sanity check. The simple residual score is hard to beat; for random forests, the absolute residual interval has average length about 0.856, and oracle local normalization gives essentially the same number. Local geometry has nothing useful to learn when there’s no local scale structure.</p>
+<p><strong>Heavy-tailed and skewed cases</strong> are mixed but informative. Blended local-scale scores give modest gains for RF and MLP in the heavy-tailed setting and often improve conditional balance. In the skewed setting, RF and MLP blended scores work well, while CQR improves conditional balance but isn’t uniformly shorter in this run. More flexible geometry isn’t automatically better — it helps only when the fitted score ranks labels well.</p>
+<h2 id="the-multimodal-case" class="anchored">The multimodal case</h2>
+<p>The multimodal setting is the clearest example. Interval methods have the wrong shape: they must cover the space between modes even when the middle isn’t very plausible.</p>
+<p>I fit a simple two-mode conditional density model</p>
+<p><span class="math display">\hat{p}(y \mid x) = \hat\pi(x)\,\mathcal{N}(y;\hat\mu_+(x),\hat\sigma_+^2) + (1-\hat\pi(x))\,\mathcal{N}(y;\hat\mu_-(x),\hat\sigma_-^2),</span></p>
+<p>not as a state-of-the-art density estimator, but just expressive enough to test the geometry. The density-level-set conformal method gives average length about 1.82 with coverage about 0.904.</p>
 <div class="wide-table">
 <table class="caption-top">
 <colgroup>
-<col style="width: 20%">
-<col style="width: 26%">
-<col style="width: 26%">
-<col style="width: 26%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
 </colgroup>
 <thead>
 <tr class="header">
 <th>baseline family</th>
-<th style="text-align: right;">interval baseline len.</th>
-<th style="text-align: right;">density-set len.</th>
-<th style="text-align: right;">reduction</th>
+<th>interval baseline len.</th>
+<th>density-set len.</th>
+<th>reduction</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td>GBRT-CQR</td>
-<td style="text-align: right;">2.345</td>
-<td style="text-align: right;">1.820</td>
-<td style="text-align: right;">22.4%</td>
+<td>2.345</td>
+<td>1.820</td>
+<td>22.4%</td>
 </tr>
 <tr class="even">
 <td>KRR</td>
-<td style="text-align: right;">3.803</td>
-<td style="text-align: right;">1.820</td>
-<td style="text-align: right;">52.1%</td>
+<td>3.803</td>
+<td>1.820</td>
+<td>52.1%</td>
 </tr>
 <tr class="odd">
 <td>MLP</td>
-<td style="text-align: right;">2.691</td>
-<td style="text-align: right;">1.820</td>
-<td style="text-align: right;">32.4%</td>
+<td>2.691</td>
+<td>1.820</td>
+<td>32.4%</td>
 </tr>
 <tr class="even">
 <td>RF</td>
-<td style="text-align: right;">2.457</td>
-<td style="text-align: right;">1.820</td>
-<td style="text-align: right;">25.9%</td>
+<td>2.457</td>
+<td>1.820</td>
+<td>25.9%</td>
 </tr>
 </tbody>
 </table>
 </div>
-<p>This is the main idea in its most visible form:</p>
-<blockquote>
-<p>once the score geometry matches the conditional law, conformal sets become much more efficient.</p>
-</blockquote>
-<h2 id="part-vii-diagnostics-should-match-the-geometry" class="anchored">Part VII: Diagnostics should match the geometry</h2>
-<p>At first, the density method looked less locally balanced when I binned by <span class="math inline">\sigma(x)</span>. The mean conditional error was about <span class="math inline">0.0757</span>. But <span class="math inline">\sigma(x)</span> is not the right diagnostic for a mixture score. The score models mode structure.</p>
-<p>So I also bin by mixture-specific quantities: the estimated upper-mode probability <span class="math inline">\widehat\pi(x)</span>, its entropy <span class="math inline">H(\widehat\pi(x))</span>, the mode margin <span class="math inline">|\widehat\pi(x)-0.5|</span>, and the mode separation <span class="math inline">|\widehat\mu_+(x)-\widehat\mu_-(x)|</span>.</p>
+<p>Once the score geometry matches the conditional law, conformal sets become much more efficient.</p>
+<h2 id="diagnostics-should-match-the-geometry" class="anchored">Diagnostics should match the geometry</h2>
+<p>At first, the density method looked less locally balanced when I binned by <span class="math inline">\sigma(x)</span>. But <span class="math inline">\sigma(x)</span> isn’t the right diagnostic for a mixture score — the score models mode structure, not local scale. Binning instead by mixture-specific quantities:</p>
 <div class="wide-table">
 <table class="caption-top">
 <thead>
 <tr class="header">
 <th>diagnostic</th>
-<th style="text-align: right;">mean conditional error</th>
+<th>mean conditional error</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td><span class="math inline">\sigma(x)</span> bins</td>
-<td style="text-align: right;">0.0757</td>
+<td>0.0757</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\widehat\pi(x)</span> bins</td>
-<td style="text-align: right;">0.0232</td>
+<td><span class="math inline">\hat\pi(x)</span> bins</td>
+<td>0.0232</td>
 </tr>
 <tr class="odd">
 <td>mode entropy bins</td>
-<td style="text-align: right;">0.0240</td>
+<td>0.0240</td>
 </tr>
 <tr class="even">
 <td>mode margin bins</td>
-<td style="text-align: right;">0.0240</td>
+<td>0.0240</td>
 </tr>
 <tr class="odd">
 <td>mode separation bins</td>
-<td style="text-align: right;">0.0248</td>
+<td>0.0248</td>
 </tr>
 </tbody>
 </table>
 </div>
 <p>The earlier diagnostic was partly asking the wrong question. If the score models local scale, bin by local scale. If the score models mixture uncertainty, bin by mixture uncertainty.</p>
 <h2 id="takeaway" class="anchored">Takeaway</h2>
-<p>Conformal calibration and score geometry do different jobs.</p>
-<p>Calibration supplies marginal validity. The score determines which candidate labels look plausible, and therefore determines the shape and efficiency of the prediction set.</p>
-<p>Efficiency depends on whether the score ranks candidate labels according to the actual conditional structure of <span class="math inline">Y</span> given <span class="math inline">X</span>. A well-matched score can shorten the conformal set; a poorly matched one can preserve coverage while wasting volume.</p>
-<p>A simple taxonomy is:</p>
-<p><span class="math display">
-\boxed{\text{flat noise} \Rightarrow \text{residual score}}
-</span></p>
-<p><span class="math display">
-\boxed{\text{heteroskedasticity} \Rightarrow \text{local scale score}}
-</span></p>
-<p><span class="math display">
-\boxed{\text{varying quantiles} \Rightarrow \text{CQR}}
-</span></p>
-<p><span class="math display">
-\boxed{\text{multimodality} \Rightarrow \text{density-level-set score}.}
-</span></p>
-<p>The conformal layer is the safety net. It turns model-dependent scores into marginally valid prediction sets. But it does not make all scores equally good.</p>
-<h2 id="technical-appendix" class="anchored">Technical appendix</h2>
-<h3 id="why-monotone-score-transforms-did-not-matter" class="anchored">Why monotone score transforms did not matter</h3>
-<p>I initially tried Student-<span class="math inline">t</span> and Huber versions of normalized residual scores. In scalar symmetric regression, these are mostly rank-equivalent to normalized absolute residuals. For example,</p>
-<p><span class="math display">
-\log\left(1+\frac{r^2}{\nu}\right)
-</span></p>
-<p>is monotone in <span class="math inline">|r|</span>, and the Huber loss is also monotone in <span class="math inline">|r|</span>. Since conformal prediction is rank-based, these transformations do not change the prediction set if they use the same scale. They may be useful diagnostics, but they do not create a new scalar interval geometry.</p>
+<p>Conformal calibration and score geometry do different jobs. Calibration supplies marginal validity. The score determines which candidate labels look plausible, and therefore determines the shape and efficiency of the prediction set.</p>
+<p>Efficiency depends on whether the score ranks candidate labels according to the actual conditional structure of <span class="math inline">Y</span> given <span class="math inline">X</span>. A rough taxonomy: flat noise calls for a residual score, heteroskedasticity for a local scale score, varying quantiles for CQR, multimodality for a density-level-set score. The conformal layer is the safety net — it turns model-dependent scores into marginally valid prediction sets, but it doesn’t make all scores equally good.</p>
+<hr>
+<h2 id="appendix" class="anchored">Appendix</h2>
+<h3 id="why-monotone-score-transforms-didnt-matter" class="anchored">Why monotone score transforms didn’t matter</h3>
+<p>I tried Student-<span class="math inline">t</span> and Huber versions of normalized residual scores. In scalar symmetric regression, these are mostly rank-equivalent to normalized absolute residuals — <span class="math inline">\log(1 + r^2/\nu)</span> is monotone in <span class="math inline">|r|</span>, and the Huber loss is also monotone in <span class="math inline">|r|</span>. Since conformal prediction is rank-based, these transforms don’t change the prediction set if they use the same scale.</p>
 <h3 id="what-density-set-length-means" class="anchored">What density-set length means</h3>
-<p>For density-level-set conformal prediction in one-dimensional regression, I approximate</p>
-<p><span class="math display">
-|C_\alpha(x)|
-</span></p>
-<p>on a grid. The accepted grid points are those satisfying</p>
-<p><span class="math display">
--\log \widehat p(y\mid x)\le \widehat q.
-</span></p>
-<p>If the density has two separated modes, the accepted grid points can form two disconnected intervals. The reported length is the total grid length of the accepted region.</p>
+<p>For density-level-set conformal prediction in one-dimensional regression, I approximate <span class="math inline">|C_\alpha(x)|</span> on a grid. Accepted grid points are those satisfying <span class="math inline">-\log \hat{p}(y \mid x) \le \hat{q}</span>. If the density has two separated modes, the accepted grid points can form two disconnected intervals. The reported length is the total grid length of the accepted region.</p>
 <h3 id="a-classification-analogue" class="anchored">A classification analogue</h3>
-<p>The same idea has a classification analogue. For a neural classifier, ordinary conformal scores use softmax probabilities,</p>
-<p><span class="math display">
-S(x,y)=1-\widehat p_\theta(y\mid x),
-</span></p>
-<p>or cumulative-probability rankings. A more geometric score could use the penultimate-layer representation <span class="math inline">\phi_\theta(x)</span>. For class <span class="math inline">y</span>, fit a class center <span class="math inline">m_y</span> and covariance <span class="math inline">\Sigma_y</span>, then use</p>
-<p><span class="math display">
-S(x,y)
-=
-(\phi_\theta(x)-m_y)^\top
-\Sigma_y^{-1}
-(\phi_\theta(x)-m_y).
-</span></p>
-<p>This is the classification analogue of local metric scores in regression. The network supplies the geometry. Conformal calibration supplies the validity.</p>
-<h3 id="what-is-and-is-not-proved-here" class="anchored">What is, and is not, proved here</h3>
-<p>The coverage statements used above are the standard split-conformal ones. The new part is empirical and conceptual: different score geometries induce different set shapes and efficiencies.</p>
-<p>A formal theorem would need to control excess set size, for example</p>
-<p><span class="math display">
-\mathbb E|C_\alpha(X)|-\mathbb E|C_\alpha^*(X)|,
-</span></p>
-<p>in terms of score-ranking error, density-estimation error, or metric-estimation error. That is not proved here.</p>
+<p>For a neural classifier, ordinary conformal scores use softmax probabilities, <span class="math inline">S(x,y) = 1 - \hat{p}_\theta(y \mid x)</span>, or cumulative-probability rankings. A more geometric score could use the penultimate-layer representation <span class="math inline">\phi_\theta(x)</span>, fitting class centers <span class="math inline">m_y</span> and covariances <span class="math inline">\Sigma_y</span>, then</p>
+<p><span class="math display">S(x,y) = (\phi_\theta(x) - m_y)^\top \Sigma_y^{-1} (\phi_\theta(x) - m_y).</span></p>
+<p>The network supplies the geometry. Conformal calibration supplies the validity.</p>
+<h3 id="what-is-and-isnt-proved-here" class="anchored">What is and isn’t proved here</h3>
+<p>The coverage statements are standard split-conformal ones. The new part is empirical and conceptual: different score geometries induce different set shapes and efficiencies. A formal theorem would need to control excess set size — something like <span class="math inline">\mathbb{E}|C_\alpha(X)| - \mathbb{E}|C_\alpha^*(X)|</span> in terms of score-ranking error, density-estimation error, or metric-estimation error. That’s not proved here.</p>
 <h3 id="reproducing-the-benchmark" class="anchored">Reproducing the benchmark</h3>
 <p>The full benchmark can be regenerated from <code>ig_conformal.py</code>:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>raw, summary <span class="op">=</span> ig.run_grid(</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    settings<span class="op">=</span>[</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"homoskedastic"</span>,</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"heteroskedastic"</span>,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"heavy_tail"</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"skewed"</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"multimodal"</span>,</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    ],</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    model_families<span class="op">=</span>[<span class="st">"rf"</span>, <span class="st">"krr"</span>, <span class="st">"mlp"</span>, <span class="st">"cqr_gbrt"</span>],</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    n<span class="op">=</span><span class="dv">6000</span>,</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    d<span class="op">=</span><span class="dv">5</span>,</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    alpha<span class="op">=</span><span class="fl">0.1</span>,</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    seeds<span class="op">=</span>[<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>],</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    save_csv<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    output_prefix<span class="op">=</span><span class="st">"ig_conformal_results"</span>,</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>compact <span class="op">=</span> ig.summarize_geometry_effect(summary)</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>compact.to_csv(<span class="st">"ig_conformal_geometry_effect.csv"</span>, index<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>multimodal_diag <span class="op">=</span> ig.summarize_multimodal_density_diagnostics(summary)</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>multimodal_diag.to_csv(</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="st">"ig_conformal_multimodal_density_diagnostics.csv"</span>,</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    settings<span class="op">=</span>[<span class="st">"homoskedastic"</span>, <span class="st">"heteroskedastic"</span>, <span class="st">"heavy_tail"</span>, <span class="st">"skewed"</span>, <span class="st">"multimodal"</span>],</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    model_families<span class="op">=</span>[<span class="st">"rf"</span>, <span class="st">"krr"</span>, <span class="st">"mlp"</span>, <span class="st">"cqr_gbrt"</span>],</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    n<span class="op">=</span><span class="dv">6000</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    d<span class="op">=</span><span class="dv">5</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    alpha<span class="op">=</span><span class="fl">0.1</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    seeds<span class="op">=</span>[<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>],</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    save_csv<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    output_prefix<span class="op">=</span><span class="st">"ig_conformal_results"</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>compact <span class="op">=</span> ig.summarize_geometry_effect(summary)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>compact.to_csv(<span class="st">"ig_conformal_geometry_effect.csv"</span>, index<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>multimodal_diag <span class="op">=</span> ig.summarize_multimodal_density_diagnostics(summary)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>multimodal_diag.to_csv(<span class="st">"ig_conformal_multimodal_density_diagnostics.csv"</span>, index<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
 <h2 id="references" class="anchored">References</h2>
 <p>Vladimir Vovk, Alexander Gammerman, and Glenn Shafer. <em>Algorithmic Learning in a Random World</em>. Springer, 2005.</p>
-<p>Glenn Shafer and Vladimir Vovk. “A Tutorial on Conformal Prediction.” <em>Journal of Machine Learning Research</em> 9, 371–421, 2008.</p>
-<p>Jing Lei, Max G’Sell, Alessandro Rinaldo, Ryan J. Tibshirani, and Larry Wasserman. “Distribution-Free Predictive Inference for Regression.” <em>Journal of the American Statistical Association</em> 113(523), 1094–1111, 2018.</p>
+<p>Glenn Shafer and Vladimir Vovk. “A Tutorial on Conformal Prediction.” <em>Journal of Machine Learning Research</em> 9, 2008.</p>
+<p>Jing Lei, Max G’Sell, Alessandro Rinaldo, Ryan J. Tibshirani, and Larry Wasserman. “Distribution-Free Predictive Inference for Regression.” <em>Journal of the American Statistical Association</em> 113(523), 2018.</p>
 <p>Yaniv Romano, Evan Patterson, and Emmanuel Candès. “Conformalized Quantile Regression.” <em>NeurIPS</em>, 2019.</p>
 <p>Anastasios Angelopoulos and Stephen Bates. “A Gentle Introduction to Conformal Prediction and Distribution-Free Uncertainty Quantification.” arXiv:2107.07511, 2021.</p>
-<p>Rob Hyndman. “Computing and Graphing Highest Density Regions.” <em>The American Statistician</em> 50(2), 120–126, 1996.</p>
+<p>Rob Hyndman. “Computing and Graphing Highest Density Regions.” <em>The American Statistician</em> 50(2), 1996.</p>
 <p>Rafael Izbicki, Gilson Shimizu, and Rafael Stern. “Flexible Distribution-Free Conditional Predictive Bands using Density Estimators.” <em>AISTATS</em>, 2020.</p>
 <p>Shun-ichi Amari. <em>Information Geometry and Its Applications</em>. Springer, 2016.</p>
 <h2 id="suggested-citation" class="anchored">Suggested citation</h2>

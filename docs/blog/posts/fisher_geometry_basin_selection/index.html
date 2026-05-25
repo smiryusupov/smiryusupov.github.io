@@ -143,21 +143,14 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#preface" id="toc-preface">Preface</a></li>
-  <li><a href="#part-i-the-information-geometric-view" id="toc-part-i-the-information-geometric-view">Part I: The information-geometric view</a>
-  <ul>
-  <li><a href="#fisher-as-a-score-gram-matrix" id="toc-fisher-as-a-score-gram-matrix">Fisher as a score Gram matrix</a></li>
-  </ul></li>
-  <li><a href="#part-ii-the-experiment" id="toc-part-ii-the-experiment">Part II: The experiment</a>
-  <ul>
-  <li><a href="#endpoint-classification" id="toc-endpoint-classification">Endpoint classification</a></li>
-  </ul></li>
-  <li><a href="#part-iii-success-rates-by-regime" id="toc-part-iii-success-rates-by-regime">Part III: Success rates by regime</a></li>
-  <li><a href="#part-iv-the-trajectories" id="toc-part-iv-the-trajectories">Part IV: The trajectories</a></li>
-  <li><a href="#part-v-alignment-is-only-a-diagnostic" id="toc-part-v-alignment-is-only-a-diagnostic">Part V: Alignment is only a diagnostic</a></li>
-  <li><a href="#part-vi-where-k-fac-enters" id="toc-part-vi-where-k-fac-enters">Part VI: Where K-FAC enters</a></li>
+  <li><a href="#the-information-geometric-view" id="toc-the-information-geometric-view">The information-geometric view</a></li>
+  <li><a href="#the-experiment" id="toc-the-experiment">The experiment</a></li>
+  <li><a href="#success-rates-by-regime" id="toc-success-rates-by-regime">Success rates by regime</a></li>
+  <li><a href="#the-trajectories" id="toc-the-trajectories">The trajectories</a></li>
+  <li><a href="#alignment-as-a-diagnostic" id="toc-alignment-as-a-diagnostic">Alignment as a diagnostic</a></li>
+  <li><a href="#where-k-fac-enters" id="toc-where-k-fac-enters">Where K-FAC enters</a></li>
   <li><a href="#takeaway" id="toc-takeaway">Takeaway</a></li>
-  <li><a href="#technical-appendix" id="toc-technical-appendix">Technical appendix</a>
+  <li><a href="#appendix" id="toc-appendix">Appendix</a>
   <ul>
   <li><a href="#exact-fisher-for-the-bernoulli-model" id="toc-exact-fisher-for-the-bernoulli-model">Exact Fisher for the Bernoulli model</a></li>
   <li><a href="#model-fisher-versus-empirical-fisher" id="toc-model-fisher-versus-empirical-fisher">Model Fisher versus empirical Fisher</a></li>
@@ -189,291 +182,110 @@ window.Quarto = {
   text-align: left;
 }
 </style>
-<p><strong>Claim.</strong> A correct local Fisher metric does not guarantee selection of the globally desirable basin.<br>
-<strong>Scope.</strong> Standard Fisher-geometry facts; small non-convex diagnostics comparing local preconditioners.</p>
-<h2 id="preface" class="anchored">Preface</h2>
 <p>Natural gradient descent has a beautiful geometric story. Ordinary gradient descent measures a step in the coordinates in which the parameters happen to be written. Natural gradient descent instead measures a step by the change it induces in the model distribution.</p>
 <p>The local ruler is the Fisher information matrix. For a parametric predictive model <span class="math inline">p_\theta(y \mid x)</span>,</p>
-<p><span class="math display">
-F(\theta)
-=
-\mathbb{E}_x\,\mathbb{E}_{y\sim p_\theta(\cdot\mid x)}
-\left[
-\nabla_\theta \log p_\theta(y\mid x)
-\nabla_\theta \log p_\theta(y\mid x)^\top
-\right].
-</span></p>
+<p><span class="math display">F(\theta) = \mathbb{E}_x\,\mathbb{E}_{y \sim p_\theta(\cdot \mid x)} \left[ \nabla_\theta \log p_\theta(y \mid x)\, \nabla_\theta \log p_\theta(y \mid x)^\top \right].</span></p>
 <p>The damped natural-gradient step is</p>
-<p><span class="math display">
-\theta_{t+1}
-=
-\theta_t
--
-\eta\left(F(\theta_t)+\lambda I\right)^{-1}
-\nabla_\theta L(\theta_t).
-</span></p>
-<p>This is the right object to study if the question is information geometry rather than merely curvature. A Hessian-preconditioned method may be useful, but it is not natural gradient unless the Fisher metric is actually computed or approximated.</p>
-<p>The note studies a failure mode of a local metric in a global problem. Even when the Fisher matrix is the correct infinitesimal geometry of the statistical model, it need not guide the trajectory toward the validation basin one would choose after seeing the whole landscape.</p>
-<h2 id="part-i-the-information-geometric-view" class="anchored">Part I: The information-geometric view</h2>
-<p>Let <span class="math inline">P_\theta</span> denote the probability law induced by the model. If <span class="math inline">\theta</span> and <span class="math inline">\theta+d\theta</span> are close, then</p>
-<p><span class="math display">
-\operatorname{KL}\left(P_\theta\,\|\,P_{\theta+d\theta}\right)
-=
-\frac{1}{2}\,d\theta^\top F(\theta)d\theta
-+
-o\!\left(\|d\theta\|^2\right).
-</span></p>
-<p>Thus <span class="math inline">F(\theta)</span> is the metric tensor associated with infinitesimal KL distance. A displacement <span class="math inline">v</span> in parameter space has squared statistical length</p>
-<p><span class="math display">
-\|v\|_{F(\theta)}^2
-=
-v^\top F(\theta)v.
-</span></p>
-<p>Natural gradient is the steepest descent direction under this Fisher geometry. Equivalently, it is the solution of the local trust-region problem</p>
-<p><span class="math display">
-\min_{\Delta}
-\left\{
-\nabla L(\theta)^\top \Delta
-+
-\frac{1}{2\eta}\Delta^\top F(\theta)\Delta
-\right\}.
-</span></p>
-<p>When <span class="math inline">F(\theta)</span> is nonsingular, the solution is</p>
-<p><span class="math display">
-\Delta_{\mathrm{NG}}
-=
--\eta F(\theta)^{-1}\nabla L(\theta).
-</span></p>
-<p>This form makes both the promise and the limitation visible. The Fisher matrix tells us which infinitesimal steps are large or small in distribution space. It does not tell us which faraway basin has better validation loss.</p>
-<h3 id="fisher-as-a-score-gram-matrix" class="anchored">Fisher as a score Gram matrix</h3>
-<p>There is also a useful Hilbert-space way to read the same formula. For a dominated model with density <span class="math inline">p_\theta(z)</span>, write the score as</p>
-<p><span class="math display">
-s_\theta(z)
-=
-\nabla_\theta \log p_\theta(z).
-</span></p>
-<p>Under regularity conditions,</p>
-<p><span class="math display">
-\mathbb{E}_{P_\theta}\left[s_\theta(Z)\right]=0,
-</span></p>
-<p>so each score component is an element of the mean-zero space <span class="math inline">L^2_0(P_\theta)</span>. The Fisher matrix is the Gram matrix of these score functions:</p>
-<p><span class="math display">
-F_{rs}(\theta)
-=
-\left\langle
-\partial_r\log p_\theta,
-\partial_s\log p_\theta
-\right\rangle_{L^2(P_\theta)}.
-</span></p>
-<p>A parameter velocity <span class="math inline">v\in\mathbb{R}^p</span> maps to the tangent random variable</p>
-<p><span class="math display">
-z\mapsto v^\top s_\theta(z),
-</span></p>
-<p>and its squared norm is</p>
-<p><span class="math display">
-\mathbb{E}_{P_\theta}
-\left[\left\{v^\top s_\theta(Z)\right\}^2\right]
-=
-v^\top F(\theta)v.
-</span></p>
-<p>So natural gradient is not just “rescaling by a matrix.” It is steepest descent after measuring parameter motion by the <span class="math inline">L^2(P_\theta)</span> norm of the induced score perturbation.</p>
+<p><span class="math display">\theta_{t+1} = \theta_t - \eta\left(F(\theta_t) + \lambda I\right)^{-1} \nabla_\theta L(\theta_t).</span></p>
+<p>The note is narrow: a correct local Fisher metric doesn’t guarantee selection of the globally desirable basin in a multimodal non-convex likelihood. This isn’t an argument that natural gradient or K-FAC is bad — it’s about what local geometry can and can’t promise. Fisher information gives a local geometry on a statistical model. It’s not, by itself, a global map of the validation landscape.</p>
+<h2 id="the-information-geometric-view" class="anchored">The information-geometric view</h2>
+<p>If <span class="math inline">\theta</span> and <span class="math inline">\theta + d\theta</span> are close,</p>
+<p><span class="math display">\operatorname{KL}(P_\theta \,\|\, P_{\theta + d\theta}) = \frac{1}{2}\, d\theta^\top F(\theta)\, d\theta + o(\|d\theta\|^2),</span></p>
+<p>so <span class="math inline">F(\theta)</span> is the metric tensor associated with infinitesimal KL distance, and a displacement <span class="math inline">v</span> has squared statistical length <span class="math inline">v^\top F(\theta) v</span>. Natural gradient is the steepest descent direction under this Fisher geometry — equivalently, the solution of</p>
+<p><span class="math display">\min_{\Delta} \left\{ \nabla L(\theta)^\top \Delta + \frac{1}{2\eta} \Delta^\top F(\theta) \Delta \right\},</span></p>
+<p>which gives <span class="math inline">\Delta_{\mathrm{NG}} = -\eta F(\theta)^{-1} \nabla L(\theta)</span> when <span class="math inline">F(\theta)</span> is nonsingular.</p>
+<p>There’s also a useful Hilbert-space reading. Write the score as <span class="math inline">s_\theta(z) = \nabla_\theta \log p_\theta(z)</span>. The Fisher matrix is the Gram matrix of these score functions:</p>
+<p><span class="math display">F_{rs}(\theta) = \langle \partial_r \log p_\theta,\, \partial_s \log p_\theta \rangle_{L^2(P_\theta)}.</span></p>
+<p>A parameter velocity <span class="math inline">v \in \mathbb{R}^p</span> maps to the tangent random variable <span class="math inline">z \mapsto v^\top s_\theta(z)</span>, with squared norm <span class="math inline">v^\top F(\theta) v</span>. So natural gradient is steepest descent after measuring parameter motion by the <span class="math inline">L^2(P_\theta)</span> norm of the induced score perturbation — not just rescaling by a matrix.</p>
 <p>But the inner product is taken under the current model <span class="math inline">P_\theta</span>. It describes infinitesimal motion around the current distribution, not the global topology of the loss surface. The experiment below is designed to make that local/global distinction visible.</p>
-<h2 id="part-ii-the-experiment" class="anchored">Part II: The experiment</h2>
-<p>The experiment uses a two-parameter Bernoulli model</p>
-<p><span class="math display">
-p_\theta(y\mid x)
-=
-\operatorname{Bernoulli}\!\left(\sigma(f_\theta(x))\right),
-\qquad
-\theta\in\mathbb{R}^2.
-</span></p>
-<p>The logit <span class="math inline">f_\theta(x)</span> is nonlinear in <span class="math inline">\theta</span>, so the validation surface over <span class="math inline">(\theta_1,\theta_2)</span> can have multiple basins. The model is intentionally small: small enough to draw the surface and compute the exact Fisher matrix.</p>
-<p>For a Bernoulli logit model, let</p>
-<p><span class="math display">
-p_i(\theta)=\sigma(f_\theta(x_i)),
-\qquad
-J_i(\theta)=\nabla_\theta f_\theta(x_i).
-</span></p>
-<p>The exact model Fisher on the training inputs is</p>
-<p><span class="math display">
-F(\theta)
-=
-\frac{1}{n}\sum_{i=1}^n
-p_i(\theta)\left\{1-p_i(\theta)\right\}
-J_i(\theta)J_i(\theta)^\top.
-</span></p>
-<p>This is not a Hessian proxy. It is the Fisher matrix of the predictive Bernoulli model.</p>
-<p>I compare five optimizers:</p>
-<ol type="1">
-<li>AdamW;</li>
-<li>SGD with momentum;</li>
-<li>exact Fisher natural gradient;</li>
-<li>empirical Fisher natural gradient;</li>
-<li>diagonal exact Fisher.</li>
-</ol>
-<p>The initializations are separated into three regimes:</p>
-<ul>
-<li><strong>Easy</strong> starts are positive controls. The good validation basin is nearby, and all methods should have a fair chance.</li>
-<li><strong>Medium</strong> starts are ambiguous. The good basin is reachable, but the trajectories can differ.</li>
-<li><strong>Hard</strong> starts are adversarial. They are included to expose failure modes, not to suggest that every start is equally reasonable.</li>
-</ul>
-<p>This split matters. Without positive controls, the experiment would only say that the surface is hard. With easy, medium, and hard starts separated, the question becomes sharper: when the good basin is reachable, does Fisher geometry reliably select it?</p>
-<h3 id="endpoint-classification" class="anchored">Endpoint classification</h3>
-<p>The endpoint labels are defined on the validation landscape. A run is counted as successful only if its final point lands in the good validation basin: the basin containing the best validation grid point. Endpoints that converge to other stable regions, or to stationary regions outside the good basin, are not counted as successes.</p>
-<p>This empirical basin label is stricter than final training loss. A run may reduce the objective and still settle in the wrong region of the validation landscape.</p>
-<h2 id="part-iii-success-rates-by-regime" class="anchored">Part III: Success rates by regime</h2>
-<p>The first figure summarizes the endpoint classification.</p>
+<h2 id="the-experiment" class="anchored">The experiment</h2>
+<p>Two-parameter Bernoulli model:</p>
+<p><span class="math display">p_\theta(y \mid x) = \operatorname{Bernoulli}(\sigma(f_\theta(x))), \qquad \theta \in \mathbb{R}^2.</span></p>
+<p>The logit <span class="math inline">f_\theta(x)</span> is nonlinear in <span class="math inline">\theta</span>, so the validation surface over <span class="math inline">(\theta_1, \theta_2)</span> can have multiple basins. The model is intentionally small — small enough to draw the surface and compute the exact Fisher matrix.</p>
+<p>With <span class="math inline">p_i(\theta) = \sigma(f_\theta(x_i))</span> and <span class="math inline">J_i(\theta) = \nabla_\theta f_\theta(x_i)</span>, the exact model Fisher is</p>
+<p><span class="math display">F(\theta) = \frac{1}{n} \sum_{i=1}^n p_i(\theta)\{1 - p_i(\theta)\} J_i(\theta) J_i(\theta)^\top.</span></p>
+<p>Five optimizers: AdamW, SGD with momentum, exact Fisher natural gradient, empirical Fisher natural gradient, and diagonal exact Fisher.</p>
+<p>Initializations split into three regimes. <strong>Easy</strong> starts are positive controls — the good validation basin is nearby, all methods should have a fair chance. <strong>Medium</strong> starts are ambiguous — the good basin is reachable, but trajectories can diverge. <strong>Hard</strong> starts are adversarial, included to expose failure modes rather than to suggest every initialization is equally reasonable. Without positive controls the experiment would only show that the surface is hard; with the three regimes separated, the question sharpens: when the good basin is reachable, does Fisher geometry reliably select it?</p>
+<p>Endpoint classification is strict. A run is counted as successful only if its final point lands in the good validation basin — the one containing the best validation grid point. This is deliberately stricter than reporting final training loss.</p>
+<h2 id="success-rates-by-regime" class="anchored">Success rates by regime</h2>
 <figure class="article-figure">
-<img src="figures/exact_fisher_2d_success_rate_by_regime.png" alt="Good-basin hit rate by initialization regime.">
+<img src="figures/exact_fisher_2d_success_rate_by_regime.png" alt="Good-basin hit rate by initialization regime. Easy starts are positive controls; medium starts are the informative regime; hard starts expose failure modes.">
 <figcaption>
 Good-basin hit rate by initialization regime. Easy starts are positive controls; medium starts are the informative regime; hard starts expose failure modes.
 </figcaption>
 </figure>
-<p>The easy starts show that the task is not broken. All methods reach the good basin when the start is favorable.</p>
-<p>The hard starts show the opposite extreme. In this run, no method reaches the good basin from the hard starts. These starts are useful as stress tests, but they should not dominate the interpretation.</p>
-<p>The medium starts are the diagnostic regime. The good basin is reachable, but basin selection depends on the optimizer. In this run, exact Fisher NGD reaches the good basin on all medium starts. AdamW, diagonal exact Fisher, and SGD with momentum reach it on about half of the medium starts. Empirical Fisher NGD does not reach it from the medium starts.</p>
-<p>This should not be read as a general benchmark victory for exact Fisher. The point is narrower: the local metric induces a trajectory, and the success of that trajectory depends on the initialization regime.</p>
-<p>Aggregating over all starts gives a compact comparison, but it should be read only after the regime split.</p>
+<p>The easy starts confirm the task isn’t broken — natural gradient, AdamW, SGD, and the diagonal Fisher method can all reach the good basin from a favorable start. The medium starts are more informative. The good basin is reachable, but not all methods select it from every ambiguous start. That’s where the main claim is tested: a locally correct Fisher metric need not encode the global basin structure.</p>
 <figure class="article-figure">
-<img src="figures/exact_fisher_2d_success_rate_by_optimizer.png" alt="Good-basin hit rate by optimizer.">
+<img src="figures/exact_fisher_2d_success_rate_by_optimizer.png" alt="Good-basin hit rate by optimizer, pooled over balanced easy, medium, and hard starts.">
 <figcaption>
-Good-basin hit rate by optimizer, pooled over the balanced easy, medium, and hard starts.
+Good-basin hit rate by optimizer, pooled over balanced easy, medium, and hard starts.
 </figcaption>
 </figure>
-<p>The pooled plot is useful only as a summary. It combines three qualitatively different regimes: easy starts where all methods succeed, hard starts where all methods fail, and medium starts where the methods actually differ.</p>
-<p>For the question in this note, the medium regime carries most of the evidence. The pooled rate should therefore be read after the regime split, not as a standalone optimizer ranking.</p>
-<h2 id="part-iv-the-trajectories" class="anchored">Part IV: The trajectories</h2>
-<p>The level-set plots make the basin story more concrete. Line color and line style identify the optimizer. The final marker identifies the endpoint class.</p>
-<p>The easy case is the sanity check.</p>
+<p>The pooled number is secondary. The more important observation is regime dependence: no optimizer here turns local geometry into a global basin-selection guarantee.</p>
+<h2 id="the-trajectories" class="anchored">The trajectories</h2>
+<p>Level-set plots make the basin story concrete. Line color and style identify the optimizer; the final marker identifies the endpoint class.</p>
 <figure class="article-figure">
-<img src="figures/exact_fisher_2d_landscape_easy_init0.png" alt="Easy initialization trajectory plot.">
+<img src="figures/exact_fisher_2d_landscape_easy_init0.png" alt="Easy initialization. All methods reach the good validation basin.">
 <figcaption>
 Easy initialization. All methods reach the good validation basin.
 </figcaption>
 </figure>
-<p>This plot prevents the experiment from becoming an anti-natural-gradient caricature. Exact Fisher NGD can work. The geometry can be helpful.</p>
-<p>The medium cases are the real diagnostic.</p>
+<p>The easy case is a sanity check — exact Fisher NGD can work, and the geometry can be helpful. This plot prevents the experiment from becoming an anti-natural-gradient caricature.</p>
 <figure class="article-figure">
-<img src="figures/exact_fisher_2d_landscape_medium_init2.png" alt="Medium initialization trajectory plot.">
+<img src="figures/exact_fisher_2d_landscape_medium_init2.png" alt="Medium initialization. The good basin is reachable, but the selected basin depends on the optimizer and the induced trajectory.">
 <figcaption>
 Medium initialization. The good basin is reachable, but the selected basin depends on the optimizer and the induced trajectory.
 </figcaption>
 </figure>
 <figure class="article-figure">
-<img src="figures/exact_fisher_2d_landscape_medium_init3.png" alt="Second medium initialization trajectory plot.">
+<img src="figures/exact_fisher_2d_landscape_medium_init3.png" alt="Another medium initialization. The local direction field can agree with the geometry and still not imply universal dominance.">
 <figcaption>
 Another medium initialization. The local direction field can agree with the geometry and still not imply universal dominance.
 </figcaption>
 </figure>
-<p>In these plots, Fisher information is not “wrong.” It is locally correct by construction. The question is whether local correctness determines the global attractor. In these cases, it does not.</p>
-<p>The hard case is included as an edge case.</p>
+<p>In these plots, Fisher information isn’t wrong — it’s locally correct by construction. The question is whether local correctness determines the global attractor. In these cases, it doesn’t.</p>
 <figure class="article-figure">
-<img src="figures/exact_fisher_2d_landscape_hard_init4.png" alt="Hard initialization trajectory plot.">
+<img src="figures/exact_fisher_2d_landscape_hard_init4.png" alt="Hard initialization. Most methods are pulled toward bad or stationary basins.">
 <figcaption>
 Hard initialization. Most methods are pulled toward bad or stationary basins.
 </figcaption>
 </figure>
-<p>If every plot looked like this, the experiment would only show that the initialization was too adversarial. Here, its role is narrower: it demonstrates that the local metric does not prevent bad-basin capture.</p>
-<h2 id="part-v-alignment-is-only-a-diagnostic" class="anchored">Part V: Alignment is only a diagnostic</h2>
-<p>A tempting diagnostic is to compare each update direction with the direction to the best validation grid point. This can be useful, but it should not be mistaken for the conclusion. A single step can point locally away from the final target while still following a sensible curved path; conversely, a locally well-aligned step does not guarantee that the trajectory will enter the desired basin.</p>
-<p>For this reason, I treat alignment as secondary and prefer a simpler trajectory summary: distance to the best validation grid point.</p>
+<p>The hard case demonstrates that the local metric doesn’t prevent bad-basin capture. If every plot looked like this, the experiment would only show the initialization was too adversarial.</p>
+<h2 id="alignment-as-a-diagnostic" class="anchored">Alignment as a diagnostic</h2>
+<p>A tempting diagnostic is to compare each update direction with the direction toward the best validation grid point. Useful, but a single step can point locally away from the final target while still following a sensible curved path — and a locally well-aligned step doesn’t guarantee the trajectory enters the desired basin. I treat alignment as secondary and prefer distance to the best validation grid point.</p>
 <figure class="article-figure">
 <img src="figures/exact_fisher_2d_distance_medium_init2.png" alt="Distance to the best validation grid point for one medium initialization.">
 <figcaption>
-Distance to the best validation grid point for one medium initialization. This is often easier to read than raw alignment.
+Distance to the best validation grid point for one medium initialization.
 </figcaption>
 </figure>
-<p>This plot is not meant to prove a theorem. It is a way to read the trajectory. The main evidence remains the endpoint classification and the basin plots.</p>
-<h2 id="part-vi-where-k-fac-enters" class="anchored">Part VI: Where K-FAC enters</h2>
-<p>K-FAC belongs to the same local-metric family, but with a structured approximation to the Fisher rather than the exact Fisher. For a linear layer with input activations <span class="math inline">a</span> and preactivation score gradients <span class="math inline">\delta</span>, K-FAC approximates the Fisher block by</p>
-<p><span class="math display">
-F_l
-\approx
-A_l\otimes G_l,
-\qquad
-A_l=\mathbb{E}[aa^\top],
-\qquad
-G_l=\mathbb{E}[\delta\delta^\top].
-</span></p>
-<p>This gives a preconditioned weight update of the form</p>
-<p><span class="math display">
-\Delta W_l
-\propto
--
-G_l^{-1}(\nabla_{W_l}L)A_l^{-1},
-</span></p>
-<p>with damping in practice.</p>
-<p>The point here is not to benchmark K-FAC. It is to locate it conceptually. K-FAC is a Fisher-based local metric method: it can improve scaling by approximating the geometry of each layer, but its Kronecker factors do not decide which distant basin should be selected.</p>
-<p>So the lesson from the two-dimensional experiment transfers only at this level of abstraction. Fisher-based preconditioning can be locally principled and still globally noncommittal.</p>
+<p>The main evidence remains the endpoint classification and basin plots.</p>
+<h2 id="where-k-fac-enters" class="anchored">Where K-FAC enters</h2>
+<p>K-FAC is the neural-network analogue of the same idea: replace an expensive Fisher matrix with a structured local approximation. For a linear layer with input activations <span class="math inline">a</span> and preactivation score gradients <span class="math inline">\delta</span>,</p>
+<p><span class="math display">F_l \approx A_l \otimes G_l, \qquad A_l = \mathbb{E}[aa^\top], \qquad G_l = \mathbb{E}[\delta\delta^\top],</span></p>
+<p>giving a preconditioned weight update <span class="math inline">\Delta W_l \propto -G_l^{-1}(\nabla_{W_l} L) A_l^{-1}</span> with damping in practice.</p>
+<p>The point isn’t to benchmark K-FAC but to locate it conceptually. It’s a Fisher-based local metric method — it can improve scaling by approximating the geometry of each layer, but its Kronecker factors don’t decide which distant basin should be selected. The lesson from the two-dimensional experiment transfers at that level of abstraction: Fisher-based preconditioning can be locally principled and still globally noncommittal.</p>
 <h2 id="takeaway" class="anchored">Takeaway</h2>
-<p>The experiment supports a narrower conclusion. Natural gradient and K-FAC are local metric methods: they can use the correct Fisher geometry and still remain agnostic about which distant basin is preferable.</p>
-<p>Local correctness is only one part of the story. In a non-convex problem, the induced trajectory also has to reach the basin that matters for the task.</p>
-<p>When the answer is yes, Fisher methods can be excellent. When the answer is no, there is no general reason to expect them to dominate AdamW.</p>
-<h2 id="technical-appendix" class="anchored">Technical appendix</h2>
+<p>This isn’t a no-free-lunch theorem, and it isn’t a claim that AdamW is generally better than natural gradient or that K-FAC is only useful in easy cases.</p>
+<p>The claim is smaller: natural gradient and K-FAC are local metric-based methods, and the Fisher metric may be the correct local geometry while remaining globally uninformative about which basin is desirable. A low loss, a short Fisher step, or a locally natural direction isn’t the same as reaching the basin you wanted. In non-convex problems the optimizer isn’t only solving a local quadratic — it’s generating a trajectory, and the local geometry doesn’t fully determine where that trajectory ends up.</p>
+<hr>
+<h2 id="appendix" class="anchored">Appendix</h2>
 <h3 id="exact-fisher-for-the-bernoulli-model" class="anchored">Exact Fisher for the Bernoulli model</h3>
-<p>Let</p>
-<p><span class="math display">
-p_\theta(x)=\sigma(f_\theta(x)).
-</span></p>
-<p>For one observation, the log-likelihood score is</p>
-<p><span class="math display">
-\nabla_\theta \log p_\theta(y\mid x)
-=
-\left(y-p_\theta(x)\right)\nabla_\theta f_\theta(x).
-</span></p>
-<p>Taking expectation over</p>
-<p><span class="math display">
-y\sim\operatorname{Bernoulli}\left(p_\theta(x)\right)
-</span></p>
-<p>gives</p>
-<p><span class="math display">
-\mathbb{E}_y\left[\left(y-p_\theta(x)\right)^2\right]
-=
-p_\theta(x)\left\{1-p_\theta(x)\right\}.
-</span></p>
-<p>Therefore</p>
-<p><span class="math display">
-F(\theta)
-=
-\mathbb{E}_x
-\left[
-p_\theta(x)\left\{1-p_\theta(x)\right\}
-\nabla_\theta f_\theta(x)
-\nabla_\theta f_\theta(x)^\top
-\right].
-</span></p>
-<p>This is the matrix used by exact Fisher NGD in the two-parameter experiment.</p>
+<p>For one observation, the log-likelihood score is <span class="math inline">(y - p_\theta(x)) \nabla_\theta f_\theta(x)</span>. Taking expectation over <span class="math inline">y \sim \operatorname{Bernoulli}(p_\theta(x))</span> gives</p>
+<p><span class="math display">F(\theta) = \mathbb{E}_x \left[ p_\theta(x)\{1 - p_\theta(x)\} \nabla_\theta f_\theta(x)\, \nabla_\theta f_\theta(x)^\top \right].</span></p>
 <h3 id="model-fisher-versus-empirical-fisher" class="anchored">Model Fisher versus empirical Fisher</h3>
-<p>The model Fisher takes the inner expectation over labels drawn from the model itself. The empirical Fisher replaces that expectation with the observed labels. For the Bernoulli case, this gives</p>
-<p><span class="math display">
-\widehat{F}_{\mathrm{emp}}(\theta)
-=
-\frac{1}{n}\sum_i
-\left(y_i-p_\theta(x_i)\right)^2
-J_i(\theta)J_i(\theta)^\top.
-</span></p>
-<p>The two matrices can behave differently away from a well-specified optimum. That is why the experiment includes both exact Fisher NGD and empirical Fisher NGD.</p>
+<p>The model Fisher takes the inner expectation over labels drawn from the model itself. The empirical Fisher replaces that with observed labels:</p>
+<p><span class="math display">\hat{F}_{\mathrm{emp}}(\theta) = \frac{1}{n} \sum_i \left(y_i - p_\theta(x_i)\right)^2 J_i(\theta) J_i(\theta)^\top.</span></p>
+<p>The two can behave differently away from a well-specified optimum — which is why the experiment includes both.</p>
 <h3 id="damping-and-step-size" class="anchored">Damping and step size</h3>
-<p>All Fisher inverses in the experiment are damped:</p>
-<p><span class="math display">
-\left(F(\theta)+\lambda I\right)^{-1}.
-</span></p>
-<p>Damping is not a cosmetic implementation detail. Near singular regions, the Fisher matrix can be poorly conditioned, and the undamped inverse can produce unstable steps. Damping interpolates between natural gradient and ordinary gradient descent. It is therefore part of the optimizer, not merely numerical hygiene.</p>
+<p>All Fisher inverses are damped: <span class="math inline">(F(\theta) + \lambda I)^{-1}</span>. Near singular regions the Fisher matrix can be poorly conditioned and the undamped inverse can produce unstable steps. Damping interpolates between natural gradient and ordinary gradient descent and is part of the optimizer, not merely numerical hygiene.</p>
 <h3 id="alignment-diagnostics" class="anchored">Alignment diagnostics</h3>
-<p>For a trajectory <span class="math inline">\theta_t</span>, one can compare the update direction <span class="math inline">\Delta_t</span> with the direction from <span class="math inline">\theta_t</span> to the best validation grid point <span class="math inline">\theta^\star_{\mathrm{grid}}</span>:</p>
-<p><span class="math display">
-\operatorname{align}_t
-=
-\frac{
-\langle \Delta_t,\theta^\star_{\mathrm{grid}}-\theta_t\rangle
-}{
-\|\Delta_t\|\,\|\theta^\star_{\mathrm{grid}}-\theta_t\|
-}.
-</span></p>
-<p>This is the diagnostic referred to in Part V. It is useful for reading trajectories, but the main classification is endpoint-based.</p>
+<p><span class="math display">\operatorname{align}_t = \frac{\langle \Delta_t,\, \theta^\star_{\mathrm{grid}} - \theta_t \rangle}{\|\Delta_t\|\,\|\theta^\star_{\mathrm{grid}} - \theta_t\|}.</span></p>
+<p>Useful for reading trajectories; the main classification is endpoint-based.</p>
+<hr>
 <h2 id="references" class="anchored">References</h2>
 <p>Shun-ichi Amari. “Natural gradient works efficiently in learning.” <em>Neural Computation</em> 10(2), 1998.</p>
-<p>James Martens and Roger Grosse. “Optimizing neural networks with Kronecker-factored approximate curvature.” <em>International Conference on Machine Learning</em>, 2015.</p>
+<p>James Martens and Roger Grosse. “Optimizing neural networks with Kronecker-factored approximate curvature.” <em>ICML</em>, 2015.</p>
 <p>James Martens. “New insights and perspectives on the natural gradient method.” <em>Journal of Machine Learning Research</em> 21, 2020.</p>
 <p>Thomas Minka. “A family of algorithms for approximate Bayesian inference.” PhD thesis, MIT, 2001.</p>
 <h2 id="suggested-citation" class="anchored">Suggested citation</h2>

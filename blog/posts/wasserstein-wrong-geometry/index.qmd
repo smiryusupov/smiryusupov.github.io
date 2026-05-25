@@ -38,35 +38,16 @@ format:
 }
 </style>
 
-**Claim.** Wasserstein loss is only as meaningful as the ground geometry supplied to it.  
 
-**Scope.** Standard Gaussian Wasserstein and Fisher--Rao calculations; illustrative diagnostics.
+Wasserstein distance has a clean promise: it compares probability distributions by asking how much mass must move, and how far. If the sample-space geometry matches the geometry of the problem, that is exactly the right question. A meter is a meter. A pixel is a pixel.
 
-Wasserstein distance has a clean promise: it compares probability distributions by asking how much mass must move, and how far it must move.
+But when Wasserstein distance is used as a statistical loss, there is a small trap. Absolute displacement is not the same as scale-relative discrepancy. Raw Wasserstein distance detects location shifts; what it does not automatically detect is whether a shift is large or small relative to the uncertainty or intrinsic scale of the distributions being compared.
 
-That is often exactly the right question. If the sample-space geometry is the geometry of the problem, then Wasserstein distance is natural. A meter is a meter. A pixel is a pixel. A coordinate displacement is a coordinate displacement.
-
-But when Wasserstein distance is used as a statistical loss, there is a small trap:
-
-$$
-\boxed{
-\text{absolute displacement is not the same as scale-relative discrepancy.}
-}
-$$
-
-Raw Wasserstein distance detects location shifts. What it does not automatically detect is whether a shift is large or small relative to the uncertainty, spread, or intrinsic scale of the distributions being compared.
-
-We use three diagnostics.
-
-- For equal-variance Gaussians, raw Euclidean $W_2$ sees the mean shift but not its size in standard-deviation units.
-- Fisher--Rao geometry gives a contrasting scale-relative notion of distance.
-- A scaled Wasserstein ground cost can recover scale-relative behavior, but only after the geometry is changed.
-
-Wasserstein distance answers the question posed by its ground geometry. Change the geometry, and the loss changes its meaning.
+Three diagnostics below. For equal-variance Gaussians, raw Euclidean $W_2$ sees the mean shift but not its size in standard-deviation units. Fisher--Rao geometry gives a contrasting scale-relative notion of distance. And a scaled Wasserstein ground cost can recover scale-relative behavior — but only after the geometry is changed.
 
 ```{python}
 #| label: setup
-# Helper code used in the numerical table and figure.
+#| include: false
 
 import numpy as np
 import pandas as pd
@@ -91,115 +72,58 @@ def fisher_rao_exact_equal_variance(delta, sigma):
 
 ## Wasserstein distance depends on the ground geometry
 
-Optimal transport is defined after choosing a cost for moving mass from one point to another. In the usual Wasserstein distance, this cost comes from a ground metric on the sample space; see Peyré and Cuturi (2019).
+Optimal transport is defined after choosing a cost for moving mass from one point to another. In the usual Wasserstein distance, this cost comes from a ground metric on the sample space; see Peyré and Cuturi (2019). This is not an implementation detail — it is the geometry of the loss.
 
-This is not an implementation detail. It is the geometry of the loss.
+If the data are measured in meters, the loss sees meters. If they are represented by coordinates, labels, features, embeddings, or point clouds, the loss sees whatever geometry has been assigned to those objects. So the practical question is not only whether you are using Wasserstein distance, but also what geometry you gave it.
 
-If the data are measured in meters, the loss sees meters. If the data are measured in pixels, the loss sees pixels. If the data are represented by coordinates, labels, features, embeddings, or point clouds, the loss sees whatever geometry has been assigned to those objects.
-
-So the practical question is not only:
-
-> are we using Wasserstein distance?
-
-It is also:
-
-> what geometry did we give to Wasserstein distance?
-
-In some problems, absolute displacement is exactly the right notion of error. Moving mass by one physical unit may be the quantity that matters.
-
-In other problems, the relevant question is scale-relative:
-
-> how large is this displacement relative to the uncertainty or intrinsic scale of the distribution?
-
-Raw Euclidean Wasserstein distance answers the first question. It does not automatically answer the second.
+In some problems, absolute displacement is exactly the right notion of error: moving mass by one physical unit is what matters. In other problems, the relevant question is scale-relative: how large is this displacement relative to the uncertainty or intrinsic scale of the distribution? Raw Euclidean Wasserstein answers the first question. It does not automatically answer the second.
 
 ## A two-Gaussian diagnostic
 
-Consider the univariate Gaussian family $N(\mu,\sigma^2)$.
-
-Let
+Consider the univariate Gaussian family $N(\mu,\sigma^2)$. For two Gaussians with the same variance, the squared 2-Wasserstein distance reduces to the squared difference between means. This is a special case of the Gaussian Wasserstein formula; see Dowson and Landau (1982):
 
 $$
-P=N(\mu_1,\sigma^2),
+W_2^2(P,Q)=|\mu_1-\mu_2|^2,
 \qquad
-Q=N(\mu_2,\sigma^2).
+W_2(P,Q)=|\mu_1-\mu_2|.
 $$
 
-For two Gaussians with the same variance, the squared 2-Wasserstein distance reduces to the squared difference between the means. This is a special case of the Gaussian Wasserstein formula; see Dowson and Landau (1982).
+Now compare these two pairs:
 
 $$
-W_2^2(P,Q)
-=
-|\mu_1-\mu_2|^2.
+N(0,0.1^2) \ \text{vs.}\ N(1,0.1^2),
+\qquad
+N(0,100^2) \ \text{vs.}\ N(1,100^2).
 $$
 
-Therefore,
+In both cases the means differ by one, so $W_2=1$. But the scale-relative meaning is very different:
 
 $$
-W_2(P,Q)
-=
-|\mu_1-\mu_2|.
-$$
-
-Now compare
-
-$$
-N(0,0.1^2)
-\quad \text{versus} \quad
-N(1,0.1^2),
-$$
-
-with
-
-$$
-N(0,100^2)
-\quad \text{versus} \quad
-N(1,100^2).
-$$
-
-In both cases the means differ by one, so
-
-$$
-W_2=1.
-$$
-
-But the scale-relative meaning is different.
-
-For $\sigma=0.1$, the shift is ten standard deviations:
-
-$$
-\frac{|\Delta \mu|}{\sigma}
+\frac{|\Delta\mu|}{\sigma}
 =
 \frac{1}{0.1}
 =
-10.
-$$
-
-For $\sigma=100$, the shift is one-hundredth of a standard deviation:
-
-$$
-\frac{|\Delta \mu|}{\sigma}
+10,
+\qquad
+\frac{|\Delta\mu|}{\sigma}
 =
 \frac{1}{100}
 =
 0.01.
 $$
 
-The Wasserstein value is the same. The statistical interpretation is not. 
-This does not mean that Wasserstein distance is blind to variance in general. It means that, in this equal-variance location comparison, the same absolute displacement receives the same Wasserstein cost regardless of whether that displacement is statistically large or small.
+The Wasserstein value is the same. The statistical interpretation is not. This does not mean Wasserstein distance is blind to variance in general. It means that in this equal-variance location comparison, the same absolute displacement gets the same cost regardless of whether that displacement is statistically large or small.
 
 ## Fisher geometry as a contrast
 
-The Fisher--Rao metric gives a different geometry on a statistical model.
-
-It is not a universal replacement for Wasserstein distance. It is useful here because it encodes the intrinsic statistical scale of the Gaussian family.
+The Fisher--Rao metric gives a different geometry on a statistical model. It is not a universal replacement for Wasserstein distance, but it is useful here because it encodes the intrinsic statistical scale of the Gaussian family.
 
 For $N(\mu,\sigma^2)$, the Fisher--Rao line element is
 
 $$
 ds^2
 =
-\frac{d\mu^2+2d\sigma^2}{\sigma^2}.
+\frac{d\mu^2+2\,d\sigma^2}{\sigma^2}.
 $$
 
 For a small location perturbation with $\sigma$ fixed,
@@ -210,27 +134,9 @@ ds
 \frac{|d\mu|}{\sigma}.
 $$
 
-Thus a one-unit displacement is large when $\sigma=0.1$ and small when $\sigma=100$.
+So a one-unit displacement is large when $\sigma=0.1$ and small when $\sigma=100$.
 
-The contrast is:
-
-$$
-\text{raw Wasserstein location cost}
-\sim
-|\Delta \mu|,
-$$
-
-whereas locally,
-
-$$
-\text{Fisher--Rao location cost}
-\sim
-\frac{|\Delta \mu|}{\sigma}.
-$$
-
-Wasserstein distance measures displacement in the external sample-space geometry. Fisher--Rao distance measures displacement in the internal statistical geometry of the model.
-
-They are not contradicting each other. They are measuring different geometries.
+Wasserstein distance measures displacement in the external sample-space geometry. Fisher--Rao distance measures displacement in the internal statistical geometry of the model. They are not contradicting each other — they are measuring different things.
 
 For equal-variance univariate Gaussians, the exact Fisher--Rao distance is
 
@@ -246,20 +152,10 @@ N(\mu_2,\sigma^2)
 \left(
 1+
 \frac{(\mu_1-\mu_2)^2}{4\sigma^2}
-\right).
+\right),
 $$
 
-This agrees locally with
-
-$$
-d_{\mathrm{FR}}
-\approx
-\frac{|\mu_1-\mu_2|}{\sigma}
-$$
-
-when the displacement is small relative to $\sigma$; see Pinele, Strapasson, and Costa (2020).
-
-The appearance of the $\operatorname{arcosh}$ term is geometric. After the change of variables
+which agrees locally with $|\mu_1-\mu_2|/\sigma$ when the displacement is small relative to $\sigma$; see Pinele, Strapasson, and Costa (2020). The $\operatorname{arcosh}$ term is geometric: after the change of variables
 
 $$
 x=\frac{\mu}{\sqrt{2}},
@@ -272,28 +168,14 @@ the Fisher--Rao line element becomes
 $$
 ds^2
 =
-2\frac{dx^2+dy^2}{y^2}.
+2\,\frac{dx^2+dy^2}{y^2}.
 $$
 
 So the univariate Gaussian Fisher--Rao geometry is, up to a constant factor, the Poincaré upper half-plane geometry.
 
-This exact formula is not needed for the modeling point. The local diagnostic already shows the issue:
-
-$$
-W_2
-=
-|\Delta \mu|
-\qquad
-\text{but}
-\qquad
-d_{\mathrm{FR}}
-\text{ depends on }
-\frac{|\Delta \mu|}{\sigma}.
-$$
-
 ## A small numerical check
 
-Let $\Delta \mu = 1$.
+Let $\Delta\mu=1$.
 
 ```{python}
 #| label: tbl-scale-diagnostic
@@ -319,11 +201,7 @@ df = pd.DataFrame(rows)
 print(df.to_markdown(index=False))
 ```
 
-The Wasserstein value is unchanged. The Fisher--Rao diagnostic changes dramatically.
-
-For $\sigma=0.1$, the local Fisher--Rao value is not meant to be a precise numerical approximation, because the shift is large relative to the scale. The qualitative conclusion is unchanged: both the local and exact Fisher--Rao quantities regard the narrow Gaussian shift as much larger than the wide Gaussian shift.
-
-A continuous version of the same diagnostic is shown below.
+The Wasserstein value does not move. The Fisher--Rao diagnostic changes dramatically. For $\sigma=0.1$, the local Fisher--Rao value is not meant to be a precise numerical approximation because the shift is large relative to the scale. The qualitative conclusion is the same either way: the narrow Gaussian shift is much larger than the wide Gaussian shift in scale-relative terms.
 
 ::: {.narrow-figure}
 
@@ -358,11 +236,9 @@ plt.show()
 
 ## A scaled ground cost changes the answer
 
-Wasserstein distance can be made scale-aware.
+Wasserstein distance can be made scale-aware. But scale awareness does not appear for free — it has to enter through the ground geometry.
 
-But scale awareness does not appear for free. It must enter through the ground geometry.
-
-In the Gaussian example, suppose we measure displacement not by the raw Euclidean cost $|x-y|$, but by the standardized cost
+In the Gaussian example, suppose displacement is measured not by the raw Euclidean cost $|x-y|$ but by the standardized cost
 
 $$
 \frac{|x-y|}{\sigma}.
@@ -374,49 +250,17 @@ $$
 z=\frac{x}{\sigma}.
 $$
 
-Then the Wasserstein distance between
+Then the Wasserstein distance between $N(0,\sigma^2)$ and $N(1,\sigma^2)$ in standardized coordinates is $1/\sigma$. That is $10$ for $\sigma=0.1$ and $0.01$ for $\sigma=100$.
 
-$$
-N(0,\sigma^2)
-\quad \text{and} \quad
-N(1,\sigma^2)
-$$
+This recovers the scale-relative quantity. But it is not the raw Wasserstein distance in the original coordinates. It is Wasserstein distance after changing the geometry. In this equal-variance example, the rescaling is unambiguous; if the two distributions have different scales, the choice of normalization becomes part of the modeling problem.
 
-in standardized coordinates is
-
-$$
-\frac{1}{\sigma}.
-$$
-
-So for $\sigma=0.1$, the standardized transport distance is $10$.
-
-For $\sigma=100$, it is $0.01$.
-
-This gives the scale-relative quantity. But it is not the raw Wasserstein distance in the original coordinate system. It is Wasserstein distance after changing the geometry.
-
-In this equal-variance example, the rescaling is unambiguous. If the two distributions have different scales, the choice of normalization becomes part of the modeling problem.
-
-That is the main lesson:
-
-$$
-\boxed{
-\text{the ground cost is part of the statistical meaning of the loss.}
-}
-$$
+The ground cost is part of the statistical meaning of the loss.
 
 ## Predictive distributions
 
-Suppose a model outputs a predictive distribution.
+Suppose a model outputs a predictive distribution. Then the scale parameter is not decoration: a wide predictive distribution signals uncertainty, and a narrow one signals confidence. Now suppose the predicted mean is wrong by one unit. Should the loss treat that error the same in both cases?
 
-Then the scale parameter is not decoration. A wide predictive distribution says that the model is uncertain. A narrow predictive distribution says that the model is confident.
-
-Now suppose the predicted mean is wrong by one unit. Should the loss treat that error the same in both cases?
-
-For the equal-variance Gaussian comparison above, raw Euclidean Wasserstein loss says yes for the location term. A Fisher-type geometry says no.
-
-A likelihood-based loss would also treat the same residual differently depending on $\sigma$, because a one-unit error has a different meaning under a sharp predictive distribution than under a diffuse one.
-
-This does not mean that likelihood, Fisher--Rao distance, or Wasserstein distance is universally better. It means they encode different meanings of error.
+For the equal-variance Gaussian comparison above, raw Euclidean Wasserstein says yes for the location term. A Fisher-type geometry says no. A likelihood-based loss would also treat the same residual differently depending on $\sigma$, because a one-unit error means something different under a sharp predictive distribution than under a diffuse one.
 
 There is also a distinction between comparing two distributions and comparing a distribution to a point observation. If $P=N(\mu,\sigma^2)$ and $Q=\delta_y$, then
 
@@ -426,19 +270,13 @@ W_2^2(P,Q)
 (\mu-y)^2+\sigma^2.
 $$
 
-So Wasserstein distance does see predictive spread in this setting. But it sees spread as transport cost to collapse a distribution onto a point. That is different from treating $\sigma$ as calibrated uncertainty in the likelihood or Fisher-geometric sense.
+Wasserstein does see predictive spread here. But it sees spread as transport cost to collapse a distribution onto a point, which is different from treating $\sigma$ as calibrated uncertainty in the likelihood or Fisher-geometric sense.
 
-The practical question is therefore:
-
-For some tasks, absolute displacement is the right unit: one meter, one dollar, or one pixel may have the same cost regardless of predictive uncertainty. For other tasks, the relevant error is relative to the distribution’s scale. In those cases, raw Wasserstein loss can measure the wrong discrepancy.
+The practical question is whether the Wasserstein loss measures the kind of error the task actually cares about. For some tasks, absolute displacement is the right unit: one meter, one dollar, or one pixel may have the same cost regardless of predictive uncertainty. For other tasks, the relevant error is relative to the distribution's scale. In those cases, raw Wasserstein loss can measure the wrong discrepancy.
 
 ## Unscaled data
 
-The same issue appears when Wasserstein distance is used on unscaled data.
-
-Suppose one coordinate is measured in dollars and another in percentages. Or suppose one feature has variance $10^{-2}$, while another has variance $10^4$.
-
-A Wasserstein loss built from the raw Euclidean ground cost inherits those units. It may emphasize coordinates with larger numerical scale, even when those coordinates are not more meaningful for the task.
+The same issue appears on unscaled data. If one coordinate is in dollars and another in percentages, or one feature has variance $10^{-2}$ and another has variance $10^4$, a Wasserstein loss built on the raw Euclidean ground cost inherits those units. It may emphasize coordinates with larger numerical scale even when they are not more meaningful.
 
 This is the same issue practitioners already know from feature scaling: a Euclidean cost on raw coordinates inherits raw units. Wasserstein loss does the same because its ground cost does the same.
 
@@ -447,7 +285,7 @@ In raw coordinates,
 $$
 W_2
 =
-|\Delta \mu|.
+|\Delta\mu|.
 $$
 
 In standardized coordinates,
@@ -455,18 +293,14 @@ In standardized coordinates,
 $$
 W_2
 =
-\frac{|\Delta \mu|}{\sigma}.
+\frac{|\Delta\mu|}{\sigma}.
 $$
 
 Both are Wasserstein distances. They differ because the geometry differs.
 
-## Where this issue can arise
+## Where this comes up
 
-This warning is not a criticism of Wasserstein distance.
-
-It is a modeling fact: whenever a Wasserstein-type loss is applied, the chosen ground geometry becomes part of the loss.
-
-This issue can arise in several standard settings:
+Some settings where the ground geometry choice is non-trivial:
 
 - supervised learning with structured output spaces
 - generative modeling on high-dimensional observations
@@ -474,30 +308,18 @@ This issue can arise in several standard settings:
 - point-cloud and shape reconstruction
 - transport losses on features, embeddings, labels, or raw coordinates
 
-In each case, the practical question is not only:
+In each case, applying a Wasserstein-type loss is also choosing a ground geometry. That choice is part of the model.
 
-> are we using Wasserstein distance?
+## What to do
 
-It is also:
-
-> what geometry did we give to Wasserstein distance?
-
-A Wasserstein loss on coordinates, pixels, labels, features, embeddings, or point clouds is not automatically wrong. But it is automatically tied to the metric and scale structure of those objects.
-
-## What to do in practice
-
-There is no universal fix, because the right geometry depends on the problem.
-
-Useful options include:
+There is no universal fix — the right geometry depends on the problem. Some options:
 
 - use Wasserstein distance directly when absolute displacement is the desired notion of error
 - standardize variables before applying a Wasserstein loss
 - choose a ground cost that reflects the relevant geometry of the task
-- use a scale-aware transport cost, for example by normalizing displacement by a relevant uncertainty scale
+- use a scale-aware transport cost, normalizing displacement by a relevant uncertainty scale
 - use a Mahalanobis-type ground metric when covariance structure is meaningful
-- combine losses, such as a Wasserstein term for physical displacement and a likelihood, Fisher-type, or calibration term for statistical meaning
-
-The important point is not that one of these choices is always correct. The important point is that a choice is being made.
+- combine losses — a Wasserstein term for physical displacement alongside a likelihood, Fisher-type, or calibration term for statistical meaning
 
 A useful diagnostic question is:
 
@@ -507,35 +329,19 @@ If the answer is no, the raw ground geometry may not be the right geometry.
 
 ## Takeaway
 
-The ambiguity is interpretive: the numerical value of a Wasserstein loss inherits the ground geometry chosen for the sample space.
+The issue is not Wasserstein distance. It is the interpretation.
 
-The correct statement is:
+For equal-variance Gaussians under the usual Euclidean ground metric, a unit mean shift has $W_2=1$ regardless of whether the standard deviation is $0.1$ or $100$. That is not a defect — it is what the geometry says. Raw Wasserstein reports that both pairs require one unit of transport in the chosen sample-space geometry.
 
-> In the equal-variance Gaussian diagnostic, raw Wasserstein distance reports the absolute location shift.
+Whether that one unit is statistically large or small is a separate question. Answering it requires either a different geometry, a rescaled ground cost, or an additional statistical loss.
 
-The stronger statement is not automatic:
-
-> Wasserstein distance measures whether a location shift is large relative to uncertainty.
-
-For equal-variance Gaussians under the usual Euclidean ground metric, a unit mean shift has Wasserstein distance one, regardless of whether the standard deviation is $0.1$ or $100$.
-
-That is not a defect. It is the geometry.
-
-Raw Wasserstein distance reports that both pairs require one unit of transport in the chosen sample-space geometry. Whether that one unit is statistically large or statistically small is a different question.
-
-That second question requires a different geometry, a rescaled ground cost, or an additional statistical loss.
-
-The practical question is:
+The practical question is simple:
 
 $$
-\boxed{
 \text{Should the loss measure absolute displacement, or scale-relative discrepancy?}
-}
 $$
 
-When the answer is absolute displacement, Wasserstein distance may be exactly the right tool.
-
-When the answer is scale-relative discrepancy, raw Wasserstein loss may have the wrong scale.
+When the answer is absolute displacement, Wasserstein distance may be exactly the right tool. When the answer is scale-relative discrepancy, raw Wasserstein loss may have the wrong scale.
 
 ## References
 

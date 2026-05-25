@@ -143,15 +143,14 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#preface" id="toc-preface">Preface</a></li>
-  <li><a href="#part-i-the-finite-theorem" id="toc-part-i-the-finite-theorem">Part I: The finite theorem</a></li>
-  <li><a href="#part-ii-the-empirical-identity" id="toc-part-ii-the-empirical-identity">Part II: The empirical identity</a></li>
-  <li><a href="#part-iii-the-population-gap" id="toc-part-iii-the-population-gap">Part III: The population gap</a></li>
-  <li><a href="#part-iv-the-tail-can-be-absent" id="toc-part-iv-the-tail-can-be-absent">Part IV: The tail can be absent</a></li>
-  <li><a href="#part-v-exact-matching-is-not-an-out-of-sample-map" id="toc-part-v-exact-matching-is-not-an-out-of-sample-map">Part V: Exact matching is not an out-of-sample map</a></li>
-  <li><a href="#part-vi-empirical-ot-is-an-estimator" id="toc-part-vi-empirical-ot-is-an-estimator">Part VI: Empirical OT is an estimator</a></li>
+  <li><a href="#the-finite-theorem" id="toc-the-finite-theorem">The finite theorem</a></li>
+  <li><a href="#the-empirical-identity" id="toc-the-empirical-identity">The empirical identity</a></li>
+  <li><a href="#the-population-gap" id="toc-the-population-gap">The population gap</a></li>
+  <li><a href="#the-tail-can-be-absent" id="toc-the-tail-can-be-absent">The tail can be absent</a></li>
+  <li><a href="#exact-matching-is-not-an-out-of-sample-map" id="toc-exact-matching-is-not-an-out-of-sample-map">Exact matching is not an out-of-sample map</a></li>
+  <li><a href="#empirical-ot-is-an-estimator" id="toc-empirical-ot-is-an-estimator">Empirical OT is an estimator</a></li>
   <li><a href="#takeaway" id="toc-takeaway">Takeaway</a></li>
-  <li><a href="#technical-appendix" id="toc-technical-appendix">Technical appendix</a>
+  <li><a href="#appendix" id="toc-appendix">Appendix</a>
   <ul>
   <li><a href="#solver-exactness-is-not-population-validity" id="toc-solver-exactness-is-not-population-validity">Solver exactness is not population validity</a></li>
   <li><a href="#non-uniqueness-and-instability" id="toc-non-uniqueness-and-instability">Non-uniqueness and instability</a></li>
@@ -184,52 +183,21 @@ window.Quarto = {
   text-align: left;
 }
 </style>
-<p><strong>Claim.</strong> Exact LSAP matching is exact for empirical measures, not automatically for population transport.</p>
-<p><strong>Scope.</strong> Standard finite-assignment facts; examples about missing tail mass and out-of-sample interpretation.</p>
-<h2 id="preface" class="anchored">Preface</h2>
-<p>The linear sum assignment problem has a clean promise. Given two point clouds of the same size, it matches every source point to one target point and minimizes the total cost.</p>
-<p>At the finite level, there is no ambiguity. If</p>
+<p>The linear sum assignment problem has a clean promise. Given two point clouds of the same size, it matches every source point to one target point and minimizes total cost. At the finite level, there is no ambiguity. If</p>
 <p><span class="math display">
-\hat\mu_n=\frac1n\sum_{i=1}^n\delta_{x_i},
-\qquad
-\hat\nu_n=\frac1n\sum_{j=1}^n\delta_{y_j},
+\hat\mu_n = \frac{1}{n}\sum_{i=1}^n \delta_{x_i}, \qquad \hat\nu_n = \frac{1}{n}\sum_{j=1}^n \delta_{y_j},
 </span></p>
-<p>then an optimal assignment returns a permutation <span class="math inline">\sigma</span>. The empirical map</p>
-<p><span class="math display">
-x_i\mapsto y_{\sigma(i)}
-</span></p>
-<p>pushes the empirical source sample exactly onto the empirical target sample.</p>
+<p>then an optimal assignment returns a permutation <span class="math inline">\sigma</span>, and the empirical map <span class="math inline">x_i \mapsto y_{\sigma(i)}</span> pushes the empirical source sample exactly onto the empirical target sample.</p>
 <p>That statement is correct. The question is what it means.</p>
-<p>The assignment is exact for <span class="math inline">\hat\mu_n</span> and <span class="math inline">\hat\nu_n</span>. It is not automatically a map from <span class="math inline">\mu</span> to <span class="math inline">\nu</span>. It is not automatically a generative rule for new points.</p>
-<p>The important word is <em>empirical</em>.</p>
-<blockquote>
-<p>LSAP solves the finite matching problem exactly. It does not, by itself, turn two samples into a population transport rule.</p>
-</blockquote>
-<p>This distinction matters most in tail-risk problems. A rare target region can have small probability and large consequence. If that region is absent from the finite target sample, LSAP still returns an exact empirical assignment. But the assignment contains no target atom in the rare region.</p>
-<p>So the slogan is</p>
+<p>The assignment is exact for <span class="math inline">\hat\mu_n</span> and <span class="math inline">\hat\nu_n</span>. It is not automatically a map from <span class="math inline">\mu</span> to <span class="math inline">\nu</span>. It is not automatically a generative rule for new points. LSAP solves the finite matching problem; it does not, by itself, learn a population transport rule. The distinction matters most in tail-risk problems, where a rare target region can have small probability and large consequence — and if that region is absent from the finite target sample, LSAP still returns an exact empirical assignment, just one with no target atom in the rare region.</p>
+<h2 id="the-finite-theorem" class="anchored">The finite theorem</h2>
+<p>In the finite equal-mass setting, two point sets <span class="math inline">X = \{P_1,\ldots,P_m\}</span> and <span class="math inline">Y = \{N_1,\ldots,N_m\}</span> with cost function <span class="math inline">c: X \times Y \to \mathbb{R}</span> give rise to the finite Monge problem</p>
 <p><span class="math display">
-\boxed{\text{exact empirical matching is not population transport.}}
+M = \min_{\sigma \in S_m} \sum_{i=1}^m c(P_i, N_{\sigma(i)}).
 </span></p>
-<h2 id="part-i-the-finite-theorem" class="anchored">Part I: The finite theorem</h2>
-<p>In the finite equal-mass setting, there are two point sets</p>
+<p>This is the linear assignment problem. The Kantorovich relaxation is over doubly stochastic matrices:</p>
 <p><span class="math display">
-X=\{P_1,\ldots,P_m\},
-\qquad
-Y=\{N_1,\ldots,N_m\},
-</span></p>
-<p>and a cost function <span class="math inline">c:X\times Y\to\mathbb R</span>. The finite Monge problem is</p>
-<p><span class="math display">
-M
-=
-\min_{\sigma\in S_m}
-\sum_{i=1}^m c(P_i,N_{\sigma(i)}).
-</span></p>
-<p>This is the linear assignment problem.</p>
-<p>The Kantorovich relaxation is over doubly stochastic matrices:</p>
-<p><span class="math display">
-K
-=
-\min_A
+K = \min_A
 \left\{
 \sum_{i,j=1}^m a_{ij}c(P_i,N_j):
 A=(a_{ij})\text{ is doubly stochastic}
@@ -237,125 +205,44 @@ A=(a_{ij})\text{ is doubly stochastic}
 </span></p>
 <p>In the finite equal-mass setting, the Monge value, Kantorovich value, and dual value coincide:</p>
 <p><span class="math display">
-M=K=D.
+M = K = D.
 </span></p>
-<p>This is the right finite conclusion:</p>
-<blockquote>
-<p>in the equal-weight finite setting, LSAP solves empirical discrete optimal transport.</p>
-</blockquote>
-<p>The theorem is finite. It does not say that a permutation learned from two random samples is a population OT map. It does not define what happens to a new point. It does not add missing tail mass.</p>
-<p>The finite statement is true. The population interpretation is the extra step.</p>
-<h2 id="part-ii-the-empirical-identity" class="anchored">Part II: The empirical identity</h2>
-<p>Let</p>
-<p><span class="math display">
-\hat\mu_n=\frac1n\sum_{i=1}^n\delta_{x_i},
-\qquad
-\hat\nu_n=\frac1n\sum_{j=1}^n\delta_{y_j}.
-</span></p>
+<p>This is the right finite conclusion: in the equal-weight finite setting, LSAP solves empirical discrete optimal transport. But the theorem is finite. It does not say that a permutation learned from two random samples is a population OT map. It does not define what happens to a new point. It does not add missing tail mass. The population interpretation is the extra step.</p>
+<h2 id="the-empirical-identity" class="anchored">The empirical identity</h2>
 <p>For a cost <span class="math inline">c</span>, LSAP solves</p>
 <p><span class="math display">
-\min_{\sigma\in S_n}
-\frac1n\sum_{i=1}^n c(x_i,y_{\sigma(i)}).
+\min_{\sigma \in S_n} \frac{1}{n}\sum_{i=1}^n c(x_i, y_{\sigma(i)}).
 </span></p>
-<p>Given a permutation <span class="math inline">\sigma</span>, define the empirical assignment</p>
-<p><span class="math display">
-T_n(x_i)=y_{\sigma(i)}.
-</span></p>
-<p>Then</p>
-<p><span class="math display">
-T_{n\#}\hat\mu_n=\hat\nu_n.
-</span></p>
-<p>This identity is exact. It is also exactly empirical. For any measurable set <span class="math inline">A</span>,</p>
+<p>Given a permutation <span class="math inline">\sigma</span>, define <span class="math inline">T_n(x_i)=y_{\sigma(i)}</span>. Then <span class="math inline">T_{n\#}\hat\mu_n = \hat\nu_n</span> — for any measurable set <span class="math inline">A</span>:</p>
 <p><span class="math display">
 T_{n\#}\hat\mu_n(A)
-=
-\frac1n\sum_{i=1}^n\mathbf 1\{T_n(x_i)\in A\}
-=
-\frac1n\sum_{i=1}^n\mathbf 1\{y_{\sigma(i)}\in A\}.
+= \frac{1}{n}\sum_{i=1}^n \mathbf{1}\{y_{\sigma(i)} \in A\}
+= \frac{1}{n}\sum_{j=1}^n \mathbf{1}\{y_j \in A\}
+= \hat\nu_n(A),
 </span></p>
-<p>Because <span class="math inline">\sigma</span> is a permutation,</p>
+<p>where the second equality uses that <span class="math inline">\sigma</span> is a permutation. This is exactly what LSAP gets right — and exactly where it stops.</p>
+<h2 id="the-population-gap" class="anchored">The population gap</h2>
+<p>A population transport map is a measurable function <span class="math inline">T: \mathcal{X} \to \mathcal{Y}</span> with <span class="math inline">T_\#\mu = \nu</span>. The LSAP output is a finite table:</p>
 <p><span class="math display">
-\frac1n\sum_{i=1}^n\mathbf 1\{y_{\sigma(i)}\in A\}
-=
-\frac1n\sum_{j=1}^n\mathbf 1\{y_j\in A\}
-=
-\hat\nu_n(A).
-</span></p>
-<p>So <span class="math inline">T_{n\#}\hat\mu_n=\hat\nu_n</span>. This is what LSAP gets exactly right.</p>
-<h2 id="part-iii-the-population-gap" class="anchored">Part III: The population gap</h2>
-<p>A population transport map is a measurable function</p>
-<p><span class="math display">
-T:\mathcal X\to\mathcal Y
-</span></p>
-<p>such that</p>
-<p><span class="math display">
-T_\#\mu=\nu.
-</span></p>
-<p>The LSAP output is different. It is a finite table:</p>
-<p><span class="math display">
-x_1\mapsto y_{\sigma(1)},
-\quad
-\ldots,
-\quad
-x_n\mapsto y_{\sigma(n)}.
+x_1 \mapsto y_{\sigma(1)}, \ldots, x_n \mapsto y_{\sigma(n)}.
 </span></p>
 <p>For a new point <span class="math inline">x</span>, LSAP alone has no answer.</p>
-<p>Suppose <span class="math inline">\mu</span> is continuous and</p>
+<p>If <span class="math inline">\mu</span> is continuous, then <span class="math inline">\mu(\{x_1,\ldots,x_n\})=0</span> — the empirical assignment is defined only on a set of population measure zero. Without an extension rule, <span class="math inline">T_{n\#}\mu</span> is not a well-defined population pushforward. Any out-of-sample map comes from an additional choice: nearest-neighbor extension, interpolation, kernel regression, a neural network, a parametric model. That choice may be useful, but it is no longer LSAP alone.</p>
+<h2 id="the-tail-can-be-absent" class="anchored">The tail can be absent</h2>
+<p>Consider a target distribution with a rare region <span class="math inline">A</span> where <span class="math inline">\nu(A)=\varepsilon</span>. A useful mental model is a well-separated mixture like <span class="math inline">\nu = 0.99\,N(0,1) + 0.01\,N(20,1)</span>. Draw <span class="math inline">Y_1,\ldots,Y_n \sim \nu</span>. Then</p>
 <p><span class="math display">
-X_n=\{x_1,\ldots,x_n\}.
+\mathbb{P}\{\hat\nu_n(A)=0\} = (1-\varepsilon)^n.
 </span></p>
-<p>Then</p>
-<p><span class="math display">
-\mu(X_n)=0.
-</span></p>
-<p>The empirical assignment is defined only on <span class="math inline">X_n</span>. Hence it is defined only on a set of population measure zero. Without an extension rule, <span class="math inline">T_{n\#}\mu</span> is not a well-defined population pushforward.</p>
-<p>The practical point is simple:</p>
-<blockquote>
-<p>a table of assignments is not yet a transport function.</p>
-</blockquote>
-<p>Any out-of-sample map comes from an additional choice: nearest-neighbor extension, interpolation, kernel regression, a neural network, a parametric model, or something else. That choice may be useful. But it is no longer LSAP alone.</p>
-<h2 id="part-iv-the-tail-can-be-absent" class="anchored">Part IV: The tail can be absent</h2>
-<p>Now consider a target distribution with a rare region <span class="math inline">A</span>:</p>
-<p><span class="math display">
-\nu(A)=\varepsilon.
-</span></p>
-<p>A useful mental model is a well-separated mixture such as</p>
-<p><span class="math display">
-\nu=0.99\,N(0,1)+0.01\,N(20,1),
-</span></p>
-<p>where a region like <span class="math inline">A=\{y&gt;10\}</span> has probability essentially <span class="math inline">0.01</span>. The exact mixture details are not important. What matters is that the target distribution assigns small but nonzero mass to a consequential region. Draw</p>
-<p><span class="math display">
-Y_1,\ldots,Y_n\sim\nu.
-</span></p>
-<p>Then</p>
-<p><span class="math display">
-\mathbb P\{\hat\nu_n(A)=0\}=(1-\varepsilon)^n.
-</span></p>
-<p>On this event,</p>
-<p><span class="math display">
-\hat\nu_n(A)=0,
-\qquad
-\nu(A)=\varepsilon.
-</span></p>
-<p>LSAP cannot match to a target atom that is not present. The empirical assignment is still exact, but it has no target atom in <span class="math inline">A</span>.</p>
 <p>For <span class="math inline">\varepsilon=0.01</span> and <span class="math inline">n=100</span>,</p>
 <p><span class="math display">
-(1-0.01)^{100}\approx 0.366.
+(0.99)^{100} \approx 0.366.
 </span></p>
-<p>So even with one hundred target samples, a one-percent rare region is absent with probability about <span class="math inline">37\%</span>.</p>
-<p>This is the tail-miss event:</p>
-<blockquote>
-<p>the empirical problem can be solved exactly while the population feature of interest is missing. This is not a numerical failure of assignment. It is a sampling failure hidden by an exact combinatorial solution.</p>
-</blockquote>
-<p>A crude risk calculation makes the point. If missing <span class="math inline">A</span> has consequence <span class="math inline">C_A</span>, then the contribution from the event that the target sample contains no atom in <span class="math inline">A</span> is of order</p>
+<p>With one hundred target samples, a one-percent rare region is absent with probability about 37%. LSAP cannot match to a target atom that is not present — the empirical assignment is still exact, but it has nothing in <span class="math inline">A</span>.</p>
+<p>When missing <span class="math inline">A</span> carries consequence <span class="math inline">C_A</span>, the contribution from this event is of order</p>
 <p><span class="math display">
 C_A(1-\varepsilon)^n.
 </span></p>
-<p>When <span class="math inline">C_A</span> is large, this can matter even when <span class="math inline">\varepsilon</span> is small.</p>
-<p>The practical lesson is:</p>
-<blockquote>
-<p>small probability is not the same as small consequence.</p>
-</blockquote>
+<p>Small probability is not the same as small consequence.</p>
 <div id="cell-fig-missing-tail" class="cell" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div id="fig-missing-tail" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -371,8 +258,8 @@ Figure&nbsp;1: A finite target sample may miss a rare but consequential target r
 </div>
 </div>
 <p>The plot is not a solver benchmark. It only shows the sampling issue. If the target sample contains no rare atom, the assignment cannot invent one. If it contains one or two, the finite assignment sends exactly that many source atoms into the rare region.</p>
-<h2 id="part-v-exact-matching-is-not-an-out-of-sample-map" class="anchored">Part V: Exact matching is not an out-of-sample map</h2>
-<p>LSAP assigns values only at the observed source atoms. Different extensions can agree on the assigned pairs and disagree elsewhere.</p>
+<h2 id="exact-matching-is-not-an-out-of-sample-map" class="anchored">Exact matching is not an out-of-sample map</h2>
+<p>LSAP assigns values only at the observed source atoms. Different extensions can agree on the assigned pairs and disagree everywhere else.</p>
 <div id="cell-fig-extensions" class="cell" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div id="fig-extensions" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -388,40 +275,22 @@ Figure&nbsp;2: The LSAP output is a finite table of pairs. Nearest-neighbor exte
 </div>
 </div>
 <p>The three curves are not three versions of LSAP. They are three choices made after the assignment.</p>
-<h2 id="part-vi-empirical-ot-is-an-estimator" class="anchored">Part VI: Empirical OT is an estimator</h2>
-<p>There is a simple case where the population OT map is known. Let</p>
-<p><span class="math display">
-\mu=N(0,I_d),
-\qquad
-\nu=N(a,I_d),
-</span></p>
-<p>and use quadratic cost. The population OT map is</p>
+<h2 id="empirical-ot-is-an-estimator" class="anchored">Empirical OT is an estimator</h2>
+<p>There is a simple case where the population OT map is known. Let <span class="math inline">\mu=N(0,I_d)</span>, <span class="math inline">\nu=N(a,I_d)</span>, with quadratic cost. The population OT map is</p>
 <p><span class="math display">
 T^\star(x)=x+a.
 </span></p>
-<p>Now draw independent samples</p>
+<p>Now draw independent samples <span class="math inline">X_1,\ldots,X_n\sim\mu</span> and <span class="math inline">Y_1,\ldots,Y_n\sim\nu</span>. LSAP returns a permutation <span class="math inline">\sigma_n</span>.</p>
+<p>If the empirical assignment recovered the population map exactly, we would need <span class="math inline">Y_{\sigma_n(i)}=X_i+a</span> for every <span class="math inline">i</span>. But with probability one,</p>
 <p><span class="math display">
-X_1,\ldots,X_n\sim\mu,
-\qquad
-Y_1,\ldots,Y_n\sim\nu.
+\{Y_1,\ldots,Y_n\} \ne \{X_1+a,\ldots,X_n+a\},
 </span></p>
-<p>LSAP returns a permutation <span class="math inline">\sigma_n</span>. If the empirical assignment were literally the population map evaluated on the sample, then</p>
-<p><span class="math display">
-Y_{\sigma_n(i)}=X_i+a
-</span></p>
-<p>for every (i). But with probability one,</p>
-<p><span class="math display">
-\{Y_1,\ldots,Y_n\}
-\ne
-\{X_1+a,\ldots,X_n+a\}.
-</span></p>
-<p>So no finite-sample permutation can equal the population map exactly, except in a probability-zero coincidence.</p>
+<p>so no finite-sample permutation can equal the population map except in a probability-zero coincidence.</p>
 <p>A useful diagnostic is</p>
 <p><span class="math display">
-\frac1n\sum_{i=1}^n
-\left\|Y_{\sigma_n(i)}-X_i-a\right\|^2.
+\frac{1}{n}\sum_{i=1}^n \left\|Y_{\sigma_n(i)} - X_i - a\right\|^2,
 </span></p>
-<p>This measures how far the empirical LSAP displacement is from the known population displacement.</p>
+<p>which measures how far the empirical LSAP displacement is from the known population displacement.</p>
 <div id="cell-fig-empirical-ot-estimator" class="cell" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div id="fig-empirical-ot-estimator" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -436,76 +305,32 @@ Figure&nbsp;3: Empirical LSAP displacement compared with the known population OT
 </div>
 </div>
 </div>
-<p>The lesson is not that empirical OT is useless. The claim is smaller:</p>
-<blockquote>
-<p>empirical OT is an estimator; exact optimization does not remove sampling error.</p>
-</blockquote>
+<p>Empirical OT is not useless. The claim is smaller: it is an estimator, and exact optimization does not remove sampling error.</p>
 <h2 id="takeaway" class="anchored">Takeaway</h2>
-<p>The assignment certifies an exact coupling of two empirical measures. It does not, without an extension rule and sampling assumptions, certify a population transport map.</p>
-<p>The gap has three sources. First, the assignment is defined only on the observed source atoms; for a continuous source distribution, this set has population measure zero. Second, rare target regions may be absent from the empirical target sample, so exact matching can still miss them entirely. Third, empirical OT is an estimator: exact finite optimization does not remove sampling error.</p>
-<p>Thus the relevant question is not whether LSAP solved the finite assignment problem. It did. The question is whether the empirical coupling contains enough information to support the population transport claim being made.</p>
-<p>When it does not, exact matching is the wrong comfort.</p>
-<h2 id="technical-appendix" class="anchored">Technical appendix</h2>
+<p>LSAP solves finite empirical discrete OT between equal-weight point clouds. That is what it does, and it does it exactly. What is not automatic is that it learns a population OT map or a generative transport rule.</p>
+<p>The gap shows up in three places. First, the assignment is defined only on the observed source atoms — a set of population measure zero for any continuous source. Second, rare target regions can be absent from the empirical sample with non-negligible probability, and on that event the exact assignment simply has nothing to send there. Third, even in a Gaussian shift model where the population OT map is known, an exact finite assignment does not recover it from independent samples.</p>
+<p>So the practical question is not whether LSAP solved the assignment problem — it did. The question is whether the empirical assignment contains enough information to define the population transport needed for the task. When the answer is no, exact matching is the wrong comfort.</p>
+<h2 id="appendix" class="anchored">Appendix</h2>
 <h3 id="solver-exactness-is-not-population-validity" class="anchored">Solver exactness is not population validity</h3>
-<p>The linear assignment problem is classical. Kuhn’s Hungarian method is the canonical reference point. Munkres gave a standard polynomial-time treatment of assignment and transportation algorithms. Later exact methods include shortest augmenting path and Jonker–Volgenant-type algorithms. Bertsekas’ auction algorithm is another important family.</p>
-<p>The solver literature is not the target here. Hungarian, Jonker–Volgenant, auction, and related methods solve their finite problems exactly. The issue begins after that: an exactly solved sampled problem can still omit the part of the population one cares about.</p>
+<p>This note is not a comparison of solvers — not a critique of the Hungarian algorithm, Jonker–Volgenant methods, auction algorithms, or exact assignment algorithms in general. The point is simpler: an exact solver can solve the sampled problem exactly while the sampled problem still omits a rare but important part of the target distribution.</p>
 <p><span class="math display">
 \text{solver exactness}
 \quad\ne\quad
 \text{population validity}.
 </span></p>
-<p>An exact solver can solve the sampled problem exactly while the sampled problem still omits a rare but important part of the target distribution.</p>
 <h3 id="non-uniqueness-and-instability" class="anchored">Non-uniqueness and instability</h3>
-<p>The LSAP objective returns an optimal permutation. The optimal value can be well-defined even when the selected permutation is not.</p>
-<p>Take</p>
+<p>The LSAP objective returns an optimal value; the selected permutation need not be unique. Take <span class="math inline">X=\{0,0\}</span>, <span class="math inline">Y=\{-1,1\}</span> with squared cost. Both assignments have total cost 2, so both are optimal and a solver must pick one arbitrarily.</p>
+<p>There is also a small instability example. Let <span class="math inline">X=\{0,1\}</span> and</p>
 <p><span class="math display">
-X=\{0,0\},
-\qquad
-Y=\{-1,1\},
+Y_\delta = \left\{\frac{1}{2}-\delta,\frac{1}{2}+\delta\right\}
 </span></p>
-<p>with squared cost. The two assignments</p>
-<p><span class="math display">
-0_1\mapsto -1,\quad 0_2\mapsto 1
-</span></p>
-<p>and</p>
-<p><span class="math display">
-0_1\mapsto 1,\quad 0_2\mapsto -1
-</span></p>
-<p>both have total cost <span class="math inline">2</span>. Both are optimal. A solver must return one of them.</p>
-<p>There is also a small instability example. Let</p>
-<p><span class="math display">
-X=\{0,1\},
-\qquad
-Y_\delta=
-\left\{\frac12-\delta,\frac12+\delta\right\}.
-</span></p>
-<p>With squared cost, one assignment has cost</p>
-<p><span class="math display">
-2\left(\frac12-\delta\right)^2,
-</span></p>
-<p>and the swapped assignment has cost</p>
-<p><span class="math display">
-2\left(\frac12+\delta\right)^2.
-</span></p>
-<p>If <span class="math inline">\delta&gt;0</span>, the first assignment is optimal. If <span class="math inline">\delta&lt;0</span>, the swapped assignment is optimal. At <span class="math inline">\delta=0</span>, both tie.</p>
-<p>The value changes smoothly. The assignment can change discontinuously.</p>
-<blockquote>
-<p>LSAP can be stable as a value while unstable as a map.</p>
-</blockquote>
+<p>with squared cost. For <span class="math inline">\delta&gt;0</span> one assignment is optimal; for <span class="math inline">\delta&lt;0</span> the swapped one is; at <span class="math inline">\delta=0</span> they tie. The value changes smoothly — the assignment can change discontinuously. LSAP can be stable as a value while unstable as a map.</p>
 <h3 id="equal-weights-are-doing-work" class="anchored">Equal weights are doing work</h3>
-<p>The LSAP formulation above assumes two finite point clouds of the same size with equal atom weights:</p>
-<p><span class="math display">
-\hat\mu_n=\frac1n\sum_{i=1}^n\delta_{x_i},
-\qquad
-\hat\nu_n=\frac1n\sum_{j=1}^n\delta_{y_j}.
-</span></p>
-<p>In this special case, the finite Kantorovich problem reduces to linear assignment. After rescaling, the feasible set is the set of doubly stochastic matrices, and an optimal plan can be chosen to be a permutation.</p>
-<p>If the empirical weights are not equal, or if the two point clouds do not have the same number of atoms, the one-to-one assignment formulation is no longer the general finite OT problem.</p>
+<p>The formulation above assumes two finite point clouds of the same size with equal atom weights. In this special case the finite Kantorovich problem reduces to linear assignment. If the empirical weights are not equal, or the point clouds have different sizes, the one-to-one assignment formulation is no longer the general finite OT problem.</p>
 <p>Rectangular assignment routines do not change this point. A rectangular LSAP returns an optimal matching of cardinality <span class="math inline">\min(n,m)</span>, leaving atoms on the larger side unmatched. That can be a useful combinatorial problem, but it is not the same as transporting all of one empirical probability measure onto the other.</p>
 <p>The finite Kantorovich problem is then a transportation linear program:</p>
 <p><span class="math display">
-\min_{\pi_{ij}\ge 0}
-\sum_{i,j} c(x_i,y_j)\pi_{ij}
+\min_{\pi_{ij}\ge 0} \sum_{i,j} c(x_i,y_j)\pi_{ij}
 </span></p>
 <p>subject to</p>
 <p><span class="math display">
@@ -515,62 +340,30 @@ Y_\delta=
 </span></p>
 <p>where</p>
 <p><span class="math display">
-a_i\ge 0,\qquad b_j\ge 0,\qquad
-\sum_i a_i=\sum_j b_j=1.
+a_i\ge 0,\qquad b_j\ge 0,\qquad \sum_i a_i=\sum_j b_j=1.
 </span></p>
 <p>Here mass may need to split. A permutation cannot represent that in general.</p>
-<p>A minimal example is</p>
+<p>A minimal example is <span class="math inline">\mu=\delta_0</span> and <span class="math inline">\nu=\frac12\delta_{-1}+\frac12\delta_1</span>. A deterministic assignment from the single source atom must send all mass to either <span class="math inline">-1</span> or <span class="math inline">1</span>. It cannot push <span class="math inline">\delta_0</span> to a measure splitting mass equally between both target points. The Kantorovich plan can:</p>
 <p><span class="math display">
-\mu=\delta_0,
-\qquad
-\nu=\frac12\delta_{-1}+\frac12\delta_1.
+\pi(0,-1)=\frac12, \qquad \pi(0,1)=\frac12.
 </span></p>
-<p>A deterministic assignment from the single source atom at (0) must send all mass either to (-1) or to (1). It cannot push (_0) to a measure that puts half the mass at each target point.</p>
-<p>The Kantorovich plan can split the source atom:</p>
-<p><span class="math display">
-\pi(0,-1)=\frac12,
-\qquad
-\pi(0,1)=\frac12.
-</span></p>
-<p>So equal weights are not a cosmetic assumption. They are what make the finite OT problem reduce to LSAP. Without them, exact finite OT may require a transportation plan rather than a one-to-one assignment.</p>
+<p>Equal weights are not a cosmetic assumption; they are what make finite OT reduce to LSAP.</p>
 <h3 id="empirical-geodesics" class="anchored">Empirical geodesics</h3>
-<p>This section is optional; it explains what the LSAP coupling can produce under squared Euclidean cost. The empirical LSAP solution defines the coupling</p>
+<p>Under squared Euclidean cost, the LSAP solution defines a coupling</p>
 <p><span class="math display">
-\pi_n
-=
-\frac1n\sum_{i=1}^n
-\delta_{(x_i,y_{\sigma(i)})}.
+\pi_n = \frac{1}{n}\sum_{i=1}^n \delta_{(x_i,y_{\sigma(i)})},
 </span></p>
-<p>From this coupling one can form the displacement interpolation</p>
+<p>from which one can form the displacement interpolation</p>
 <p><span class="math display">
 \hat\mu_{n,t}
-=
-\left((1-t)x+ty\right)_\#\pi_n,
-\qquad
-0\le t\le 1.
+= \frac{1}{n}\sum_{i=1}^n
+\delta_{(1-t)x_i + t\,y_{\sigma(i)}},
+\qquad 0\le t\le 1.
 </span></p>
-<p>Equivalently,</p>
-<p><span class="math display">
-\hat\mu_{n,t}
-=
-\frac1n\sum_{i=1}^n
-\delta_{(1-t)x_i+t y_{\sigma(i)}}.
-</span></p>
-<p>This curve satisfies</p>
-<p><span class="math display">
-\hat\mu_{n,0}=\hat\mu_n,
-\qquad
-\hat\mu_{n,1}=\hat\nu_n.
-</span></p>
-<p>When the cost is squared Euclidean distance and the coupling is optimal for <span class="math inline">W_2</span>, this interpolation is the empirical Wasserstein geodesic between the two empirical measures.</p>
-<p>But the geodesic is still empirical. It is a curve from <span class="math inline">\hat\mu_n</span> to <span class="math inline">\hat\nu_n</span>, not necessarily from <span class="math inline">\mu</span> to <span class="math inline">\nu</span>. If the target sample misses a rare region <span class="math inline">A</span>, then the endpoint <span class="math inline">\hat\nu_n</span> misses <span class="math inline">A</span>, and the interpolation inherits that endpoint.</p>
-<p>So the safer statement is:</p>
-<blockquote>
-<p>LSAP can induce an empirical Wasserstein geodesic under the right geometry, but it is not itself a population geodesic.</p>
-</blockquote>
-<p>The assignment is a coupling. The geodesic is a curve of measures built from that coupling.</p>
+<p>When the cost is squared Euclidean and the coupling is optimal for <span class="math inline">W_2</span>, this is the empirical Wasserstein geodesic between the two empirical measures. But it is still empirical — a curve from <span class="math inline">\hat\mu_n</span> to <span class="math inline">\hat\nu_n</span>, not from <span class="math inline">\mu</span> to <span class="math inline">\nu</span>. If the target sample misses a rare region <span class="math inline">A</span>, the endpoint <span class="math inline">\hat\nu_n</span> misses it, and the interpolation inherits that. LSAP can induce an empirical Wasserstein geodesic under the right geometry; it is not a population geodesic.</p>
 <h3 id="reproducibility-notes" class="anchored">Reproducibility notes</h3>
-<p>The diagnostic code above is intentionally small. It uses SciPy’s <code>linear_sum_assignment</code> to solve the finite assignment problem with squared Euclidean costs. The experiments are not solver benchmarks; they are small illustrations of the gap between exact empirical matching and population transport.</p>
+<p>The diagnostic code uses SciPy’s <code>linear_sum_assignment</code> with squared Euclidean costs. The experiments are small illustrations of the gap between exact empirical matching and population transport, not solver benchmarks.</p>
+<hr>
 <h2 id="references" class="anchored">References</h2>
 <p>Dimitri P. Bertsekas. “The auction algorithm: A distributed relaxation method for the assignment problem.” <em>Annals of Operations Research</em> 14, 1988.</p>
 <p>Haim Brezis. “Remarks on the Monge–Kantorovich problem in the discrete setting.” <em>Comptes Rendus Mathématique</em> 356(2), 2018.</p>

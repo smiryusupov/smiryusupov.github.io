@@ -54,76 +54,64 @@ table.dataframe td:first-child {
 }
 </style>
 
-**Claim.** The power function is not an error bar by itself. It is the computable geometric factor in a bound whose scale is controlled by an unknown RKHS norm.  
-**Scope.** Standard kernel approximation facts; illustrative diagnostics about when the bound becomes practically vacuous.
+
+*Research note; not peer reviewed. The power-function bound is a standard fact from kernel approximation theory; the experiments below are small diagnostics about why its direct use as a pointwise ML error bar can become vacuous.*
 
 A recurring trap in kernel methods is that a computable geometric quantity can look like an uncertainty estimate.
 
-The power function is such a quantity. It is mathematically meaningful. It measures how well the design points constrain evaluation at a new point, relative to a chosen kernel.
-
-But the usual pointwise error bound is not a power-function-only statement. It has a hidden constant:
+The power function is such a quantity. It is mathematically meaningful: it measures how well the design points constrain evaluation at a new location, relative to a chosen kernel. But the usual pointwise error bound has a hidden constant:
 
 $$
-|f(x)-s_X f(x)| \leq P_X(x)\,\|f\|_{\mathcal H}.
+|f(x) - s_X f(x)| \leq P_X(x)\,\|f\|_{\mathcal H}.
 $$
 
 The computable part is $P_X(x)$. The difficult part is $\|f\|_{\mathcal H}$.
 
-In classical approximation theory this is natural: one assumes that the target belongs to the native space and has controlled norm. In machine learning, the target is unknown, noisy observations are common, the kernel is a modeling choice, and the RKHS norm may be enormous, infinite, or simply not connected to the prediction problem.
+In classical approximation theory, that is natural: one assumes the target belongs to the native space with a controlled norm. In machine learning, the target is unknown, observations are noisy, the kernel is a modeling choice, and the RKHS norm may be enormous, infinite, or simply unconnected to the prediction problem.
 
-I use four small diagnostics.
-
-- The same power function can accompany very different pointwise errors.
-- Smooth-looking targets can have very different native-space costs under the same kernel.
-- The fitted interpolation norm can mostly measure the cost of fitting noise.
-- The resulting bound can be much larger than the output scale.
+The point of this note is narrow. The power function is useful as a geometry-of-information diagnostic, but it should not be read as a pointwise ML error bar unless the missing norm factor has a meaningful and calibrated scale. The four diagnostics below show why.
 
 ## The formal statement
 
-Let $X=\{x_1,\ldots,x_n\}$ be interpolation sites, and let $k$ be a positive definite kernel with RKHS $\mathcal H$.
-
-The kernel interpolant has the form
+Let $X = \{x_1, \ldots, x_n\}$ be interpolation sites and let $k$ be a positive definite kernel with RKHS $\mathcal H$. The kernel interpolant is
 
 $$
-s_X f(x)=\sum_{i=1}^n \alpha_i k(x,x_i),
+s_X f(x) = \sum_{i=1}^n \alpha_i k(x, x_i),
 \qquad
-K_X\alpha=f_X,
+K_X \alpha = f_X,
 $$
 
-where $(K_X)_{ij}=k(x_i,x_j)$ and $f_X=(f(x_1),\ldots,f(x_n))^\top$.
-
-The power function is
+where $(K_X)_{ij} = k(x_i, x_j)$ and $f_X = (f(x_1), \ldots, f(x_n))^\top$. The power function is
 
 $$
 P_X^2(x)
 =
-k(x,x)-k_X(x)^\top K_X^{-1}k_X(x),
+k(x,x) - k_X(x)^\top K_X^{-1} k_X(x),
 $$
 
-where
+where $k_X(x) = (k(x,x_1), \ldots, k(x,x_n))^\top$.
 
-$$
-k_X(x)=(k(x,x_1),\ldots,k(x,x_n))^\top.
-$$
-
-It depends on the kernel, the design, and the evaluation point. It does not depend on the observed values of the target.
+It depends on the kernel, the design, and the evaluation point. It does not depend on the observed target values.
 
 The standard deterministic estimate is
 
 $$
-|f(x)-s_X f(x)| \leq P_X(x)\,\|f\|_{\mathcal H}.
+|f(x) - s_X f(x)| \leq P_X(x)\,\|f\|_{\mathcal H}.
 $$
 
-The theorem separates two quantities that are often conflated in applications. The power function is the design-dependent geometric term. The RKHS norm is the target-dependent scale term, and it is usually the unknown part.
+That is a useful theorem. But the theorem is not the same as the applied claim that $P_X(x)$ alone is an error bar. The cleaner separation is
+
+$$
+P_X(x) = \text{design geometry under the kernel},
+\qquad
+\|f\|_{\mathcal H} = \text{unknown target complexity under the kernel}.
+$$
 
 The second term is usually where the statistical difficulty lives.
 
-## Setup
-
-The examples use a one-dimensional Gaussian kernel. This is only for visualization. The point is not specific to this implementation. The small Cholesky jitter used below is numerical stabilization; it should not be interpreted as a statistical ridge penalty.
-
 ```{python}
 #| label: setup
+#| include: false
 # The code below defines the helper functions used in all figures.
 import numpy as np
 import pandas as pd
@@ -203,9 +191,7 @@ def output_range(f, x_eval):
 
 ## Same power function, different errors
 
-Fix the training sites and the kernel. Then the power function is fixed.
-
-Now change only the target.
+Fix the training sites and the kernel. The power function is now fixed. Change only the target.
 
 ::: {.narrow-figure}
 
@@ -258,15 +244,11 @@ plt.show()
 
 :::
 
-The design has not changed. The kernel has not changed. The power function has not changed.
+The design has not changed. The kernel has not changed. The power function has not changed. Only the target has changed — and that is enough to rule out interpreting $P_X(x)$ alone as a pointwise error estimate.
 
-Only the target changed.
+At most, $P_X(x)$ is the computable geometric factor in a bound whose missing factor is the target norm.
 
-So $P_X(x)$ cannot be a pointwise error estimate by itself. It does not see the target. It only sees the kernel, the design, and the evaluation point. At most, it is the computable geometric factor in a bound whose missing factor is the target norm.
-
-Table 1 reports the numerical version of Figure 1. Since the design and kernel are fixed, max power is identical for every target. The changing columns show that the actual error depends on the target and on the relevant norm scale, not on the power function alone.
-
-Here, the fitted norm is the computable interpolation norm $\|s_X\|_{\mathcal H}$, and bound scale means $\max_x P_X(x)\,\|s_X\|_{\mathcal H}$. This is a diagnostic scale, not the theorem's true bound with the unknown $\|f\|_{\mathcal H}$. Therefore it can be smaller than the actual error.
+Table @tbl-same-power gives the numerical version. Since design and kernel are fixed, max power is identical for every target. The fitted norm column is the computable interpolation norm $\|s_X\|_{\mathcal H}$, and the bound scale is $\max_x P_X(x)\,\|s_X\|_{\mathcal H}$. This is a diagnostic scale, not the theorem's true bound with the unknown $\|f\|_{\mathcal H}$, so it can be smaller than the actual error.
 
 ```{python}
 #| label: tbl-same-power
@@ -284,19 +266,15 @@ show_table(tbl)
 
 ## The hidden norm can become the whole problem
 
-Suppose we accept the chosen kernel and ask how expensive different targets are under it.
-
-We use a finite-dimensional proxy:
+Suppose we accept the chosen kernel and ask how expensive different targets are under it. A finite-dimensional proxy for the RKHS norm is
 
 $$
-\|f\|_{\mathcal H,m}^{2}
-=
-f(Z)^\top K_Z^{-1}f(Z),
+\|f\|_{\mathcal H,m}^2 = f(Z)^\top K_Z^{-1} f(Z),
 $$
 
 where $Z$ is a fine grid. This is the RKHS norm of the minimum-norm interpolant through the values of $f$ on $Z$.
 
-It is not the true continuous RKHS norm of $f$. It is only a diagnostic. It is also affected by conditioning and the stabilization used to invert $K_Z$, so the point is qualitative rather than metrological. But it is useful: if this proxy grows rapidly as the grid is refined, then the native-space assumption is not giving a stable scale for the target.
+It is not the true continuous RKHS norm of $f$, but it is a useful diagnostic. If this proxy grows rapidly as the grid is refined, the native-space assumption is not giving a stable scale for the target.
 
 ::: {.narrow-figure}
 
@@ -339,10 +317,6 @@ plt.show()
 
 :::
 
-For compatible smooth targets, the scale can remain moderate. For rough, oscillatory, or discontinuous targets, the native-space cost can become very large.
-
-The theorem remains correct; the difficulty is that its scale is controlled by a target-complexity constant that the learning problem usually does not supply.
-
 ```{python}
 #| label: tbl-norm-proxy
 #| tbl-cap: 'Finite-grid RKHS norm proxy versus grid resolution. The smooth target remains stable, while oscillatory, kinked, and discontinuous targets become increasingly expensive under the same Gaussian kernel.'
@@ -359,20 +333,17 @@ norm_table = (
 show_table(norm_table)
 ```
 
+For compatible smooth targets, the scale stays moderate. For rough, oscillatory, or discontinuous targets, the native-space cost can become very large under the same Gaussian kernel. The theorem is not failing. It is asking for a target-complexity constant that the machine-learning problem usually does not provide.
+
 ## A noisy ML-style example
 
-In machine learning we usually do not observe a noiseless function. We observe data.
-
-A tempting substitution is to replace the unknown $\|f\|_{\mathcal H}$ by the fitted interpolation norm
+In practice, we do not observe a noiseless function. We observe data. A tempting substitution is to replace the unknown $\|f\|_{\mathcal H}$ with the fitted interpolation norm
 
 $$
-\|s_X\|_{\mathcal H}^{2}=y^\top K_X^{-1}y.
+\|s_X\|_{\mathcal H}^2 = y^\top K_X^{-1} y.
 $$
 
-This quantity is computable. But it is not the unknown target norm; it is a data-dependent interpolation norm.
-
-When the noise variance is not negligible relative to the signal, the interpolant is forced to pass through the noise, and the 
-resulting fitted norm can be much larger than the norm of the underlying signal.
+This quantity is computable, but it is not the unknown target norm. It is a data-dependent interpolation norm, and with noisy observations it can mostly measure the cost of fitting noise.
 
 ::: {.narrow-figure}
 
@@ -422,23 +393,18 @@ plt.show()
 
 :::
 
-If ridge regularization is introduced, the fitted norm can be stabilized. But then the original interpolation theorem is no longer being used as stated. One has moved from a deterministic interpolation bound to a different regularized statistical procedure.
-
-That may be reasonable. It is just not the same certificate.
+If ridge regularization is introduced, the fitted norm can be stabilized. But then the original interpolation theorem is no longer being used as stated. We have moved from a deterministic interpolation bound to a different regularized statistical procedure. That may be entirely reasonable; it is just not the same certificate.
 
 ## Vacuity ratios
 
-A bound is useful only if its scale is meaningful relative to the prediction problem.
-
-Define the simple diagnostic
+A bound is useful only if its scale is meaningful relative to the prediction problem. Define
 
 $$
-V = \frac{\max_x P_X(x) C}{\operatorname{range}(y)},
+V =
+\frac{\max_x P_X(x) \cdot C}{\operatorname{range}(y)},
 $$
 
-where $C$ is a candidate norm scale.
-
-If $C=\|f\|_{\mathcal H}$, this is the formal native-space constant. In practice $C$ is usually unavailable. If one replaces it with a fitted norm or a finite-grid proxy, the number should be interpreted only as a scale diagnostic, not as a theorem.
+where $C$ is a candidate norm scale. When $V \gg 1$, the bound may be formally true but no longer informative at the scale of the prediction problem.
 
 ```{python}
 #| label: tbl-vacuity-ratios
@@ -481,63 +447,37 @@ for col in vacuity_table.columns:
 show_table(vacuity_table)
 ```
 
-When these ratios are much larger than one, the bound may be formally true but no longer informative at the scale of the prediction problem.
+The norm term does not make the bound wrong. It makes it vacuous when the hidden complexity factor is too large, too unstable, or unavailable.
 
-This is the sense in which the norm term becomes vacuous: not because the power function is wrong, but because the hidden complexity factor is too large, too unstable, or unavailable.
+## What the power function does and does not see
 
-## What the power function sees
+The power function sees the kernel, the design points, geometric coverage under the kernel metric, and where interpolation is weakly constrained by the data locations.
 
-The power function sees:
+It does not see the unknown target complexity, kernel misspecification, observation noise, distribution shift, model-selection error, hyperparameter-selection error, whether the fitted norm is signal or noise, or whether the target belongs to the native space at all.
 
-- the kernel
-- the design points
-- geometric coverage under the kernel metric
-- where interpolation is weakly constrained by the data locations
-
-The power function does not see:
-
-- the unknown target complexity
-- misspecification of the kernel class
-- observation noise
-- distribution shift
-- model-selection error
-- hyperparameter-selection error
-- whether the fitted norm is fitting signal or noise
-- whether the target belongs to the native space at all
-
-This is why the object is useful as a design diagnostic but fragile as a pointwise uncertainty statement.
+That is why the power function is useful as a design diagnostic but fragile as a pointwise uncertainty statement.
 
 ## The misleading substitution
 
-The tempting applied substitution is
+The tempting applied move is
 
 $$
-|f(x)-s_X f(x)|
-\leq
-P_X(x)\,\|f\|_{\mathcal H}
+|f(x) - s_X f(x)| \leq P_X(x)\,\|f\|_{\mathcal H}
 \qquad\leadsto\qquad
-\text{error at }x \approx P_X(x).
+\text{error at } x \approx P_X(x).
 $$
 
-But this removes the factor that depends on the target.
+This drops the factor that depends on the target.
 
-A slightly less naive substitution is
+A slightly less naive version replaces $\|f\|_{\mathcal H}$ with $\|s_X\|_{\mathcal H}$. But that is not a theorem either. It is a heuristic that can be dominated by noise, conditioning, and hyperparameter choices.
 
-$$
-\|f\|_{\mathcal H}
-\approx
-\|s_X\|_{\mathcal H}.
-$$
-
-This is also not a theorem. It can be a heuristic, but it is data-dependent and can be dominated by noise, conditioning, and hyperparameters.
-
-The formal theorem controls approximation error for functions in the RKHS. The machine-learning problem is usually to learn an unknown target from finite, noisy data under model uncertainty. These are not the same problem.
+The formal theorem controls approximation error for functions in the RKHS. The ML problem is to learn an unknown target from finite, noisy data under model uncertainty. These are not the same problem, and the power function carries the geometry of the first without the statistics of the second.
 
 ## Takeaway
 
 The power function is a valid geometric quantity. It tells us something real about the design and the kernel.
 
-But the pointwise error bound is a product:
+But the pointwise error bound is a product of design geometry and unknown target complexity:
 
 $$
 \text{pointwise error}
@@ -549,9 +489,7 @@ $$
 
 In applications, the first term is computable and visually appealing. The second term is usually unknown, unstable, or incompatible with the modeling assumptions.
 
-A cautious interpretation is therefore:
-
-> The power function is a geometry-of-information diagnostic. It is not, without a meaningful and calibrated control of $\|f\|_{\mathcal H}$, a pointwise prediction-error estimate.
+The useful interpretation is therefore simple: the power function is a geometry-of-information diagnostic. Without meaningful and calibrated control of $\|f\|_{\mathcal H}$, it is not a pointwise prediction-error estimate.
 
 ## References
 
@@ -559,7 +497,7 @@ Gregory E. Fasshauer. *Meshfree Approximation Methods with MATLAB*. World Scient
 
 Holger Wendland. *Scattered Data Approximation*. Cambridge University Press, 2005.
 
-Robert Schaback and Holger Wendland. “Kernel techniques: From machine learning to meshless methods.” *Acta Numerica* 15, 2006.
+Robert Schaback and Holger Wendland. "Kernel techniques: From machine learning to meshless methods." *Acta Numerica* 15, 2006.
 
 Carl Edward Rasmussen and Christopher K. I. Williams. *Gaussian Processes for Machine Learning*. MIT Press, 2006.
 
