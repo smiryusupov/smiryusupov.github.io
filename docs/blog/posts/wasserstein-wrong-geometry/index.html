@@ -191,7 +191,7 @@ window.Quarto = {
 <li>Fisher–Rao geometry gives a contrasting scale-relative notion of distance.</li>
 <li>A scaled Wasserstein ground cost can recover scale-relative behavior, but only after the geometry is changed.</li>
 </ul>
-<p>The point is not that Wasserstein distance is wrong. The point is that Wasserstein distance answers a geometric question, and the geometry is part of the model.</p>
+<p>Wasserstein distance answers the question posed by its ground geometry. Change the geometry, and the loss changes its meaning.</p>
 <h2 id="wasserstein-distance-depends-on-the-ground-geometry">Wasserstein distance depends on the ground geometry</h2>
 <p>Optimal transport is defined after choosing a cost for moving mass from one point to another. In the usual Wasserstein distance, this cost comes from a ground metric on the sample space; see Peyré and Cuturi (2019).</p>
 <p>This is not an implementation detail. It is the geometry of the loss.</p>
@@ -451,11 +451,7 @@ W_2^2(P,Q)
 </span></p>
 <p>So Wasserstein distance does see predictive spread in this setting. But it sees spread as transport cost to collapse a distribution onto a point. That is different from treating <span class="math inline">\sigma</span> as calibrated uncertainty in the likelihood or Fisher-geometric sense.</p>
 <p>The practical question is therefore:</p>
-<blockquote>
-<p>does the Wasserstein loss measure the kind of error the task cares about?</p>
-</blockquote>
-<p>Sometimes the answer is yes. If moving mass by one meter, one dollar, or one pixel has the same meaning regardless of predictive uncertainty, then absolute transport cost is natural.</p>
-<p>Sometimes the answer is no. If the task cares about errors relative to predictive uncertainty, then raw Wasserstein loss may have the wrong scale.</p>
+<p>For some tasks, absolute displacement is the right unit: one meter, one dollar, or one pixel may have the same cost regardless of predictive uncertainty. For other tasks, the relevant error is relative to the distribution’s scale. In those cases, raw Wasserstein loss can measure the wrong discrepancy.</p>
 <h2 id="unscaled-data">Unscaled data</h2>
 <p>The same issue appears when Wasserstein distance is used on unscaled data.</p>
 <p>Suppose one coordinate is measured in dollars and another in percentages. Or suppose one feature has variance <span class="math inline">10^{-2}</span>, while another has variance <span class="math inline">10^4</span>.</p>
@@ -512,8 +508,7 @@ W_2
 </blockquote>
 <p>If the answer is no, the raw ground geometry may not be the right geometry.</p>
 <h2 id="takeaway">Takeaway</h2>
-<p>Wasserstein distance is not the problem.</p>
-<p>The interpretation is the problem.</p>
+<p>The ambiguity is interpretive: the numerical value of a Wasserstein loss inherits the ground geometry chosen for the sample space.</p>
 <p>The correct statement is:</p>
 <blockquote>
 <p>In the equal-variance Gaussian diagnostic, raw Wasserstein distance reports the absolute location shift.</p>

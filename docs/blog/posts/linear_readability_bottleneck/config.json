@@ -1,7 +1,7 @@
 {
   "dataset": "mnist",
   "data_root": "/content/data",
-  "out_dir": "/content/runs/linsep_heads_mnist_v4",
+  "out_dir": "/content/runs/linread_heads_mnist",
   "seed": 43,
   "epochs": 20,
   "batch_size": 256,

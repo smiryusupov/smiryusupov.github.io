@@ -16,6 +16,10 @@ The recurring theme is that a method can be mathematically correct and still eas
 
 Most posts use small diagnostics, examples, and geometric viewpoints to make those gaps visible.
 
-## Independence
+## Independence and sources
 
-This site is written independently and uses only public sources, publicly available software, and personal resources. It does not contain confidential information, client data, internal materials, or non-public employer know-how.
+This site contains personal and independent mathematical, statistical, and software notes. They are written outside working time, using personal resources, and are not prepared at the request of, under the supervision of, or according to the instructions of any employer or client.
+
+The notes rely only on public mathematical literature, public software, public documentation where cited, and synthetic or schematic examples. They do not use, describe, reproduce, adapt, or disclose any employer or client work product, internal method, API, source code, dataset, benchmark, architecture, calibration procedure, validation result, business requirement, or confidential know-how.
+
+Any connection with industrial, financial, or applied settings is purely at the level of general public mathematics, standard scientific computing, and publicly available references.

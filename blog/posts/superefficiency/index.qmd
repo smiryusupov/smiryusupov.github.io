@@ -88,7 +88,7 @@ The slogan is:
 
 Classical statistics often treats unbiasedness as a cleanliness condition. James--Stein shows why that is too narrow: under squared-error loss, the relevant object is risk, and risk contains both bias and variance.
 
-The lesson is not that bias is good. The lesson is that a small, structured bias can be cheaper than a large variance.
+Bias helps here only because it buys a larger reduction in variance.
 
 The note has five parts. Part I gives the fixed-shrinkage warm-up. Part II states the James--Stein phenomenon. Part III explains the geometry. Part IV gives a small machine-learning analogue. Part V discusses super-efficiency at the shrinkage target.
 
@@ -758,7 +758,7 @@ The price is bias. The reward is a larger reduction in variance.
 
 The geometric reason is that high-dimensional noise has length. The usual estimator treats the whole observed vector as signal. Shrinkage refuses to do that.
 
-So the lesson is not that bias is good by itself. The lesson is that bias can be a tool.
+Bias is useful only when it is doing identifiable work: moving an estimator away from a region where variance, boundary behavior, or unsupported directions dominate.
 
 * In Firth's adjustment, bias keeps likelihood away from the boundary.
 * In James--Stein estimation, bias removes part of the length created by noise.

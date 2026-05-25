@@ -35,7 +35,7 @@ execute:
 
 **Scope.** Standard Gaussian/projection facts with small visual diagnostics.
 
-A recurring trap in high-dimensional exploratory data analysis is that a dataset can have strong geometric structure in the ambient space and still look ordinary in a low-dimensional plot.
+A high-dimensional cloud can have strong ambient geometry and still look ordinary in a low-dimensional plot.
 
 Two examples expose the failure mode.
 

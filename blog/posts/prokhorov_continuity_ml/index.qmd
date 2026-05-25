@@ -735,6 +735,6 @@ K. De Brabanter and J. Vandewalle. “Robustness by Reweighting for Kernel Estim
   title        = {Prokhorov Continuity and Machine-Learning Robustness},
   year         = {2026},
   howpublished = {Research note},
-  url          = {https://www.miryusupov.com/blog/posts/prokhorov_continuity_robustness/index.html}
+  url          = {https://www.miryusupov.com/blog/posts/prokhorov_continuity_ml/index.html}
 }
 ```

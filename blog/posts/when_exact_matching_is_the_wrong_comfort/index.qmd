@@ -509,35 +509,13 @@ The lesson is not that empirical OT is useless. The claim is smaller:
 
 ## Takeaway
 
-LSAP is not the problem. The interpretation is the problem.
+The assignment certifies an exact coupling of two empirical measures. It does not, without an extension rule and sampling assumptions, certify a population transport map.
 
-The correct statement is:
+The gap has three sources. First, the assignment is defined only on the observed source atoms; for a continuous source distribution, this set has population measure zero. Second, rare target regions may be absent from the empirical target sample, so exact matching can still miss them entirely. Third, empirical OT is an estimator: exact finite optimization does not remove sampling error.
 
-> LSAP solves finite empirical discrete OT between equal-weight point clouds.
+Thus the relevant question is not whether LSAP solved the finite assignment problem. It did. The question is whether the empirical coupling contains enough information to support the population transport claim being made.
 
-The stronger statement is not automatic:
-
-> LSAP alone learns a population OT map or a generative transport rule.
-
-The gap appears in three places.
-
-First, the assignment is defined only on the observed source atoms. For a continuous source distribution, that set has population measure zero.
-
-Second, rare target regions can be absent from the empirical target sample with non-negligible probability. On that event, the empirical assignment is exact but contains no target atom in the rare region.
-
-Third, empirical OT is an estimator. Exact finite optimization does not remove sampling error.
-
-So the practical question is not:
-
-> Did LSAP solve the assignment problem?
-
-It did.
-
-The practical question is:
-
-> Does the empirical assignment contain enough information to support the population transport claim being made?
-
-When the answer is no, exact matching is the wrong comfort.
+When it does not, exact matching is the wrong comfort.
 
 ## Technical appendix
 
@@ -545,9 +523,7 @@ When the answer is no, exact matching is the wrong comfort.
 
 The linear assignment problem is classical. Kuhn's Hungarian method is the canonical reference point. Munkres gave a standard polynomial-time treatment of assignment and transportation algorithms. Later exact methods include shortest augmenting path and Jonker--Volgenant-type algorithms. Bertsekas' auction algorithm is another important family.
 
-This note is not a comparison of solvers. It is not a critique of the Hungarian algorithm, Jonker--Volgenant methods, auction algorithms, or exact assignment algorithms in general.
-
-The point is simpler:
+The solver literature is not the target here. Hungarian, Jonker–Volgenant, auction, and related methods solve their finite problems exactly. The issue begins after that: an exactly solved sampled problem can still omit the part of the population one cares about.
 
 $$
 \text{solver exactness}
@@ -747,6 +723,6 @@ Cédric Villani. *Optimal Transport: Old and New*. Springer, 2009.
   title        = {When exact matching is the wrong comfort},
   year         = {2026},
   howpublished = {Research note},
-  url          = {https://www.miryusupov.com/blog/posts/lsap-exact-matching-wrong-comfort/}
+  url = {https://www.miryusupov.com/blog/posts/when_exact_matching_is_the_wrong_comfort/index.html}
 }
 ```

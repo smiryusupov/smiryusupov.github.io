@@ -114,19 +114,7 @@ $$
 |f(x)-s_X f(x)| \leq P_X(x)\,\|f\|_{\mathcal H}.
 $$
 
-This is a useful theorem. But the theorem is not the applied statement that $P_X(x)$ is an error bar.
-
-A better separation is
-
-$$
-P_X(x) = \text{design geometry under the kernel},
-$$
-
-while
-
-$$
-\|f\|_{\mathcal H} = \text{unknown target complexity under the kernel}.
-$$
+The theorem separates two quantities that are often conflated in applications. The power function is the design-dependent geometric term. The RKHS norm is the target-dependent scale term, and it is usually the unknown part.
 
 The second term is usually where the statistical difficulty lives.
 
@@ -353,7 +341,7 @@ plt.show()
 
 For compatible smooth targets, the scale can remain moderate. For rough, oscillatory, or discontinuous targets, the native-space cost can become very large.
 
-The point is not that the theorem fails. The point is that the theorem asks for a target-complexity constant that the machine-learning problem usually does not provide.
+The theorem remains correct; the difficulty is that its scale is controlled by a target-complexity constant that the learning problem usually does not supply.
 
 ```{python}
 #| label: tbl-norm-proxy

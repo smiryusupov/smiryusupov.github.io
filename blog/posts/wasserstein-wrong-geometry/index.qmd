@@ -62,7 +62,7 @@ We use three diagnostics.
 - Fisher--Rao geometry gives a contrasting scale-relative notion of distance.
 - A scaled Wasserstein ground cost can recover scale-relative behavior, but only after the geometry is changed.
 
-The point is not that Wasserstein distance is wrong. The point is that Wasserstein distance answers a geometric question, and the geometry is part of the model.
+Wasserstein distance answers the question posed by its ground geometry. Change the geometry, and the loss changes its meaning.
 
 ```{python}
 #| label: setup
@@ -430,11 +430,7 @@ So Wasserstein distance does see predictive spread in this setting. But it sees 
 
 The practical question is therefore:
 
-> does the Wasserstein loss measure the kind of error the task cares about?
-
-Sometimes the answer is yes. If moving mass by one meter, one dollar, or one pixel has the same meaning regardless of predictive uncertainty, then absolute transport cost is natural.
-
-Sometimes the answer is no. If the task cares about errors relative to predictive uncertainty, then raw Wasserstein loss may have the wrong scale.
+For some tasks, absolute displacement is the right unit: one meter, one dollar, or one pixel may have the same cost regardless of predictive uncertainty. For other tasks, the relevant error is relative to the distribution’s scale. In those cases, raw Wasserstein loss can measure the wrong discrepancy.
 
 ## Unscaled data
 
@@ -511,9 +507,7 @@ If the answer is no, the raw ground geometry may not be the right geometry.
 
 ## Takeaway
 
-Wasserstein distance is not the problem.
-
-The interpretation is the problem.
+The ambiguity is interpretive: the numerical value of a Wasserstein loss inherits the ground geometry chosen for the sample space.
 
 The correct statement is:
 

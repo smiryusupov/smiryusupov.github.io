@@ -233,15 +233,7 @@ k_X(x)=(k(x,x_1),\ldots,k(x,x_n))^\top.
 <p><span class="math display">
 |f(x)-s_X f(x)| \leq P_X(x)\,\|f\|_{\mathcal H}.
 </span></p>
-<p>This is a useful theorem. But the theorem is not the applied statement that <span class="math inline">P_X(x)</span> is an error bar.</p>
-<p>A better separation is</p>
-<p><span class="math display">
-P_X(x) = \text{design geometry under the kernel},
-</span></p>
-<p>while</p>
-<p><span class="math display">
-\|f\|_{\mathcal H} = \text{unknown target complexity under the kernel}.
-</span></p>
+<p>The theorem separates two quantities that are often conflated in applications. The power function is the design-dependent geometric term. The RKHS norm is the target-dependent scale term, and it is usually the unknown part.</p>
 <p>The second term is usually where the statistical difficulty lives.</p>
 <h2 id="setup">Setup</h2>
 <p>The examples use a one-dimensional Gaussian kernel. This is only for visualization. The point is not specific to this implementation. The small Cholesky jitter used below is numerical stabilization; it should not be interpreted as a statistical ridge penalty.</p>
@@ -355,7 +347,7 @@ Figure&nbsp;2: Finite-dimensional native-space norm proxy as the grid is refined
 </div>
 </div>
 <p>For compatible smooth targets, the scale can remain moderate. For rough, oscillatory, or discontinuous targets, the native-space cost can become very large.</p>
-<p>The point is not that the theorem fails. The point is that the theorem asks for a target-complexity constant that the machine-learning problem usually does not provide.</p>
+<p>The theorem remains correct; the difficulty is that its scale is controlled by a target-complexity constant that the learning problem usually does not supply.</p>
 <div class="cell" data-execution_count="5">
 <div id="tbl-norm-proxy" class="cell quarto-float quarto-figure quarto-figure-center" data-execution_count="5">
 <figure class="quarto-float quarto-float-tbl">

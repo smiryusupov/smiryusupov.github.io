@@ -211,7 +211,7 @@ d.
 <p>In high dimension, noise has length. The estimator <span class="math inline">X</span> treats all of that length as signal. Shrinkage deliberately gives up unbiasedness to remove part of the noise length.</p>
 </blockquote>
 <p>Classical statistics often treats unbiasedness as a cleanliness condition. James–Stein shows why that is too narrow: under squared-error loss, the relevant object is risk, and risk contains both bias and variance.</p>
-<p>The lesson is not that bias is good. The lesson is that a small, structured bias can be cheaper than a large variance.</p>
+<p>Bias helps here only because it buys a larger reduction in variance.</p>
 <p>The note has five parts. Part I gives the fixed-shrinkage warm-up. Part II states the James–Stein phenomenon. Part III explains the geometry. Part IV gives a small machine-learning analogue. Part V discusses super-efficiency at the shrinkage target.</p>
 <h2 id="part-i-fixed-shrinkage">Part I: Fixed shrinkage</h2>
 <p>Before James–Stein, consider the simpler rule</p>
@@ -517,7 +517,7 @@ d\varepsilon^2
 <p>In the normal-means problem, (X) is unbiased and has constant risk (d). But for (d), James–Stein shrinkage improves on it uniformly under total squared-error loss.</p>
 <p>The price is bias. The reward is a larger reduction in variance.</p>
 <p>The geometric reason is that high-dimensional noise has length. The usual estimator treats the whole observed vector as signal. Shrinkage refuses to do that.</p>
-<p>So the lesson is not that bias is good by itself. The lesson is that bias can be a tool.</p>
+<p>Bias is useful only when it is doing identifiable work: moving an estimator away from a region where variance, boundary behavior, or unsupported directions dominate.</p>
 <ul>
 <li>In Firth’s adjustment, bias keeps likelihood away from the boundary.</li>
 <li>In James–Stein estimation, bias removes part of the length created by noise.</li>

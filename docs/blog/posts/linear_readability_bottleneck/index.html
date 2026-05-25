@@ -195,15 +195,8 @@ x \longmapsto z=\phi(x)\in\mathbb R^d
 <blockquote>
 <p>adding a nonlinear head improves accuracy.</p>
 </blockquote>
-<p>That sentence is not false, but it hides the more important geometric question:</p>
-<blockquote>
-<p>Did the backbone already make the labels linearly readable?</p>
-</blockquote>
-<p>If the answer is yes, then the nonlinear head has little left to do. It may still win a leaderboard by a few examples. It may regularize differently. It may change the tie-breaking on borderline points. But it is no longer solving the main representation problem. The backbone has already done that.</p>
-<p>The point of this note is not that nonlinear heads are useless. The point is narrower:</p>
-<blockquote>
-<p>nonlinear heads diagnose what geometry the frozen representation left behind.</p>
-</blockquote>
+<p>The useful comparison is not simply linear versus nonlinear. Once the backbone has made the labels almost linearly readable, a nonlinear head is working in the residual geometry: boundary cases, ambiguous digits, and small regularization differences.</p>
+<p>I use the nonlinear heads as probes of what the frozen representation has not already made linear.</p>
 <p>In the final checkpoint below, nonlinear heads do beat logistic regression. But they do not stably beat the best linear head. That difference is the point of the note.</p>
 <p>If a nonlinear head gives a large and stable gain over the best linear head, the representation still contains useful nonlinear label geometry. If the gain is small, unstable, and concentrated near the remaining boundary errors, then the main bottleneck is no longer the head. It is the linear readability of the representation.</p>
 <h2 id="the-fixed-representation-question">The fixed-representation question</h2>
@@ -440,7 +433,7 @@ C(x)=\{y:r_y(x)\le \widehat q\}.
 \text{singleton rate}=1.0,
 </span></p>
 <p>and coverage around <span class="math inline">0.988</span> on the conformal evaluation split.</p>
-<p>This is not evidence that the heads are perfectly calibrated. It says something simpler and more geometric: by the final checkpoint, top-1 prediction is already conservative relative to a 90% coverage target. Conformal uncertainty has collapsed to singleton sets.</p>
+<p>This should not be read as calibration evidence. At this checkpoint, the top-ranked class is already enough for a 90% conformal target, so the conformal sets collapse to singletons.</p>
 <div class="narrow-figure">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -488,7 +481,7 @@ C(x)=\{y:r_y(x)\le \widehat q\}.
 </span></p>
 <h2 id="reproducibility-notes">Reproducibility notes</h2>
 <p>The run used saved checkpoints and posthoc frozen-feature evaluation. For the blog version, the post directory is organized as</p>
-<pre class="text"><code>blog/posts/linear_separability_bottleneck/
+<pre class="text"><code>blog/posts/linear_readability_bottleneck/
   index.qmd
   figures/
     geometry_diagnostics.png
@@ -501,7 +494,7 @@ C(x)=\{y:r_y(x)\le \widehat q\}.
     conformal_coverage_by_epoch.png
   data/
     head_results.csv
-    separability_metrics.csv
+    readability_metrics.csv
     conformal_results.csv
     conformal_examples.csv
     pca_points.csv

@@ -536,7 +536,7 @@ This gives a useful picture of a common retrieval failure. The generation model 
 
 The oracle one-dimensional kNN in the toy experiment corresponds to a better retrieval metric: one that ignores nuisance variation and emphasizes the feature that matters for the question. In practical RAG systems, the analogues are better chunking, metadata filters, query rewriting, hybrid lexical--dense retrieval, domain-specific embeddings, and rerankers.
 
-The claim is not that dense embeddings are bad because they are high-dimensional. Learned embeddings are useful precisely because they try to organize semantic structure. The narrower lesson is that retrieval quality depends on alignment between the representation, the similarity measure, and the user's query.
+Dense embeddings are not the villain here. They are useful precisely because they organize semantic structure. Retrieval fails when the geometry they impose is misaligned with the feature needed by the query.
 
 This is the retrieval version of the same relevance gap. The correct passage may exist in the corpus, but the metric may rank nearby passages according to the wrong kind of similarity. The retrieved chunks are close in embedding space, but not relevant in the sense needed by the query.
 
@@ -547,11 +547,7 @@ Nearest-neighbor methods fail when closeness stops meaning relevance.
 
 In the Gaussian toy model, independent nuisance coordinates corrupt Euclidean distance. In one-hot tabular data, the relevant quantity is not raw ambient dimension but the effective geometry induced by fields, scaling, and mismatch variance. In retrieval systems, the same failure appears when top-ranked chunks are plausible but not answer-bearing.
 
-The practical question is the same in all three settings:
-
-> Does the retrieval geometry make the right objects close?
-
-More precisely: does closeness track relevance? When those two notions separate, a relevance gap opens. The local neighborhood may look plausible, but it is no longer the right neighborhood for the task.
+Across the Gaussian toy model, one-hot tabular data, and retrieval, the same failure appears: closeness stops tracking relevance. Once that happens, the local neighborhood may look plausible while becoming useless for the task.
 
 If the answer is no, increasing the sophistication of the downstream model may not fix the problem. The error has already entered through the retrieved neighborhood.
 

@@ -227,7 +227,7 @@ $$
 \gamma\widetilde\sigma_{\mathrm{global}}.
 $$
 
-Here $\gamma=0$ is fully local geometry, while $\gamma=1$ is mostly global residual geometry. The practical question is not whether local geometry is elegant. It is how much local geometry we can trust.
+Here $\gamma=0$ keeps the score fully local, while $\gamma=1$ moves it back toward a global residual scale. The tuning parameter is a trust parameter: how much estimated local geometry should be allowed into the score?
 
 ## Part IV: The experiment
 
@@ -353,11 +353,7 @@ Conformal calibration and score geometry do different jobs.
 
 Calibration supplies marginal validity. The score determines which candidate labels look plausible, and therefore determines the shape and efficiency of the prediction set.
 
-The practical question is:
-
-> does the score geometry match the conditional law of $Y\mid X$?
-
-When the answer is yes, conformal sets can be much smaller. When the answer is no, coverage can remain valid while efficiency degrades.
+Efficiency depends on whether the score ranks candidate labels according to the actual conditional structure of $Y$ given $X$. A well-matched score can shorten the conformal set; a poorly matched one can preserve coverage while wasting volume.
 
 A simple taxonomy is:
 
@@ -427,9 +423,9 @@ $$
 
 This is the classification analogue of local metric scores in regression. The network supplies the geometry. Conformal calibration supplies the validity.
 
-### Why this is not a validity theorem
+### What is, and is not, proved here
 
-All validity statements here are ordinary split conformal validity statements. The new part is empirical and conceptual: different score geometries induce different set shapes and efficiencies.
+The coverage statements used above are the standard split-conformal ones. The new part is empirical and conceptual: different score geometries induce different set shapes and efficiencies.
 
 A formal theorem would need to control excess set size, for example
 
@@ -497,6 +493,6 @@ Shun-ichi Amari. *Information Geometry and Its Applications*. Springer, 2016.
   title        = {Conformal Scores and the Geometry of Efficiency},
   year         = {2026},
   howpublished = {Research note},
-  url          = {https://www.miryusupov.com/blog/posts/conformal-scores-geometry-efficiency/}
+  url = {https://www.miryusupov.com/blog/posts/geometry_conformal_scores/index.html}
 }
 ```

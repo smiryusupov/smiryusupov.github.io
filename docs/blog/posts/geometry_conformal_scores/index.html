@@ -161,7 +161,7 @@ window.Quarto = {
   <li><a href="#why-monotone-score-transforms-did-not-matter" id="toc-why-monotone-score-transforms-did-not-matter">Why monotone score transforms did not matter</a></li>
   <li><a href="#what-density-set-length-means" id="toc-what-density-set-length-means">What density-set length means</a></li>
   <li><a href="#a-classification-analogue" id="toc-a-classification-analogue">A classification analogue</a></li>
-  <li><a href="#why-this-is-not-a-validity-theorem" id="toc-why-this-is-not-a-validity-theorem">Why this is not a validity theorem</a></li>
+  <li><a href="#what-is-and-is-not-proved-here" id="toc-what-is-and-is-not-proved-here">What is, and is not, proved here</a></li>
   <li><a href="#reproducing-the-benchmark" id="toc-reproducing-the-benchmark">Reproducing the benchmark</a></li>
   </ul></li>
   <li><a href="#references" id="toc-references">References</a></li>
@@ -321,7 +321,7 @@ C_\alpha(x)=\{y:\widehat p(y\mid x)\ge e^{-\widehat q}\},
 +
 \gamma\widetilde\sigma_{\mathrm{global}}.
 </span></p>
-<p>Here <span class="math inline">\gamma=0</span> is fully local geometry, while <span class="math inline">\gamma=1</span> is mostly global residual geometry. The practical question is not whether local geometry is elegant. It is how much local geometry we can trust.</p>
+<p>Here <span class="math inline">\gamma=0</span> keeps the score fully local, while <span class="math inline">\gamma=1</span> moves it back toward a global residual scale. The tuning parameter is a trust parameter: how much estimated local geometry should be allowed into the score?</p>
 <h2 id="part-iv-the-experiment" class="anchored">Part IV: The experiment</h2>
 <p>I use synthetic regression data with mean</p>
 <p><span class="math display">
@@ -551,11 +551,7 @@ S(x,y)=-\log \widehat p(y\mid x).
 <h2 id="takeaway" class="anchored">Takeaway</h2>
 <p>Conformal calibration and score geometry do different jobs.</p>
 <p>Calibration supplies marginal validity. The score determines which candidate labels look plausible, and therefore determines the shape and efficiency of the prediction set.</p>
-<p>The practical question is:</p>
-<blockquote>
-<p>does the score geometry match the conditional law of <span class="math inline">Y\mid X</span>?</p>
-</blockquote>
-<p>When the answer is yes, conformal sets can be much smaller. When the answer is no, coverage can remain valid while efficiency degrades.</p>
+<p>Efficiency depends on whether the score ranks candidate labels according to the actual conditional structure of <span class="math inline">Y</span> given <span class="math inline">X</span>. A well-matched score can shorten the conformal set; a poorly matched one can preserve coverage while wasting volume.</p>
 <p>A simple taxonomy is:</p>
 <p><span class="math display">
 \boxed{\text{flat noise} \Rightarrow \text{residual score}}
@@ -601,8 +597,8 @@ S(x,y)
 (\phi_\theta(x)-m_y).
 </span></p>
 <p>This is the classification analogue of local metric scores in regression. The network supplies the geometry. Conformal calibration supplies the validity.</p>
-<h3 id="why-this-is-not-a-validity-theorem" class="anchored">Why this is not a validity theorem</h3>
-<p>All validity statements here are ordinary split conformal validity statements. The new part is empirical and conceptual: different score geometries induce different set shapes and efficiencies.</p>
+<h3 id="what-is-and-is-not-proved-here" class="anchored">What is, and is not, proved here</h3>
+<p>The coverage statements used above are the standard split-conformal ones. The new part is empirical and conceptual: different score geometries induce different set shapes and efficiencies.</p>
 <p>A formal theorem would need to control excess set size, for example</p>
 <p><span class="math display">
 \mathbb E|C_\alpha(X)|-\mathbb E|C_\alpha^*(X)|,
@@ -650,7 +646,7 @@ S(x,y)
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">title</span>        = {Conformal Scores and the Geometry of Efficiency},</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">year</span>         = {2026},</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">howpublished</span> = {Research note},</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">url</span>          = {https://www.miryusupov.com/blog/posts/conformal-scores-geometry-efficiency/}</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">url</span> = {https://www.miryusupov.com/blog/posts/geometry_conformal_scores/index.html}</span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 
 

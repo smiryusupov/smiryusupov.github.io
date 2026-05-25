@@ -1,4 +1,4 @@
-# Linear separability vs nonlinear heads: run summary
+# Linear readability vs nonlinear heads: run summary
 - Linear probe accuracy moved from **0.6527** at epoch 0 to **0.9865** at epoch 20.
 - Best nonlinear gain moved from **-0.0172** at epoch 0 to **+0.0016** at epoch 20.
 - Spearman correlation between linear accuracy and best nonlinear gain: **0.200**. Negative values support the bottleneck story.

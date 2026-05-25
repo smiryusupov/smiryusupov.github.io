@@ -71,11 +71,7 @@ $$
 
 This is the right object to study if the question is information geometry rather than merely curvature. A Hessian-preconditioned method may be useful, but it is not natural gradient unless the Fisher metric is actually computed or approximated.
 
-The point of this note is narrow:
-
-> A correct local Fisher metric does not guarantee selection of the globally desirable basin in a multimodal non-convex likelihood.
-
-This is not an argument that natural gradient or K-FAC is bad. It is an argument about what local geometry can and cannot promise. Fisher information gives a local geometry on a statistical model. It is not, by itself, a global map of the validation landscape.
+The note studies a failure mode of a local metric in a global problem. Even when the Fisher matrix is the correct infinitesimal geometry of the statistical model, it need not guide the trajectory toward the validation basin one would choose after seeing the whole landscape.
 
 ## Part I: The information-geometric view
 
@@ -218,7 +214,7 @@ This split matters. Without positive controls, the experiment would only say tha
 
 The endpoint labels are defined on the validation landscape. A run is counted as successful only if its final point lands in the good validation basin: the basin containing the best validation grid point. Endpoints that converge to other stable regions, or to stationary regions outside the good basin, are not counted as successes.
 
-This is an empirical basin classification, not a theorem. It is deliberately stricter than reporting final training loss. The question is not whether the optimizer made progress. The question is whether it selected the basin we wanted.
+This empirical basin label is stricter than final training loss. A run may reduce the objective and still settle in the wrong region of the validation landscape.
 
 ## Part III: Success rates by regime
 
@@ -329,17 +325,9 @@ So the lesson from the two-dimensional experiment transfers only at this level o
 
 ## Takeaway
 
-This experiment is not a no-free-lunch theorem. It is not a claim that AdamW is generally better than natural gradient, and it is not a claim that K-FAC is only useful in easy cases.
+The experiment supports a narrower conclusion. Natural gradient and K-FAC are local metric methods: they can use the correct Fisher geometry and still remain agnostic about which distant basin is preferable.
 
-The claim is smaller:
-
-> Natural gradient and K-FAC are local metric-based methods. The Fisher metric may be the correct local geometry and still be globally uninformative about which basin is desirable.
-
-This is why endpoint classification matters. A low loss, a short Fisher step, or a locally natural direction is not the same thing as reaching the basin one wanted. In non-convex problems, the optimizer is not only solving a local quadratic problem. It is generating a trajectory.
-
-The practical question is therefore:
-
-> The practical question is not only whether the metric is locally correct. It is whether the induced trajectory enters the basin that matters for the task.
+Local correctness is only one part of the story. In a non-convex problem, the induced trajectory also has to reach the basin that matters for the task.
 
 When the answer is yes, Fisher methods can be excellent. When the answer is no, there is no general reason to expect them to dominate AdamW.
 

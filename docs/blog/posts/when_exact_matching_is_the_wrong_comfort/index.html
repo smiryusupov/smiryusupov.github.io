@@ -441,34 +441,14 @@ Figure&nbsp;3: Empirical LSAP displacement compared with the known population OT
 <p>empirical OT is an estimator; exact optimization does not remove sampling error.</p>
 </blockquote>
 <h2 id="takeaway" class="anchored">Takeaway</h2>
-<p>LSAP is not the problem. The interpretation is the problem.</p>
-<p>The correct statement is:</p>
-<blockquote>
-<p>LSAP solves finite empirical discrete OT between equal-weight point clouds.</p>
-</blockquote>
-<p>The stronger statement is not automatic:</p>
-<blockquote>
-<p>LSAP alone learns a population OT map or a generative transport rule.</p>
-</blockquote>
-<p>The gap appears in three places.</p>
-<p>First, the assignment is defined only on the observed source atoms. For a continuous source distribution, that set has population measure zero.</p>
-<p>Second, rare target regions can be absent from the empirical target sample with non-negligible probability. On that event, the empirical assignment is exact but contains no target atom in the rare region.</p>
-<p>Third, empirical OT is an estimator. Exact finite optimization does not remove sampling error.</p>
-<p>So the practical question is not:</p>
-<blockquote>
-<p>Did LSAP solve the assignment problem?</p>
-</blockquote>
-<p>It did.</p>
-<p>The practical question is:</p>
-<blockquote>
-<p>Does the empirical assignment contain enough information to support the population transport claim being made?</p>
-</blockquote>
-<p>When the answer is no, exact matching is the wrong comfort.</p>
+<p>The assignment certifies an exact coupling of two empirical measures. It does not, without an extension rule and sampling assumptions, certify a population transport map.</p>
+<p>The gap has three sources. First, the assignment is defined only on the observed source atoms; for a continuous source distribution, this set has population measure zero. Second, rare target regions may be absent from the empirical target sample, so exact matching can still miss them entirely. Third, empirical OT is an estimator: exact finite optimization does not remove sampling error.</p>
+<p>Thus the relevant question is not whether LSAP solved the finite assignment problem. It did. The question is whether the empirical coupling contains enough information to support the population transport claim being made.</p>
+<p>When it does not, exact matching is the wrong comfort.</p>
 <h2 id="technical-appendix" class="anchored">Technical appendix</h2>
 <h3 id="solver-exactness-is-not-population-validity" class="anchored">Solver exactness is not population validity</h3>
 <p>The linear assignment problem is classical. Kuhn’s Hungarian method is the canonical reference point. Munkres gave a standard polynomial-time treatment of assignment and transportation algorithms. Later exact methods include shortest augmenting path and Jonker–Volgenant-type algorithms. Bertsekas’ auction algorithm is another important family.</p>
-<p>This note is not a comparison of solvers. It is not a critique of the Hungarian algorithm, Jonker–Volgenant methods, auction algorithms, or exact assignment algorithms in general.</p>
-<p>The point is simpler:</p>
+<p>The solver literature is not the target here. Hungarian, Jonker–Volgenant, auction, and related methods solve their finite problems exactly. The issue begins after that: an exactly solved sampled problem can still omit the part of the population one cares about.</p>
 <p><span class="math display">
 \text{solver exactness}
 \quad\ne\quad
@@ -605,7 +585,7 @@ a_i\ge 0,\qquad b_j\ge 0,\qquad
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">title</span>        = {When exact matching is the wrong comfort},</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">year</span>         = {2026},</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">howpublished</span> = {Research note},</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">url</span>          = {https://www.miryusupov.com/blog/posts/lsap-exact-matching-wrong-comfort/}</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">url</span> = {https://www.miryusupov.com/blog/posts/when_exact_matching_is_the_wrong_comfort/index.html}</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 
 
