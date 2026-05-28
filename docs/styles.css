@@ -114,15 +114,31 @@ body > header {
   padding: 2.75rem 2rem 5rem;
 }
 
-/* About page: put title, epigraph, and body text on same column */
+/* About page: put title and body text on same column */
 body.about-page #title-block-header,
-body.about-page .epigraph,
-body.about-page main.content > p {
+body.about-page > p,
+body.about-page > h2 {
   max-width: var(--reading) !important;
   margin-left: auto !important;
   margin-right: auto !important;
   padding-left: 0 !important;
   padding-right: 0 !important;
+}
+
+/* Move the Greek quote slightly to the right */
+body.about-page .epigraph {
+  max-width: var(--reading) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  transform: translateX(1.25rem);
+}
+
+@media (max-width: 700px) {
+  body.about-page .epigraph {
+    transform: none;
+  }
 }
 
 /* Writings page: keep Quarto content wide, but center title/listing column */

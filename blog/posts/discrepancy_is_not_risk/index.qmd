@@ -1,0 +1,809 @@
+---
+title: "Discrepancy is not risk"
+date: 2026-05-28
+description: "A note on why MMD and other distribution discrepancies are not, by themselves, classifier-risk statements."
+categories: [notes, machine-learning, statistics, robustness]
+jupyter: python3
+execute:
+  echo: false
+  warning: false
+  message: false
+  freeze: auto
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-depth: 2
+    anchor-sections: false
+    smooth-scroll: false
+---
+
+A distribution discrepancy answers one question. A classifier risk answers another.
+
+This distinction is easy to lose because the same words keep appearing: distance, separation, alignment, mismatch. MMD, Wasserstein distance, Euclidean distance, Mahalanobis distance, and learned embedding distances all sound as if they measure whether two classes or two domains are easy to tell apart.
+
+Sometimes they do. Often they do not.
+
+A two-sample discrepancy compresses a comparison into one number,
+
+$$
+D(P,Q).
+$$
+
+If this number is large, the distributions are far apart in the chosen geometry. If it is small, they are close in that geometry. That is the right answer when the question is a two-sample question.
+
+Classification asks for something more specific. A new observation $z$ comes from one of two populations, say $\pi_1$ or $\pi_2$, and a particular rule $\widehat g$ will be used. The relevant quantity is not just whether $\pi_1\ne\pi_2$. It is the error of that rule:
+
+$$
+P\{\widehat g(z)=2\mid z\in\pi_1\}.
+$$
+
+That is a different object. A discrepancy compares distributions. A risk evaluates a decision rule.
+
+The examples below are deliberately small. They are not arguments against MMD, or in favor of T-rules or D-rules. They isolate places where the objects separate.
+
+```{python}
+#| label: setup
+#| include: false
+
+import math
+import numpy as np
+import pandas as pd
+
+
+def Phi(x: float) -> float:
+    """Standard normal CDF using only the Python standard library."""
+    return 0.5 * (1 + math.erf(x / math.sqrt(2)))
+
+
+def fmt(x: float, digits: int = 4) -> str:
+    """Pretty formatting for small numerical tables."""
+    if x == 0:
+        return "0"
+    if abs(x) < 1e-5:
+        return f"{x:.2e}"
+    return f"{x:.{digits}f}"
+
+
+def escape_md(x) -> str:
+    """Escape cell text for simple markdown table output."""
+    return str(x).replace("|", r"\|")
+
+
+def markdown_table(rows, columns=None) -> str:
+    """Make a small markdown table without depending on tabulate."""
+    if isinstance(rows, pd.DataFrame):
+        df = rows.copy()
+    else:
+        df = pd.DataFrame(rows)
+
+    if columns is not None:
+        df = df[columns]
+
+    header = list(df.columns)
+    lines = []
+    lines.append("| " + " | ".join(escape_md(c) for c in header) + " |")
+    lines.append("|" + "|".join("---" for _ in header) + "|")
+
+    for _, row in df.iterrows():
+        lines.append("| " + " | ".join(escape_md(row[c]) for c in header) + " |")
+
+    return "\n".join(lines)
+```
+
+## Three objects, three questions
+
+Let
+
+$$
+X_1,\ldots,X_{n_1}\sim \pi_1,
+\qquad
+Y_1,\ldots,Y_{n_2}\sim \pi_2,
+$$
+
+with means $\mu_1,\mu_2$ and, in the classical setup, common covariance $\Sigma$. A new observation $z$ must be assigned to one of the two populations.
+
+The T-rule compares corrected Euclidean distances to the two sample centers:
+
+$$
+\alpha_1\|z-\bar X\|^2
+\quad\text{and}\quad
+\alpha_2\|z-\bar Y\|^2,
+\qquad
+\alpha_i=\frac{n_i}{n_i+1}.
+$$
+
+For a true $\pi_1$ observation, its false assignment probability is
+
+$$
+P_T(2\mid 1)
+=
+P\left\{
+\alpha_1\|z-\bar X\|^2-
+\alpha_2\|z-\bar Y\|^2>0
+\mid z\in\pi_1
+\right\}.
+$$
+
+The D-rule uses covariance-scaled geometry instead. In the population version, the relevant mean separation is
+
+$$
+\Delta^2=(\mu_1-\mu_2)^\top\Sigma^{-1}(\mu_1-\mu_2).
+$$
+
+MMD asks a different question. For a reproducing-kernel Hilbert space $\mathcal H$ with kernel $k$,
+
+$$
+\operatorname{MMD}(P,Q)
+=
+\sup_{\|f\|_{\mathcal H}\le 1}
+\left|E_P f(X)-E_Q f(Y)\right|.
+$$
+
+So the table is not a list of interchangeable distances. It is a list of different questions.
+
+| object | question |
+|---|---|
+| T-rule | What is the error of a Euclidean center rule? |
+| D-rule | What is the error of a covariance-scaled center rule? |
+| MMD | Are two distributions different in the chosen RKHS geometry? |
+
+The rest of the note is about what goes wrong when one answer is read as another.
+
+## Why T and D are useful reference points
+
+T-type and D-type rules are useful here because they make a basic high-dimensional tension visible.
+
+In low dimension, the natural instinct is
+
+$$
+\text{estimate covariance}
+\rightarrow
+\text{invert it}
+\rightarrow
+\text{use Mahalanobis geometry}.
+$$
+
+That is the D philosophy. It can be very good when the covariance estimate is reliable, because it uses scale and correlation structure.
+
+In high dimension, the covariance matrix is itself a noisy object. When $p/n$ is not small, its eigenvalues no longer behave like classical fixed-$p$ quantities. If $p>n$, the sample covariance is singular. Even when $p<n$, inversion can amplify spectral noise.
+
+The T philosophy avoids covariance inversion. It uses Euclidean or trace information instead of the full inverse covariance. This sacrifices affine invariance, but it can be stable when the D philosophy is fragile.
+
+| regime | D-type / Mahalanobis logic | T-type / trace logic |
+|---|---|---|
+| $p$ small, $n$ large | often excellent | may ignore useful covariance structure |
+| $p/n$ non-negligible | affected by random-matrix noise | often more stable |
+| $p>n$ | needs regularization or becomes undefined | still directly defined |
+| signal in low-variance correlated direction | can be much better | can miss the right geometry |
+| covariance estimate unreliable | can overfit badly | may be safer |
+
+This is the statistical version of a practical ML question:
+
+> Should I trust the learned geometry, or use a cruder but stabler one?
+
+A deep embedding may have dimension 768, 2048, or larger, while the labeled sample per class is modest. A full covariance-based rule can be fragile. A Euclidean prototype rule can be biased but stable. A kernel discrepancy such as MMD can be meaningful as a distribution test while still saying little about the finite-sample risk of the classifier that will actually be deployed.
+
+The operative question is
+
+$$
+\text{What is the distribution of the decision statistic, and what error does it imply?}
+$$
+
+More plainly: what error does the actual rule make?
+
+In the first few diagnostics I use population, known-parameter analogues of the T/D rules. That removes estimation noise, so the distinction between discrepancy and decision risk is not hidden by finite-sample terms.
+
+## Diagnostic 1: the same linear MMD can mean different errors
+
+Start with the one-dimensional Gaussian pair
+
+$$
+\pi_1=N(0,\sigma^2),
+\qquad
+\pi_2=N(1,\sigma^2).
+$$
+
+With the linear kernel
+
+$$
+k(x,y)=xy,
+$$
+
+MMD reduces to squared mean difference:
+
+$$
+\operatorname{MMD}^2(\pi_1,\pi_2)=|0-1|^2=1.
+$$
+
+So the discrepancy is identical for every $\sigma$.
+
+The classification error is not. With known means and common variance, the T-rule and D-rule have the same one-dimensional boundary,
+
+$$
+z=\frac12.
+$$
+
+Therefore
+
+$$
+P\{\widehat g(z)=2\mid z\in\pi_1\}
+=
+P\{Z>1/2\},
+\qquad
+Z\sim N(0,\sigma^2),
+$$
+
+and hence
+
+$$
+P\{\widehat g(z)=2\mid z\in\pi_1\}
+=1-\Phi\left(\frac{1}{2\sigma}\right).
+$$
+
+A one-unit mean shift is enormous when $\sigma=0.1$. It is almost invisible when $\sigma=100$.
+
+```{python}
+#| label: tbl-linear-mmd-sigma
+#| output: asis
+
+rows = []
+for sigma in [0.1, 1.0, 10.0, 100.0]:
+    rows.append({
+        "$\\sigma$": fmt(sigma, 1),
+        "linear MMD$^2$": fmt(1.0, 3),
+        "known T/D error $P(2\\mid 1)$": fmt(1 - Phi(0.5 / sigma), 8),
+    })
+
+print(markdown_table(rows))
+```
+
+The MMD value did not change. The classification meaning did. The discrepancy is correct in its chosen geometry; it is just not a risk calculation.
+
+## Diagnostic 2: RBF-MMD can shrink while error stays fixed
+
+The previous example used the linear kernel because the algebra is transparent. A high-dimensional version appears with the Gaussian RBF kernel.
+
+Let
+
+$$
+\pi_1=N_p(0,I_p),
+\qquad
+\pi_2=N_p(2e_1,I_p),
+$$
+
+where only the first coordinate separates the classes.
+
+The Bayes rule, known-mean T-rule, and known-covariance D-rule all have the same error:
+
+$$
+P(2\mid 1)=\Phi(-1)\approx 0.1587.
+$$
+
+This error does not depend on $p$. The signal remains two standard deviations apart in the first coordinate.
+
+Now use the RBF kernel
+
+$$
+k(x,y)=\exp\left(-\frac{\|x-y\|^2}{2\tau^2}\right),
+\qquad
+\tau^2=2p.
+$$
+
+For equal-covariance Gaussians with mean difference $2e_1$,
+
+$$
+\operatorname{MMD}^2
+=
+2\left(1+\frac{1}{p}\right)^{-p/2}
+\left[1-\exp\left(-\frac{1}{p+1}\right)\right].
+$$
+
+The classification error is fixed. The RBF-MMD value decays at order $1/p$.
+
+```{python}
+#| label: tbl-rbf-mmd-high-d
+#| output: asis
+
+def rbf_mmd2_equal_cov(p: int, c: float = 2.0) -> float:
+    """RBF-MMD^2 for N(0,I_p) versus N(c e_1,I_p), tau^2=2p."""
+    tau2 = 2 * p
+    factor = (1 + 2 / tau2) ** (-p / 2)
+    exponent = -(c**2) / (2 * (tau2 + 2))
+    return 2 * factor * (1 - math.exp(exponent))
+
+rows = []
+for p in [2, 5, 10, 20, 50, 100, 200, 500, 1000]:
+    rows.append({
+        "$p$": p,
+        "RBF-MMD$^2$, $\\tau^2=2p$": fmt(rbf_mmd2_equal_cov(p, c=2.0), 4),
+        "known-rule error": fmt(Phi(-1.0), 4),
+    })
+
+print(markdown_table(rows))
+```
+
+Nothing mysterious is happening. The classifier uses the coordinate that carries the signal. The kernel discrepancy, with this bandwidth, spreads the comparison across the full ambient distance.
+
+So a small MMD value does not imply high classification error. Nor does a large MMD value identify the error of the classifier being used. It only reports separation in the chosen kernel geometry.
+
+In this example, that geometry is not aligned with the discriminative coordinate.
+
+## Diagnostic 3: MMD can see a difference that mean rules cannot use
+
+Now reverse the problem. Let
+
+$$
+\pi_1=N_p(0,I_p),
+\qquad
+\pi_2=N_p(0,\operatorname{diag}(9,1,\ldots,1)).
+$$
+
+The means are equal:
+
+$$
+\mu_1=\mu_2=0.
+$$
+
+A T-rule, and the usual common-covariance D-rule when used only for mean separation, has no mean direction to use. At the population level, the center comparison carries no class information, so the error is random:
+
+$$
+P(2\mid 1)=\frac12.
+$$
+
+But the distributions are not equal. The first coordinate has variance 1 under $\pi_1$ and variance 9 under $\pi_2$. An RBF-MMD can detect this.
+
+```{python}
+#| label: tbl-covariance-only-difference
+#| output: asis
+
+def rbf_mmd2_zero_mean_cov_diag(var1, var2, tau2: float) -> float:
+    """RBF-MMD^2 for zero-mean Gaussians with diagonal covariance."""
+    var1 = np.asarray(var1, dtype=float)
+    var2 = np.asarray(var2, dtype=float)
+    term11 = np.prod(1 + 2 * var1 / tau2) ** (-0.5)
+    term22 = np.prod(1 + 2 * var2 / tau2) ** (-0.5)
+    term12 = np.prod(1 + (var1 + var2) / tau2) ** (-0.5)
+    return term11 + term22 - 2 * term12
+
+p = 10
+a = 3.0
+var1 = [1.0] * p
+var2 = [a * a] + [1.0] * (p - 1)
+tau2 = 2 * p
+mmd2 = rbf_mmd2_zero_mean_cov_diag(var1, var2, tau2)
+threshold = 2 * math.log(a) / (1 - 1 / a**2)
+bayes_error = 2 * (1 - Phi(math.sqrt(threshold)))
+
+rows = [
+    {"method/object": "T/D mean rule", "what it sees": "no mean separation", "value": "0.5000 error"},
+    {"method/object": "RBF-MMD", "what it sees": "variance difference", "value": f"{mmd2:.4f} MMD$^2$"},
+    {"method/object": "Bayes quadratic rule", "what it sees": "variance separation", "value": f"{bayes_error:.4f} false $2\\mid 1$ error"},
+]
+
+print(markdown_table(rows))
+```
+
+A quadratic Bayes rule can exploit the variance difference. In the one-coordinate variance example, the false assignment probability under $\pi_1$ is
+
+$$
+P(2\mid 1)
+=
+P\left\{|Z|>
+\sqrt{\frac{2\log 3}{1-1/9}}
+\right\},
+\qquad
+Z\sim N(0,1),
+$$
+
+which is approximately $0.1159$.
+
+So there are three correct answers:
+
+| object | answer |
+|---|---|
+| MMD | the distributions differ |
+| T/D mean rule | there is no usable mean direction under this rule |
+| Bayes quadratic rule | the variance difference is usable if the classifier may use it |
+
+None of these answers is wrong. Trouble starts when one is used as a substitute for the others.
+
+## Diagnostic 4: the wrong geometry can make a good signal look useless
+
+Now keep common covariance and mean separation, but change the geometry.
+
+Let
+
+$$
+\pi_1=N_2(-\delta/2,\Sigma),
+\qquad
+\pi_2=N_2(\delta/2,\Sigma),
+$$
+
+with
+
+$$
+\delta=(1,1),
+\qquad
+\Sigma=\operatorname{diag}(0.1^2,10^2).
+$$
+
+There is one stable coordinate and one noisy coordinate. The Euclidean T-rule uses the direction $\delta=(1,1)$, giving the noisy coordinate the same coefficient as the stable coordinate.
+
+The population T-rule error is
+
+$$
+P_T(2\mid 1)
+=
+\Phi\left(
+-\frac{\|\delta\|^2}{2\sqrt{\delta^\top\Sigma\delta}}
+\right).
+$$
+
+The D-rule uses covariance-scaled geometry. Its error is
+
+$$
+P_D(2\mid 1)
+=
+\Phi\left(
+-\frac12
+\sqrt{\delta^\top\Sigma^{-1}\delta}
+\right).
+$$
+
+```{python}
+#| label: tbl-t-vs-d-geometry
+#| output: asis
+
+delta = np.array([1.0, 1.0])
+sigma_diag = np.array([0.1**2, 10.0**2])
+
+norm2 = np.dot(delta, delta)
+t_var = np.sum(delta**2 * sigma_diag)
+T_error = Phi(-norm2 / (2 * math.sqrt(t_var)))
+
+Delta2 = np.sum(delta**2 / sigma_diag)
+D_error = Phi(-math.sqrt(Delta2) / 2)
+
+rows = [
+    {
+        "rule": "T-rule / Euclidean",
+        "signal scale": f"$\\|\\delta\\|^2={norm2:.2f}$",
+        "variance scale": f"$\\delta^\\top\\Sigma\\delta={t_var:.2f}$",
+        "error $P(2\\mid 1)$": fmt(T_error, 8),
+    },
+    {
+        "rule": "D-rule / Mahalanobis",
+        "signal scale": f"$\\Delta^2={Delta2:.2f}$",
+        "variance scale": "covariance-scaled",
+        "error $P(2\\mid 1)$": fmt(D_error, 8),
+    },
+]
+
+print(markdown_table(rows))
+```
+
+The populations, means, and covariance have not changed. Only the decision geometry has.
+
+This is the T/D lesson in miniature: classifier risk depends on the decision geometry, not only on whether the distributions differ.
+
+## Diagnostic 5: a shortcut swap in a vision representation
+
+A computer-vision version is a shortcut-feature example.
+
+Imagine a binary image classification problem. The true label is the object category, but the source training set contains a shortcut: background color, texture, lighting, camera type, or acquisition artifact. A model can classify the source domain perfectly using that shortcut.
+
+Let the learned representation be one scalar,
+
+$$
+h(x)\in\{-1,+1\},
+$$
+
+where $h$ records the shortcut rather than the object. In the source domain,
+
+$$
+Y=+1 \Rightarrow h=+1,
+\qquad
+Y=-1 \Rightarrow h=-1.
+$$
+
+In the target domain, the shortcut relation is reversed:
+
+$$
+Y=+1 \Rightarrow h=-1,
+\qquad
+Y=-1 \Rightarrow h=+1.
+$$
+
+Assume the class prior is balanced in both domains:
+
+$$
+P(Y=+1)=P(Y=-1)=\frac12.
+$$
+
+Then the marginal feature distribution is identical in the two domains:
+
+$$
+P_S(h=+1)=P_T(h=+1)=\frac12,
+\qquad
+P_S(h=-1)=P_T(h=-1)=\frac12.
+$$
+
+Therefore the MMD between the unlabeled source and target feature distributions is exactly zero, for any kernel, because the two marginal distributions are the same.
+
+But the source-trained classifier
+
+$$
+\widehat g(h)=\operatorname{sign}(h)
+$$
+
+has source error $0$ and target error $1$.
+
+```{python}
+#| label: tbl-cv-shortcut-swap
+#| output: asis
+
+rows = [
+    {
+        "quantity": "source marginal $P_S(h)$",
+        "value": "uniform on $\\{-1,+1\\}$",
+        "interpretation": "balanced shortcut feature",
+    },
+    {
+        "quantity": "target marginal $P_T(h)$",
+        "value": "uniform on $\\{-1,+1\\}$",
+        "interpretation": "same unlabeled feature distribution",
+    },
+    {
+        "quantity": "$\\operatorname{MMD}^2(P_S(h),P_T(h))$",
+        "value": "0",
+        "interpretation": "perfect marginal alignment",
+    },
+    {
+        "quantity": "source error of $\\operatorname{sign}(h)$",
+        "value": "0",
+        "interpretation": "shortcut works in source",
+    },
+    {
+        "quantity": "target error of $\\operatorname{sign}(h)$",
+        "value": "1",
+        "interpretation": "shortcut reverses in target",
+    },
+]
+
+print(markdown_table(rows))
+```
+
+The class-conditional discrepancy tells a different story. With the linear kernel on $h$,
+
+$$
+\operatorname{MMD}^2
+\left(P_S(h\mid Y=+1),P_T(h\mid Y=+1)\right)
+=
+(1-(-1))^2=4.
+$$
+
+So MMD is not blind here. It sees the marginal feature distribution correctly. That is precisely why it misses the shortcut reversal: the relevant object is label-conditional.
+
+In computer-vision language: matching the global distribution of features, textures, backgrounds, or styles does not by itself guarantee that the object-label decision boundary is aligned. A domain discrepancy can improve while the target classifier is still using the wrong visual cue.
+
+## Diagnostic 6: Gaussian-looking risk formulas can still be wrong
+
+There is one more place where the same confusion appears. Even after choosing the T-rule or D-rule, one can still use the wrong error formula.
+
+Gaussian formulas are tempting because they are clean. But high-dimensional T-rule approximations for general populations can contain higher-moment terms. Third and fourth moments can enter the variance of the decision statistic.
+
+For learned representations, this is not a corner case. They can be skewed, sparse, heavy-tailed, clipped, quantized, or produced by nonlinear activations.
+
+Consider the simplified common-covariance model
+
+$$
+\pi_1: z=u,
+\qquad
+\pi_2: z=u+\delta,
+\qquad
+\Sigma=I_p,
+$$
+
+where the coordinates of $u$ are independent and standardized:
+
+$$
+E u_j=0,
+\qquad
+E u_j^2=1,
+\qquad
+E u_j^3=\theta,
+\qquad
+E u_j^4=\gamma.
+$$
+
+For equal sample sizes $n_1=n_2=n$, write
+
+$$
+\alpha=\frac{n}{n+1}.
+$$
+
+A representative large-dimensional T-rule approximation has the form
+
+$$
+P_T(2\mid 1)
+\approx
+\Phi\left(-\frac{\alpha\|\delta\|^2}{B_p}\right),
+$$
+
+where, in the diagonal identity-covariance case, the variance scale has terms of the schematic form
+
+$$
+B_p^2
+\approx
+\left[\beta_0+\frac{2\alpha^2\gamma}{n^3}\right]p
++\frac{4\theta}{n^2}\mathbf 1^\top\delta
++4\alpha\|\delta\|^2.
+$$
+
+The exact constants depend on the asymptotic setup and normalization. The structural point is what matters here:
+
+$$
+\text{classification error can depend on } \gamma \text{ and } \theta.
+$$
+
+Two representations can have the same mean and covariance while producing different T-rule errors because their coordinate distributions have different skewness or tail behavior.
+
+```{python}
+#| label: tbl-higher-moments
+#| output: asis
+
+def t_rule_general_moment_approx(
+    p: int = 200,
+    n: int = 10,
+    delta_norm: float = 4.0,
+    gamma: float = 3.0,
+    theta: float = 0.0,
+) -> float:
+    """A simplified general-population T-rule approximation for Sigma=I.
+
+    This diagnostic spreads delta evenly across coordinates, so
+    1^T delta = ||delta|| sqrt(p). The formula is meant as a structural
+    illustration of higher-moment dependence, not a universal theorem.
+    """
+    alpha = n / (n + 1)
+    beta0 = 2 * alpha**2 * (6 * n**2 + 3 * n - 3) / n**3 + 2 * (alpha**2 - 1)
+    sum_delta = delta_norm * math.sqrt(p)
+    B2 = (beta0 + 2 * alpha**2 * gamma / n**3) * p
+    B2 += (4 * theta / n**2) * sum_delta
+    B2 += 4 * alpha * delta_norm**2
+    return Phi(-alpha * delta_norm**2 / math.sqrt(B2))
+
+rows = []
+for law, gamma in [
+    ("Rademacher-like, light-tailed", 1),
+    ("Gaussian", 3),
+    ("moderately heavy-tailed", 9),
+    ("spiky finite-moment", 100),
+    ("very spiky finite-moment", 500),
+]:
+    rows.append({
+        "coordinate law": law,
+        "fourth moment $\\gamma$": gamma,
+        "T-rule approximation": fmt(t_rule_general_moment_approx(gamma=gamma, theta=0), 4),
+    })
+
+print(markdown_table(rows))
+```
+
+The Gaussian line reports approximately $0.1500$. With the same mean and covariance but a very spiky finite-moment representation, the approximation is closer to $0.2221$.
+
+Skewness can also enter. If $\mathbf 1^\top\delta\ne0$, the third-moment term changes the variance of the T-rule statistic.
+
+```{python}
+#| label: tbl-skewness-t-rule
+#| output: asis
+
+rows = []
+for theta in [-4, -2, 0, 2, 4]:
+    rows.append({
+        "skewness $\\theta$": theta,
+        "T-rule approximation": fmt(t_rule_general_moment_approx(gamma=9, theta=theta), 4),
+    })
+
+print(markdown_table(rows))
+```
+
+The ML warning is small but important: whitening fixes first and second moments. It does not make a representation Gaussian. It also does not make a Gaussian error formula automatically correct.
+
+## Summary of the diagnostics
+
+| diagnostic | discrepancy says | classifier risk says | lesson |
+|---|---|---|---|
+| same linear MMD, different $\sigma$ | unchanged | changes from near zero to near random | scale matters |
+| RBF-MMD in high $p$ | shrinks | fixed | ambient geometry can dilute signal |
+| variance-only difference | detects distribution difference | mean rule fails | distribution difference need not be usable by a given rule |
+| T versus D geometry | same populations | different errors | rule geometry matters |
+| shortcut swap | marginal MMD is zero | target error is maximal | unlabeled alignment can miss label-conditional failure |
+| non-Gaussian moments | first two moments agree | approximate risk changes | higher moments can affect decision statistics |
+
+## What this says about ML practice
+
+The practical failure is not MMD-specific. It is the habit of replacing downstream error by a proxy geometry.
+
+A representation method may reduce MMD between domains. A contrastive objective may separate pairs. A retrieval metric may put some objects close. A Wasserstein loss may reduce transport cost. Each statement can be true while the task error moves in the wrong direction.
+
+For example, reducing domain MMD in a vision representation does not by itself show that the classifier's margin distribution, class-conditional overlap, or false-positive rate improved. It only shows that the chosen source and target distributions became closer in the chosen RKHS geometry.
+
+The missing question is always
+
+$$
+P\{\widehat g(z)\ne y\}.
+$$
+
+Or, in asymmetric problems,
+
+$$
+P\{\widehat g(z)=2\mid z\in\pi_1\}.
+$$
+
+A discrepancy is not wrong because it differs from classification error. It becomes misleading only when it is interpreted as classification error without proving the link.
+
+A useful workflow is
+
+$$
+\text{population model}
+\rightarrow
+\text{decision rule}
+\rightarrow
+\text{distribution of the decision statistic}
+\rightarrow
+\text{misclassification probability}.
+$$
+
+A weaker workflow is
+
+$$
+\text{population model}
+\rightarrow
+\text{distance between distributions}
+\rightarrow
+\text{informal claim about classification}.
+$$
+
+The second workflow is where the mistake enters.
+
+## Takeaway
+
+None of these distances is the villain. MMD, Wasserstein distance, Euclidean distance, and Mahalanobis distance are all useful when read as answers to the questions they actually ask.
+
+The danger is the interpretation placed on them.
+
+A distribution discrepancy answers a distribution question. A classifier error answers a decision question. They can agree when the geometry, model, and classifier are aligned. They can separate when the discrepancy listens to the wrong coordinate, the wrong scale, the wrong covariance, the wrong finite-sample object, the wrong marginal, or the wrong higher moments.
+
+The diagnostic question is:
+
+> Does this discrepancy control the error of the rule I will actually use?
+
+If the answer is no, a small discrepancy may be false comfort, and a large discrepancy may be irrelevant alarm.
+
+## References
+
+Bai, Z. D., and Saranadasa, H. “Effect of High Dimension: By an Example of a Two Sample Problem.” *Statistica Sinica* 6, 1996.
+
+Saranadasa, H. “Asymptotic Expansion of the Misclassification Probabilities of D- and A-Criteria for Discrimination from Two High Dimensional Populations Using the Theory of Large Dimensional Random Matrices.” *Journal of Multivariate Analysis* 46(1), 1993.
+
+Yao, J., Zheng, S., and Bai, Z. *Large Sample Covariance Matrices and High-Dimensional Data Analysis*. Cambridge University Press, 2015.
+
+Gretton, A., Borgwardt, K. M., Rasch, M. J., Schölkopf, B., and Smola, A. “A Kernel Two-Sample Test.” *Journal of Machine Learning Research* 13, 2012.
+
+Ben-David, S., Blitzer, J., Crammer, K., Kulesza, A., Pereira, F., and Vaughan, J. W. “A Theory of Learning from Different Domains.” *Machine Learning* 79, 2010.
+
+Long, M., Cao, Y., Wang, J., and Jordan, M. I. “Learning Transferable Features with Deep Adaptation Networks.” *Proceedings of ICML*, 2015.
+
+## Suggested citation
+
+```bibtex
+@misc{miryusupov2026discrepancyrisk,
+  author       = {Miryusupov, Shohruh},
+  title        = {Discrepancy Is Not Risk},
+  year         = {2026},
+  howpublished = {Research note},
+  url          = {https://www.miryusupov.com/blog/posts/discrepancy_is_not_risk/}
+}
+```
