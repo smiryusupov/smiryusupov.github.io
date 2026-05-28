@@ -114,10 +114,18 @@ body > header {
   padding: 2.75rem 2rem 5rem;
 }
 
-/* About page: put title and body text on same column */
+/* Section pages: use the same reading column as the homepage.
+   On desktop this keeps the clean centered column; on mobile the
+   gutter is restored below so text does not touch the screen edge. */
 body.about-page #title-block-header,
 body.about-page > p,
-body.about-page > h2 {
+body.about-page > h2,
+body.projects-page #title-block-header,
+body.projects-page > p,
+body.projects-page > h2,
+body.writings-page #title-block-header,
+body.writings-page #listing-listing,
+body.writings-page .quarto-listing-container-default {
   max-width: var(--reading) !important;
   margin-left: auto !important;
   margin-right: auto !important;
@@ -125,7 +133,7 @@ body.about-page > h2 {
   padding-right: 0 !important;
 }
 
-/* Move the Greek quote slightly to the right */
+/* Move the Greek quote slightly to the right on desktop only. */
 body.about-page .epigraph {
   max-width: var(--reading) !important;
   margin-left: auto !important;
@@ -704,8 +712,8 @@ footer.footer,
   body > section,
   body > div,
   body > header {
-    padding-left: 1.25rem;
-    padding-right: 1.25rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
   }
 
   #quarto-content {
@@ -715,15 +723,25 @@ footer.footer,
     padding-bottom: 5rem;
   }
 
-  body.about-page #quarto-content {
-    padding-left: 1.25rem !important;
-    padding-right: 1.25rem !important;
-  }
 
   .home-intro,
   .home-posts,
   #listing-listing,
   .quarto-listing-container-default {
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+  }
+
+  body.about-page #title-block-header,
+  body.about-page > .epigraph,
+  body.about-page > p,
+  body.about-page > h2,
+  body.projects-page #title-block-header,
+  body.projects-page > p,
+  body.projects-page > h2,
+  body.writings-page #title-block-header,
+  body.writings-page #listing-listing,
+  body.writings-page .quarto-listing-container-default {
     padding-left: 1.5rem !important;
     padding-right: 1.5rem !important;
   }
