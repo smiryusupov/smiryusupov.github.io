@@ -40,7 +40,7 @@ $$
 
 That is a different object. A discrepancy compares distributions. A risk evaluates a decision rule.
 
-The examples below are deliberately small. They are not arguments against MMD, or in favor of T-rules or D-rules. They isolate places where the objects separate.
+The examples below are deliberately small. They are not arguments against MMD, Wasserstein distance, or other discrepancies, and they are not arguments in favor of T-rules or D-rules. They isolate a single failure mode: reading a geometry-dependent distribution comparison as if it were the risk of the classifier actually being deployed.
 
 ```{python}
 #| label: setup
@@ -587,9 +587,9 @@ So MMD is not blind here. It sees the marginal feature distribution correctly. T
 
 In computer-vision language: matching the global distribution of features, textures, backgrounds, or styles does not by itself guarantee that the object-label decision boundary is aligned. A domain discrepancy can improve while the target classifier is still using the wrong visual cue.
 
-## Diagnostic 6: Gaussian-looking risk formulas can still be wrong
+## Technical addendum: Gaussian-looking risk formulas can still be wrong
 
-There is one more place where the same confusion appears. Even after choosing the T-rule or D-rule, one can still use the wrong error formula.
+A related but more technical warning appears after the decision rule has already been chosen. Even then, the risk formula may depend on distributional features that are invisible to a first-and-second-moment summary. This section is less about MMD and more about the danger of replacing a decision statistic by an overly Gaussian approximation.
 
 Gaussian formulas are tempting because they are clean. But high-dimensional T-rule approximations for general populations can contain higher-moment terms. Third and fourth moments can enter the variance of the decision statistic.
 
@@ -729,6 +729,8 @@ The practical failure is not MMD-specific. It is the habit of replacing downstre
 A representation method may reduce MMD between domains. A contrastive objective may separate pairs. A retrieval metric may put some objects close. A Wasserstein loss may reduce transport cost. Each statement can be true while the task error moves in the wrong direction.
 
 For example, reducing domain MMD in a vision representation does not by itself show that the classifier's margin distribution, class-conditional overlap, or false-positive rate improved. It only shows that the chosen source and target distributions became closer in the chosen RKHS geometry.
+The same warning applies to representation monitoring. A shift score in embedding space can be a useful alarm, but it is not automatically an accuracy-drop estimate. To make it operational, one should check whether the score is aligned with the deployed model’s margin distribution, class-conditional errors, false-positive rate, or task-specific loss. Without that link, the score remains a diagnostic of representation geometry, not a statement about downstream risk.
+
 
 The missing question is always
 
@@ -780,7 +782,7 @@ The diagnostic question is:
 
 > Does this discrepancy control the error of the rule I will actually use?
 
-If the answer is no, a small discrepancy may be false comfort, and a large discrepancy may be irrelevant alarm.
+If yes, the discrepancy has operational meaning. If no, it is still useful as a geometric diagnostic, but it should not be reported as evidence of lower risk. A small discrepancy can be false comfort; a large discrepancy can be irrelevant alarm.
 
 ## References
 
