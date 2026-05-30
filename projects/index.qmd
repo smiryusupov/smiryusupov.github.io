@@ -5,14 +5,24 @@ body-classes: "section-page projects-page"
 
 Software and reproducible research projects.
 
+These are small scientific Python packages that I maintain as research software. The emphasis is on focused numerical methods, tested examples, documentation, and clear scope boundaries.
+
 ## [cholrot](./cholrot/)
 
-`cholrot` is an alpha-stage scientific Python package for rank-one Cholesky updates, downdates, modified-factor products, and solves, with C++/pybind11 kernels and pure Python fallbacks.
+`cholrot` is a focused package for rank-one Cholesky updates, downdates, modified-factor products, and solves.
+
+It may be useful in numerical experiments where a positive-definite matrix changes by a rank-one term and recomputing or materializing every intermediate matrix is unnecessary. The package is intentionally narrow: it does not replace LAPACK or dense Cholesky factorization, but provides routines for rank-one modification workflows.
+
+Implementation: Python API with C++/pybind11 kernels and pure Python fallbacks.
 
 [Project page](./cholrot/) · [GitHub](https://github.com/smiryusupov/cholrot) · [PyPI](https://pypi.org/project/cholrot/) · [Documentation](https://cholrot.readthedocs.io/)
 
 ## [lattice-dsp](./lattice-dsp/)
 
-`lattice-dsp` is an alpha-stage scientific Python package for stable IIR lattice filters, adaptive recursive DSP, finite-Hankel model-reduction diagnostics, and experimental matrix/MIMO lattice workflows, with C++/pybind11 kernels and optional OpenMP batch processing.
+`lattice-dsp` is a research-oriented package for experiments with stability-aware recursive signal processing: IIR lattice filters, reflection/PARCOR coefficient parameterizations, adaptive recursive filtering, AR diagnostics, and finite-dimensional MIMO/model-reduction examples.
+
+The scalar filtering pieces are the most direct practical APIs. The MIMO, Schur/Pick, and model-reduction pieces are best read as tested experimental diagnostics rather than production solvers.
+
+Implementation: Python API with C++/pybind11 kernels and optional OpenMP batch processing.
 
 [Project page](./lattice-dsp/) · [GitHub](https://github.com/smiryusupov/lattice-dsp) · [PyPI](https://pypi.org/project/lattice-dsp/) · [Documentation](https://lattice-dsp.readthedocs.io/)

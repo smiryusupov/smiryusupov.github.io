@@ -15,8 +15,9 @@ format:
     smooth-scroll: false
 ---
 
-**Claim.** `lattice-dsp` provides stable IIR lattice filters, adaptive recursive DSP tools, finite-Hankel model-reduction diagnostics, and experimental matrix/MIMO lattice workflows.  
-**Status.** Alpha-stage scientific package; Python API with C++/pybind11 kernels and optional OpenMP batch processing.
+`lattice-dsp` is an alpha-stage scientific Python package for experiments with stability-aware recursive signal processing. It focuses on IIR lattice filters, reflection/PARCOR coefficient parameterizations, adaptive recursive filtering, AR diagnostics, and finite-dimensional MIMO/model-reduction examples.
+
+The scalar filtering pieces are the most direct practical APIs. The MIMO, Schur/Pick, and model-reduction pieces are best read as tested experimental diagnostics rather than production solvers.
 
 Links: [GitHub](https://github.com/smiryusupov/lattice-dsp) · [PyPI](https://pypi.org/project/lattice-dsp/) · [Documentation](https://lattice-dsp.readthedocs.io/) · License: Apache-2.0
 
@@ -44,19 +45,11 @@ y = filt.process(x)
 
 ## Motivation
 
-Recursive IIR filters are compact and useful, but direct-form denominator updates can be numerically awkward. A small update to denominator coefficients can move poles outside the unit circle and turn a stable filter into an unstable one.
+Recursive IIR filters are compact, but direct-form denominator updates can be hard to control. A small coefficient change can move poles outside the unit circle and make a filter unstable.
 
-Lattice parameterizations give a stability-aware coordinate system. In the scalar case, reflection or PARCOR coefficients with magnitude less than one correspond to stable recursive filters.
+Lattice parameterizations provide a stability-aware coordinate system. In the scalar case, reflection or PARCOR coefficients with magnitude less than one correspond to stable recursive filters.
 
-The package focuses on workflows where these coordinates are useful:
-
-- stable IIR filtering;
-- adaptive recursive filtering;
-- AR and spectral diagnostics;
-- finite-section Hankel/model-reduction experiments;
-- matrix/MIMO lattice and state-space examples.
-
-The goal is not to replace broad DSP libraries such as SciPy. The goal is to provide a focused toolkit for lattice-parameterized recursive signal processing.
+The package is meant for experiments where this coordinate system is useful: stable IIR filtering, adaptive recursive filtering, AR diagnostics, and finite-dimensional model-reduction or MIMO examples. It is not a replacement for SciPy or a production audio/control framework.
 
 ## What the package does
 

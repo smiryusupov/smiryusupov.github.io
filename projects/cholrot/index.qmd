@@ -15,12 +15,15 @@ format:
     smooth-scroll: false
 ---
 
-**Claim.** `cholrot` provides rank-one Cholesky update/downdate routines and direct modified-factor products without unnecessary matrix materialization.  
-**Status.** Alpha-stage scientific package; Python API with C++/pybind11 kernels and pure Python fallbacks.
+`cholrot` is a small scientific Python package for rank-one Cholesky updates, downdates, modified-factor products, and solves.
+
+It is intended for numerical experiments where a positive-definite matrix changes by a rank-one term and the downstream computation may not need the full modified matrix or even the full modified factor.
+
+Implementation: Python API with C++/pybind11 kernels and pure Python fallbacks.
 
 Links: [GitHub](https://github.com/smiryusupov/cholrot) · [PyPI](https://pypi.org/project/cholrot/) · [Documentation](https://cholrot.readthedocs.io/) · License: Apache-2.0
 
-```{python}
+```{bash}
 #| eval: false
 python -m pip install cholrot
 ```
