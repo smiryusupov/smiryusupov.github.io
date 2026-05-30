@@ -1,0 +1,236 @@
+---
+title: "lattice-dsp"
+description: "Stable IIR lattice filters, adaptive recursive DSP, and matrix/MIMO lattice experiments."
+categories: [projects, signal-processing, DSP, Python, C++]
+execute:
+  freeze: auto
+  warning: false
+  message: false
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-depth: 2
+    anchor-sections: false
+    smooth-scroll: false
+---
+
+**Claim.** `lattice-dsp` provides stable IIR lattice filters, adaptive recursive DSP tools, finite-Hankel model-reduction diagnostics, and experimental matrix/MIMO lattice workflows.  
+**Status.** Alpha-stage scientific package; Python API with C++/pybind11 kernels and optional OpenMP batch processing.
+
+Links: [GitHub](https://github.com/smiryusupov/lattice-dsp) · [PyPI](https://pypi.org/project/lattice-dsp/) · [Documentation](https://lattice-dsp.readthedocs.io/) · License: Apache-2.0
+
+```{bash}
+#| eval: false
+python -m pip install lattice-dsp
+```
+
+```{python}
+#| eval: false
+import numpy as np
+import lattice_dsp as ld
+
+rng = np.random.default_rng(0)
+x = rng.normal(size=4096)
+
+reflection = [0.35, -0.2, 0.1]
+numerator = [0.25, 0.0, 0.15, 0.7]
+
+print(ld.reflection_to_denominator(reflection))
+
+filt = ld.LatticeIIR(reflection, numerator)
+y = filt.process(x)
+```
+
+## Motivation
+
+Recursive IIR filters are compact and useful, but direct-form denominator updates can be numerically awkward. A small update to denominator coefficients can move poles outside the unit circle and turn a stable filter into an unstable one.
+
+Lattice parameterizations give a stability-aware coordinate system. In the scalar case, reflection or PARCOR coefficients with magnitude less than one correspond to stable recursive filters.
+
+The package focuses on workflows where these coordinates are useful:
+
+- stable IIR filtering;
+- adaptive recursive filtering;
+- AR and spectral diagnostics;
+- finite-section Hankel/model-reduction experiments;
+- matrix/MIMO lattice and state-space examples.
+
+The goal is not to replace broad DSP libraries such as SciPy. The goal is to provide a focused toolkit for lattice-parameterized recursive signal processing.
+
+## What the package does
+
+For scalar IIR filters, `lattice-dsp` provides conversions between reflection coefficients and denominator polynomials, plus lattice and lattice-ladder filtering APIs.
+
+For example, bounded reflection coefficients
+
+$$
+|k_i| < 1
+$$
+
+define a stable recursive denominator. This makes them useful for adaptive filtering, where unconstrained denominator updates can otherwise leave the stable region.
+
+The package includes:
+
+- `LatticeIIR` and `LatticeLadderIIR`;
+- reflection/PARCOR coefficient conversions;
+- adaptive lattice-ladder NLMS/RLS-style examples;
+- Burg and Levinson-Durbin AR tools;
+- finite-Hankel SISO and MIMO reduction helpers;
+- MIMO Markov tensor and state-space utilities;
+- matrix-lattice/all-pass examples;
+- tangential Schur/Pick/J-inner diagnostic helpers.
+
+## Stable adaptive IIR example
+
+```{python}
+#| eval: false
+import numpy as np
+import lattice_dsp as ld
+
+rng = np.random.default_rng(1)
+x = rng.normal(size=8000)
+
+target = ld.LatticeIIR([0.55, -0.32], [0.4, -0.1, 0.65])
+desired = np.asarray(target.process(x), dtype=float)
+
+adaptive = ld.AdaptiveLatticeLadderNLMS(
+    initial_reflection=[0.0, 0.0],
+    initial_taps=[0.0, 0.0, 0.0],
+    mu_taps=0.06,
+    mu_reflection=0.0015,
+    margin=1e-4,
+)
+
+error = np.asarray(adaptive.adapt_block(x, desired), dtype=float)
+
+print("learned reflection:", np.round(adaptive.reflection, 4))
+print("final MSE:", np.mean(error[-1000:] ** 2))
+```
+
+## Finite-Hankel and model-reduction diagnostics
+
+The package includes finite-section model-reduction tools for scalar and MIMO systems.
+
+For scalar filters, `lattice-dsp` can build finite Hankel matrices from impulse responses and compute lower-order state-space or IIR candidates. For MIMO systems, it works with Markov tensors of shape
+
+$$
+(\text{samples}, \text{outputs}, \text{inputs}).
+$$
+
+These tools are documented as finite-dimensional diagnostics and baselines, not as full infinite-dimensional optimal solvers.
+
+Included:
+
+- finite-Hankel SISO reduction;
+- MIMO block-Hankel reduction;
+- compiled batched MIMO state-space simulation;
+- finite-section Nehari/AAK-style diagnostic workflows;
+- rational-tail and certificate-style examples.
+
+## Matrix and MIMO direction
+
+A distinctive part of `lattice-dsp` is the matrix/MIMO lattice direction.
+
+The package includes examples and utilities for:
+
+- causal online MIMO lattice prediction;
+- matrix-lattice all-pass responses;
+- streaming paraunitary-style analysis;
+- finite-record adjoint diagnostics;
+- MIMO block-Hankel reduction;
+- bridge diagnostics from MIMO Markov data to matrix-lattice scaffolds;
+- finite definite tangential Schur/Pick checks.
+
+The documentation separates causal runtime APIs from offline estimation and finite-record diagnostics. This distinction matters: a fitted model may be used causally, while the fitting or diagnostic step may require a full finite record.
+
+## Algorithms
+
+The package connects several related DSP and systems ideas:
+
+- Schur and Levinson-Durbin recursions;
+- reflection/PARCOR stability coordinates;
+- lattice and lattice-ladder IIR realizations;
+- Burg AR estimation;
+- block Levinson and multichannel AR modeling;
+- finite Hankel operators and Ho-Kalman-style reduction;
+- finite-section Nehari/AAK intuition;
+- matrix all-pass and J-inner diagnostics;
+- right tangential Schur/Pick interpolation data.
+
+The implementation uses a Python API with C++/pybind11 kernels for core filtering, finite-Hankel, and MIMO state-space routines.
+
+## Benchmarks
+
+The benchmarks are intended to measure practical trade-offs rather than produce universal performance claims.
+
+Examples include:
+
+```{bash}
+#| eval: false
+python benchmarks/run_benchmarks.py \
+  --channels 64 \
+  --samples 50000 \
+  --repeats 5 \
+  --output reports/benchmark-results.json
+
+python benchmarks/hankel_reduction_speedup.py \
+  --full-orders 16 32 64 \
+  --reduced-orders 4 8 12 16 \
+  --channels 64 \
+  --samples 50000 \
+  --repeats 3 \
+  --output reports/hankel-reduction-speedup.json
+
+python benchmarks/mimo_hankel_reduction_speedup.py \
+  --full-orders 8 16 \
+  --reduced-orders 2 4 6 8 \
+  --inputs 3 \
+  --outputs 3 \
+  --batch 8 \
+  --samples 6000 \
+  --reuse-count 50 \
+  --n-threads 1 \
+  --output reports/mimo-hankel-reduction-speedup.json
+```
+
+For fair local benchmarking, report hardware, operating system, Python version, NumPy version, compiler, OpenMP availability, and thread settings.
+
+## Development status
+
+`lattice-dsp` is an alpha-stage scientific package. The public release focuses on:
+
+- stable scalar IIR lattice and lattice-ladder filtering;
+- adaptive recursive filtering examples;
+- AR and spectral diagnostics;
+- finite-Hankel SISO/MIMO reduction baselines;
+- compiled MIMO state-space processing;
+- matrix-lattice and tangential Schur/Pick diagnostics;
+- cross-platform wheels for Python 3.12+;
+- Sphinx documentation with tutorials and examples.
+
+Out of scope for the current alpha:
+
+- full infinite-dimensional AAK/Nehari solvers;
+- full matrix-valued AAK/Nehari optimal reduction;
+- generalized indefinite matrix Schur synthesis;
+- production acoustic echo cancellation;
+- complete room-acoustics, wireless, or control-system frameworks.
+
+## References
+
+J. P. Burg. “Maximum entropy spectral analysis.”
+
+N. Levinson. “The Wiener RMS error criterion in filter design and prediction.”
+
+H. Akaike. “Markovian representation of stochastic processes and its application to the analysis of autoregressive moving average processes.”
+
+V. M. Adamjan, D. Z. Arov, and M. G. Krein. Work on Hankel operators and rational approximation.
+
+P. P. Vaidyanathan. *Multirate Systems and Filter Banks.*
+
+T. Kailath, A. H. Sayed, and B. Hassibi. *Linear Estimation.*
+
+B. A. Francis. *A Course in H∞ Control Theory.*
+
+J. W. Helton. Operator-theoretic approaches to Nehari and interpolation problems.

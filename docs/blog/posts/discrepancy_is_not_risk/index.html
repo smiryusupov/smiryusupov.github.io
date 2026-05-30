@@ -148,7 +148,7 @@ window.Quarto = {
   <li><a href="#diagnostic-3-mmd-can-see-a-difference-that-mean-rules-cannot-use" id="toc-diagnostic-3-mmd-can-see-a-difference-that-mean-rules-cannot-use">Diagnostic 3: MMD can see a difference that mean rules cannot use</a></li>
   <li><a href="#diagnostic-4-the-wrong-geometry-can-make-a-good-signal-look-useless" id="toc-diagnostic-4-the-wrong-geometry-can-make-a-good-signal-look-useless">Diagnostic 4: the wrong geometry can make a good signal look useless</a></li>
   <li><a href="#diagnostic-5-a-shortcut-swap-in-a-vision-representation" id="toc-diagnostic-5-a-shortcut-swap-in-a-vision-representation">Diagnostic 5: a shortcut swap in a vision representation</a></li>
-  <li><a href="#diagnostic-6-gaussian-looking-risk-formulas-can-still-be-wrong" id="toc-diagnostic-6-gaussian-looking-risk-formulas-can-still-be-wrong">Diagnostic 6: Gaussian-looking risk formulas can still be wrong</a></li>
+  <li><a href="#technical-addendum-gaussian-looking-risk-formulas-can-still-be-wrong" id="toc-technical-addendum-gaussian-looking-risk-formulas-can-still-be-wrong">Technical addendum: Gaussian-looking risk formulas can still be wrong</a></li>
   <li><a href="#summary-of-the-diagnostics" id="toc-summary-of-the-diagnostics">Summary of the diagnostics</a></li>
   <li><a href="#what-this-says-about-ml-practice" id="toc-what-this-says-about-ml-practice">What this says about ML practice</a></li>
   <li><a href="#takeaway" id="toc-takeaway">Takeaway</a></li>
@@ -169,7 +169,7 @@ D(P,Q).
 P\{\widehat g(z)=2\mid z\in\pi_1\}.
 </span></p>
 <p>That is a different object. A discrepancy compares distributions. A risk evaluates a decision rule.</p>
-<p>The examples below are deliberately small. They are not arguments against MMD, or in favor of T-rules or D-rules. They isolate places where the objects separate.</p>
+<p>The examples below are deliberately small. They are not arguments against MMD, Wasserstein distance, or other discrepancies, and they are not arguments in favor of T-rules or D-rules. They isolate a single failure mode: reading a geometry-dependent distribution comparison as if it were the risk of the classifier actually being deployed.</p>
 <h2 id="three-objects-three-questions">Three objects, three questions</h2>
 <p>Let</p>
 <p><span class="math display">
@@ -729,8 +729,8 @@ Table&nbsp;5
 </span></p>
 <p>So MMD is not blind here. It sees the marginal feature distribution correctly. That is precisely why it misses the shortcut reversal: the relevant object is label-conditional.</p>
 <p>In computer-vision language: matching the global distribution of features, textures, backgrounds, or styles does not by itself guarantee that the object-label decision boundary is aligned. A domain discrepancy can improve while the target classifier is still using the wrong visual cue.</p>
-<h2 id="diagnostic-6-gaussian-looking-risk-formulas-can-still-be-wrong">Diagnostic 6: Gaussian-looking risk formulas can still be wrong</h2>
-<p>There is one more place where the same confusion appears. Even after choosing the T-rule or D-rule, one can still use the wrong error formula.</p>
+<h2 id="technical-addendum-gaussian-looking-risk-formulas-can-still-be-wrong">Technical addendum: Gaussian-looking risk formulas can still be wrong</h2>
+<p>A related but more technical warning appears after the decision rule has already been chosen. Even then, the risk formula may depend on distributional features that are invisible to a first-and-second-moment summary. This section is less about MMD and more about the danger of replacing a decision statistic by an overly Gaussian approximation.</p>
 <p>Gaussian formulas are tempting because they are clean. But high-dimensional T-rule approximations for general populations can contain higher-moment terms. Third and fourth moments can enter the variance of the decision statistic.</p>
 <p>For learned representations, this is not a corner case. They can be skewed, sparse, heavy-tailed, clipped, quantized, or produced by nonlinear activations.</p>
 <p>Consider the simplified common-covariance model</p>
@@ -919,7 +919,7 @@ Table&nbsp;7
 <h2 id="what-this-says-about-ml-practice">What this says about ML practice</h2>
 <p>The practical failure is not MMD-specific. It is the habit of replacing downstream error by a proxy geometry.</p>
 <p>A representation method may reduce MMD between domains. A contrastive objective may separate pairs. A retrieval metric may put some objects close. A Wasserstein loss may reduce transport cost. Each statement can be true while the task error moves in the wrong direction.</p>
-<p>For example, reducing domain MMD in a vision representation does not by itself show that the classifier’s margin distribution, class-conditional overlap, or false-positive rate improved. It only shows that the chosen source and target distributions became closer in the chosen RKHS geometry.</p>
+<p>For example, reducing domain MMD in a vision representation does not by itself show that the classifier’s margin distribution, class-conditional overlap, or false-positive rate improved. It only shows that the chosen source and target distributions became closer in the chosen RKHS geometry. The same warning applies to representation monitoring. A shift score in embedding space can be a useful alarm, but it is not automatically an accuracy-drop estimate. To make it operational, one should check whether the score is aligned with the deployed model’s margin distribution, class-conditional errors, false-positive rate, or task-specific loss. Without that link, the score remains a diagnostic of representation geometry, not a statement about downstream risk.</p>
 <p>The missing question is always</p>
 <p><span class="math display">
 P\{\widehat g(z)\ne y\}.
@@ -956,7 +956,7 @@ P\{\widehat g(z)=2\mid z\in\pi_1\}.
 <blockquote>
 <p>Does this discrepancy control the error of the rule I will actually use?</p>
 </blockquote>
-<p>If the answer is no, a small discrepancy may be false comfort, and a large discrepancy may be irrelevant alarm.</p>
+<p>If yes, the discrepancy has operational meaning. If no, it is still useful as a geometric diagnostic, but it should not be reported as evidence of lower risk. A small discrepancy can be false comfort; a large discrepancy can be irrelevant alarm.</p>
 <h2 id="references">References</h2>
 <p>Bai, Z. D., and Saranadasa, H. “Effect of High Dimension: By an Example of a Two Sample Problem.” <em>Statistica Sinica</em> 6, 1996.</p>
 <p>Saranadasa, H. “Asymptotic Expansion of the Misclassification Probabilities of D- and A-Criteria for Discrimination from Two High Dimensional Populations Using the Theory of Large Dimensional Random Matrices.” <em>Journal of Multivariate Analysis</em> 46(1), 1993.</p>

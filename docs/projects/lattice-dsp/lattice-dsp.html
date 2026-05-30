@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="description" content="Stable IIR lattice filters, adaptive recursive DSP, and matrix/MIMO lattice experiments.">
 
-<title>Home – Shohruh Miryusupov</title>
+<title>lattice-dsp – Shohruh Miryusupov</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -23,48 +24,52 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="site_libs/quarto-listing/list.min.js"></script>
-<script src="site_libs/quarto-listing/quarto-listing.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-html/tabby.min.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-html-640605f58ae58ee79329c070719e555b.min.css" rel="stylesheet" append-hash="true" data-mode="light">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script>
-
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-title','listing-description','listing-date',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-html/tabby.min.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-html-640605f58ae58ee79329c070719e555b.min.css" rel="stylesheet" append-hash="true" data-mode="light">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 
   <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
   <script>document.addEventListener("DOMContentLoaded", function () {
@@ -110,38 +115,215 @@ window.Quarto = {
 };
 </script>
 
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="../../styles.css">
 </head>
 
 <body>
 
 <nav class="site-nav">
-  <a class="nav-name" href="./">Shohruh Miryusupov</a>
+  <a class="nav-name" href="../../">Shohruh Miryusupov</a>
   <div class="nav-links">
-    <a href="./blog/">Writings</a>
-    <a href="./projects/">Projects</a>
-    <a href="./about.html">About</a>
+    <a href="../../blog/">Writings</a>
+    <a href="../../projects/">Projects</a>
+    <a href="../../about.html">About</a>
     <a href="https://github.com/smiryusupov">GitHub</a>
   </div>
 </nav>
 
 <header id="title-block-header">
-<h1 class="title">Home</h1>
+<h1 class="title">lattice-dsp</h1>
 
 </header>
 
-
-<style>
-#title-block-header {
-  display: none !important;
-}
-</style>
-<div class="home-intro">
-<p>
-Experiments, notes, and small studies on statistical learning, geometry, optimization, and the gap between formal guarantees and practical interpretation.
-</p>
+<nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#motivation" id="toc-motivation">Motivation</a></li>
+  <li><a href="#what-the-package-does" id="toc-what-the-package-does">What the package does</a></li>
+  <li><a href="#stable-adaptive-iir-example" id="toc-stable-adaptive-iir-example">Stable adaptive IIR example</a></li>
+  <li><a href="#finite-hankel-and-model-reduction-diagnostics" id="toc-finite-hankel-and-model-reduction-diagnostics">Finite-Hankel and model-reduction diagnostics</a></li>
+  <li><a href="#matrix-and-mimo-direction" id="toc-matrix-and-mimo-direction">Matrix and MIMO direction</a></li>
+  <li><a href="#algorithms" id="toc-algorithms">Algorithms</a></li>
+  <li><a href="#benchmarks" id="toc-benchmarks">Benchmarks</a></li>
+  <li><a href="#development-status" id="toc-development-status">Development status</a></li>
+  <li><a href="#references" id="toc-references">References</a></li>
+  </ul>
+</nav>
+<p><strong>Claim.</strong> <code>lattice-dsp</code> provides stable IIR lattice filters, adaptive recursive DSP tools, finite-Hankel model-reduction diagnostics, and experimental matrix/MIMO lattice workflows.<br>
+<strong>Status.</strong> Alpha-stage scientific package; Python API with C++/pybind11 kernels and optional OpenMP batch processing.</p>
+<p>Links: <a href="https://github.com/smiryusupov/lattice-dsp">GitHub</a> · <a href="https://pypi.org/project/lattice-dsp/">PyPI</a> · <a href="https://lattice-dsp.readthedocs.io/">Documentation</a> · License: Apache-2.0</p>
+<pre class="{bash}"><code>#| eval: false
+python -m pip install lattice-dsp</code></pre>
+<div id="cd0b859b" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> lattice_dsp <span class="im">as</span> ld</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">0</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> rng.normal(size<span class="op">=</span><span class="dv">4096</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>reflection <span class="op">=</span> [<span class="fl">0.35</span>, <span class="op">-</span><span class="fl">0.2</span>, <span class="fl">0.1</span>]</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>numerator <span class="op">=</span> [<span class="fl">0.25</span>, <span class="fl">0.0</span>, <span class="fl">0.15</span>, <span class="fl">0.7</span>]</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(ld.reflection_to_denominator(reflection))</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>filt <span class="op">=</span> ld.LatticeIIR(reflection, numerator)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> filt.process(x)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<h2 id="motivation">Motivation</h2>
+<p>Recursive IIR filters are compact and useful, but direct-form denominator updates can be numerically awkward. A small update to denominator coefficients can move poles outside the unit circle and turn a stable filter into an unstable one.</p>
+<p>Lattice parameterizations give a stability-aware coordinate system. In the scalar case, reflection or PARCOR coefficients with magnitude less than one correspond to stable recursive filters.</p>
+<p>The package focuses on workflows where these coordinates are useful:</p>
+<ul>
+<li>stable IIR filtering;</li>
+<li>adaptive recursive filtering;</li>
+<li>AR and spectral diagnostics;</li>
+<li>finite-section Hankel/model-reduction experiments;</li>
+<li>matrix/MIMO lattice and state-space examples.</li>
+</ul>
+<p>The goal is not to replace broad DSP libraries such as SciPy. The goal is to provide a focused toolkit for lattice-parameterized recursive signal processing.</p>
+<h2 id="what-the-package-does">What the package does</h2>
+<p>For scalar IIR filters, <code>lattice-dsp</code> provides conversions between reflection coefficients and denominator polynomials, plus lattice and lattice-ladder filtering APIs.</p>
+<p>For example, bounded reflection coefficients</p>
+<p><span class="math display">
+|k_i| &lt; 1
+</span></p>
+<p>define a stable recursive denominator. This makes them useful for adaptive filtering, where unconstrained denominator updates can otherwise leave the stable region.</p>
+<p>The package includes:</p>
+<ul>
+<li><code>LatticeIIR</code> and <code>LatticeLadderIIR</code>;</li>
+<li>reflection/PARCOR coefficient conversions;</li>
+<li>adaptive lattice-ladder NLMS/RLS-style examples;</li>
+<li>Burg and Levinson-Durbin AR tools;</li>
+<li>finite-Hankel SISO and MIMO reduction helpers;</li>
+<li>MIMO Markov tensor and state-space utilities;</li>
+<li>matrix-lattice/all-pass examples;</li>
+<li>tangential Schur/Pick/J-inner diagnostic helpers.</li>
+</ul>
+<h2 id="stable-adaptive-iir-example">Stable adaptive IIR example</h2>
+<div id="c5e634e4" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> lattice_dsp <span class="im">as</span> ld</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">1</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> rng.normal(size<span class="op">=</span><span class="dv">8000</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>target <span class="op">=</span> ld.LatticeIIR([<span class="fl">0.55</span>, <span class="op">-</span><span class="fl">0.32</span>], [<span class="fl">0.4</span>, <span class="op">-</span><span class="fl">0.1</span>, <span class="fl">0.65</span>])</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>desired <span class="op">=</span> np.asarray(target.process(x), dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>adaptive <span class="op">=</span> ld.AdaptiveLatticeLadderNLMS(</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    initial_reflection<span class="op">=</span>[<span class="fl">0.0</span>, <span class="fl">0.0</span>],</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    initial_taps<span class="op">=</span>[<span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>],</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    mu_taps<span class="op">=</span><span class="fl">0.06</span>,</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    mu_reflection<span class="op">=</span><span class="fl">0.0015</span>,</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    margin<span class="op">=</span><span class="fl">1e-4</span>,</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>error <span class="op">=</span> np.asarray(adaptive.adapt_block(x, desired), dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"learned reflection:"</span>, np.<span class="bu">round</span>(adaptive.reflection, <span class="dv">4</span>))</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"final MSE:"</span>, np.mean(error[<span class="op">-</span><span class="dv">1000</span>:] <span class="op">**</span> <span class="dv">2</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<h2 id="finite-hankel-and-model-reduction-diagnostics">Finite-Hankel and model-reduction diagnostics</h2>
+<p>The package includes finite-section model-reduction tools for scalar and MIMO systems.</p>
+<p>For scalar filters, <code>lattice-dsp</code> can build finite Hankel matrices from impulse responses and compute lower-order state-space or IIR candidates. For MIMO systems, it works with Markov tensors of shape</p>
+<p><span class="math display">
+(\text{samples}, \text{outputs}, \text{inputs}).
+</span></p>
+<p>These tools are documented as finite-dimensional diagnostics and baselines, not as full infinite-dimensional optimal solvers.</p>
+<p>Included:</p>
+<ul>
+<li>finite-Hankel SISO reduction;</li>
+<li>MIMO block-Hankel reduction;</li>
+<li>compiled batched MIMO state-space simulation;</li>
+<li>finite-section Nehari/AAK-style diagnostic workflows;</li>
+<li>rational-tail and certificate-style examples.</li>
+</ul>
+<h2 id="matrix-and-mimo-direction">Matrix and MIMO direction</h2>
+<p>A distinctive part of <code>lattice-dsp</code> is the matrix/MIMO lattice direction.</p>
+<p>The package includes examples and utilities for:</p>
+<ul>
+<li>causal online MIMO lattice prediction;</li>
+<li>matrix-lattice all-pass responses;</li>
+<li>streaming paraunitary-style analysis;</li>
+<li>finite-record adjoint diagnostics;</li>
+<li>MIMO block-Hankel reduction;</li>
+<li>bridge diagnostics from MIMO Markov data to matrix-lattice scaffolds;</li>
+<li>finite definite tangential Schur/Pick checks.</li>
+</ul>
+<p>The documentation separates causal runtime APIs from offline estimation and finite-record diagnostics. This distinction matters: a fitted model may be used causally, while the fitting or diagnostic step may require a full finite record.</p>
+<h2 id="algorithms">Algorithms</h2>
+<p>The package connects several related DSP and systems ideas:</p>
+<ul>
+<li>Schur and Levinson-Durbin recursions;</li>
+<li>reflection/PARCOR stability coordinates;</li>
+<li>lattice and lattice-ladder IIR realizations;</li>
+<li>Burg AR estimation;</li>
+<li>block Levinson and multichannel AR modeling;</li>
+<li>finite Hankel operators and Ho-Kalman-style reduction;</li>
+<li>finite-section Nehari/AAK intuition;</li>
+<li>matrix all-pass and J-inner diagnostics;</li>
+<li>right tangential Schur/Pick interpolation data.</li>
+</ul>
+<p>The implementation uses a Python API with C++/pybind11 kernels for core filtering, finite-Hankel, and MIMO state-space routines.</p>
+<h2 id="benchmarks">Benchmarks</h2>
+<p>The benchmarks are intended to measure practical trade-offs rather than produce universal performance claims.</p>
+<p>Examples include:</p>
+<pre class="{bash}"><code>#| eval: false
+python benchmarks/run_benchmarks.py \
+  --channels 64 \
+  --samples 50000 \
+  --repeats 5 \
+  --output reports/benchmark-results.json
 
+python benchmarks/hankel_reduction_speedup.py \
+  --full-orders 16 32 64 \
+  --reduced-orders 4 8 12 16 \
+  --channels 64 \
+  --samples 50000 \
+  --repeats 3 \
+  --output reports/hankel-reduction-speedup.json
+
+python benchmarks/mimo_hankel_reduction_speedup.py \
+  --full-orders 8 16 \
+  --reduced-orders 2 4 6 8 \
+  --inputs 3 \
+  --outputs 3 \
+  --batch 8 \
+  --samples 6000 \
+  --reuse-count 50 \
+  --n-threads 1 \
+  --output reports/mimo-hankel-reduction-speedup.json</code></pre>
+<p>For fair local benchmarking, report hardware, operating system, Python version, NumPy version, compiler, OpenMP availability, and thread settings.</p>
+<h2 id="development-status">Development status</h2>
+<p><code>lattice-dsp</code> is an alpha-stage scientific package. The public release focuses on:</p>
+<ul>
+<li>stable scalar IIR lattice and lattice-ladder filtering;</li>
+<li>adaptive recursive filtering examples;</li>
+<li>AR and spectral diagnostics;</li>
+<li>finite-Hankel SISO/MIMO reduction baselines;</li>
+<li>compiled MIMO state-space processing;</li>
+<li>matrix-lattice and tangential Schur/Pick diagnostics;</li>
+<li>cross-platform wheels for Python 3.12+;</li>
+<li>Sphinx documentation with tutorials and examples.</li>
+</ul>
+<p>Out of scope for the current alpha:</p>
+<ul>
+<li>full infinite-dimensional AAK/Nehari solvers;</li>
+<li>full matrix-valued AAK/Nehari optimal reduction;</li>
+<li>generalized indefinite matrix Schur synthesis;</li>
+<li>production acoustic echo cancellation;</li>
+<li>complete room-acoustics, wireless, or control-system frameworks.</li>
+</ul>
+<h2 id="references">References</h2>
+<p>J. P. Burg. “Maximum entropy spectral analysis.”</p>
+<p>N. Levinson. “The Wiener RMS error criterion in filter design and prediction.”</p>
+<p>H. Akaike. “Markovian representation of stochastic processes and its application to the analysis of autoregressive moving average processes.”</p>
+<p>V. M. Adamjan, D. Z. Arov, and M. G. Krein. Work on Hankel operators and rational approximation.</p>
+<p>P. P. Vaidyanathan. <em>Multirate Systems and Filter Banks.</em></p>
+<p>T. Kailath, A. H. Sayed, and B. Hassibi. <em>Linear Estimation.</em></p>
+<p>B. A. Francis. <em>A Course in H∞ Control Theory.</em></p>
+<p>J. W. Helton. Operator-theoretic approaches to Nehari and interpolation problems.</p>
 
 
 <footer id="site-footer" class="site-footer">
@@ -590,212 +772,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="bm90ZXMlMkNtYWNoaW5lLWxlYXJuaW5nJTJDc3RhdGlzdGljcyUyQ3JvYnVzdG5lc3M=" data-listing-date-sort="1779919200000" data-listing-file-modified-sort="1780013442854" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="19" data-listing-word-count-sort="3669">
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./blog/posts/discrepancy_is_not_risk/index.html" class="no-external">Discrepancy is not risk</a>
-</h3>
-<div class="delink listing-description"><a href="./blog/posts/discrepancy_is_not_risk/index.html" class="no-external">
-<p>A note on why MMD and other distribution discrepancies are not, by themselves, classifier-risk statements.</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="./blog/posts/discrepancy_is_not_risk/index.html" class="no-external">
-<div class="listing-date">
-2026-05-28
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="1" data-categories="bm90ZXMlMkNyb2J1c3RuZXNzJTJDbWFjaGluZS1sZWFybmluZyUyQ3N0YXRpc3RpY3M=" data-listing-date-sort="1779573600000" data-listing-file-modified-sort="1779709130241" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2134">
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./blog/posts/prokhorov_continuity_ml/index.html" class="no-external">Prokhorov continuity and machine-learning robustness</a>
-</h3>
-<div class="delink listing-description"><a href="./blog/posts/prokhorov_continuity_ml/index.html" class="no-external">
-<p>A small robustness note on weak distributional perturbations, tail-sensitive learners, and downstream model instability.</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="./blog/posts/prokhorov_continuity_ml/index.html" class="no-external">
-<div class="listing-date">
-2026-05-24
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="2" data-categories="bm90ZXMlMkNtYWNoaW5lLWxlYXJuaW5nJTJDcmVwcmVzZW50YXRpb24tbGVhcm5pbmc=" data-listing-date-sort="1779314400000" data-listing-file-modified-sort="1779709179302" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2017">
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./blog/posts/linear_readability_bottleneck/index.html" class="no-external">When linear readability is the bottleneck</a>
-</h3>
-<div class="delink listing-description"><a href="./blog/posts/linear_readability_bottleneck/index.html" class="no-external">
-<p>A diagnostic on when nonlinear heads stop adding much after a frozen representation becomes linearly readable.</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="./blog/posts/linear_readability_bottleneck/index.html" class="no-external">
-<div class="listing-date">
-2026-05-21
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="3" data-categories="bm90ZXMlMkNvcHRpbWFsJTIwdHJhbnNwb3J0JTJDaW5mb3JtYXRpb24lMjBnZW9tZXRyeQ==" data-listing-date-sort="1778882400000" data-listing-file-modified-sort="1779708841598" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1872">
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./blog/posts/wasserstein-wrong-geometry/index.html" class="no-external">When Wasserstein loss uses the wrong geometry</a>
-</h3>
-<div class="delink listing-description"><a href="./blog/posts/wasserstein-wrong-geometry/index.html" class="no-external">
-<p>A note on why raw Wasserstein loss measures displacement in the chosen ground geometry, not automatically scale-relative statistical error.</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="./blog/posts/wasserstein-wrong-geometry/index.html" class="no-external">
-<div class="listing-date">
-2026-05-16
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="4" data-categories="bm90ZXM=" data-listing-date-sort="1778709600000" data-listing-file-modified-sort="1779711256671" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="13" data-listing-word-count-sort="2550">
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./blog/posts/power_function_not_error_bar/index.html" class="no-external">When the power function is not an error bar</a>
-</h3>
-<div class="delink listing-description"><a href="./blog/posts/power_function_not_error_bar/index.html" class="no-external">
-<p>A note on why kernel power functions do not become pointwise error estimates without a meaningful RKHS norm bound.</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="./blog/posts/power_function_not_error_bar/index.html" class="no-external">
-<div class="listing-date">
-2026-05-14
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="5" data-categories="bm90ZXMlMkNzdGF0aXN0aWNzJTJDbWFjaGluZS1sZWFybmluZw==" data-listing-date-sort="1778450400000" data-listing-file-modified-sort="1779709417419" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="13" data-listing-word-count-sort="2417">
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./blog/posts/when_exact_matching_is_the_wrong_comfort/index.html" class="no-external">When exact matching is the wrong comfort</a>
-</h3>
-<div class="delink listing-description"><a href="./blog/posts/when_exact_matching_is_the_wrong_comfort/index.html" class="no-external">
-<p>A note on empirical assignment, population transport, and missing tail mass.</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="./blog/posts/when_exact_matching_is_the_wrong_comfort/index.html" class="no-external">
-<div class="listing-date">
-2026-05-11
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="6" data-categories="bm90ZXMlMkNzdGF0aXN0aWNzJTJDbWFjaGluZS1sZWFybmluZw==" data-listing-date-sort="1778018400000" data-listing-file-modified-sort="1779709687750" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1948">
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./blog/posts/geometry_conformal_scores/index.html" class="no-external">Conformal scores and the geometry of efficiency</a>
-</h3>
-<div class="delink listing-description"><a href="./blog/posts/geometry_conformal_scores/index.html" class="no-external">
-<p>A note on conformal validity, score geometry, and efficient prediction sets.</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="./blog/posts/geometry_conformal_scores/index.html" class="no-external">
-<div class="listing-date">
-2026-05-06
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="7" data-categories="bm90ZXMlMkNvcHRpbWl6YXRpb24lMkNtYWNoaW5lLWxlYXJuaW5nJTJDaW5mb3JtYXRpb24tZ2VvbWV0cnk=" data-listing-date-sort="1777932000000" data-listing-file-modified-sort="1779709896473" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="9" data-listing-word-count-sort="1622">
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./blog/posts/fisher_geometry_basin_selection/index.html" class="no-external">Fisher geometry and basin selection</a>
-</h3>
-<div class="delink listing-description"><a href="./blog/posts/fisher_geometry_basin_selection/index.html" class="no-external">
-<p>A small edge-case experiment for natural gradient, Fisher preconditioning, and non-convex basin selection.</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="./blog/posts/fisher_geometry_basin_selection/index.html" class="no-external">
-<div class="listing-date">
-2026-05-05
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="8" data-categories="bm90ZXMlMkNtYWNoaW5lLWxlYXJuaW5nJTJDcmV0cmlldmFs" data-listing-date-sort="1777586400000" data-listing-file-modified-sort="1779710212475" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="16" data-listing-word-count-sort="3116">
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./blog/posts/nearest_neighbors_noisy_features_retrieval/index.html" class="no-external">Nearest neighbors, noisy features, and retrieval</a>
-</h3>
-<div class="delink listing-description"><a href="./blog/posts/nearest_neighbors_noisy_features_retrieval/index.html" class="no-external">
-<p>A note on when Euclidean distance stops meaning relevance.</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="./blog/posts/nearest_neighbors_noisy_features_retrieval/index.html" class="no-external">
-<div class="listing-date">
-2026-05-01
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="9" data-categories="bm90ZXMlMkNzdGF0aXN0aWNzJTJDbWFjaGluZS1sZWFybmluZw==" data-listing-date-sort="1777327200000" data-listing-file-modified-sort="1779710674400" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="14" data-listing-word-count-sort="2643">
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./blog/posts/superefficiency/index.html" class="no-external">Shrinkage, noise length, and inadmissibility</a>
-</h3>
-<div class="delink listing-description"><a href="./blog/posts/superefficiency/index.html" class="no-external">
-<p>A geometric reading of James–Stein estimation, bias, and high-dimensional risk.</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="./blog/posts/superefficiency/index.html" class="no-external">
-<div class="listing-date">
-2026-04-28
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="10" data-categories="bm90ZXMlMkNzdGF0aXN0aWNzJTJDbWFjaGluZS1sZWFybmluZw==" data-listing-date-sort="1776981600000" data-listing-file-modified-sort="1779710905834" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="16" data-listing-word-count-sort="3009">
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./blog/posts/kosmidis-firth/index.html" class="no-external">Curvature, volume, and the boundary</a>
-</h3>
-<div class="delink listing-description"><a href="./blog/posts/kosmidis-firth/index.html" class="no-external">
-<p>A geometric reading of Firth’s adjustment, Jeffreys volume, and why separation breaks ordinary GLMs.</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="./blog/posts/kosmidis-firth/index.html" class="no-external">
-<div class="listing-date">
-2026-04-24
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="11" data-categories="bm90ZXM=" data-listing-date-sort="1776463200000" data-listing-file-modified-sort="1779711107460" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="13" data-listing-word-count-sort="2576">
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./blog/posts/thin-shells/index.html" class="no-external">Thin shells and misleading projections</a>
-</h3>
-<div class="delink listing-description"><a href="./blog/posts/thin-shells/index.html" class="no-external">
-<p>A note on why high-dimensional structure can disappear in 2D.</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="./blog/posts/thin-shells/index.html" class="no-external">
-<div class="listing-date">
-2026-04-18
-</div>
-</a>
-</div>
-</div>
-</div>
-<div class="listing-no-matching d-none"></div>
-</div></body></html>
+</body></html>
