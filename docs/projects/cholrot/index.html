@@ -149,13 +149,13 @@ window.Quarto = {
   <li><a href="#references" id="toc-references">References</a></li>
   </ul>
 </nav>
-<p><strong>Claim.</strong> <code>cholrot</code> provides rank-one Cholesky update/downdate routines and direct modified-factor products without unnecessary matrix materialization.<br>
-<strong>Status.</strong> Alpha-stage scientific package; Python API with C++/pybind11 kernels and pure Python fallbacks.</p>
+<p><code>cholrot</code> is a small scientific Python package for rank-one Cholesky updates, downdates, modified-factor products, and solves.</p>
+<p>It is intended for numerical experiments where a positive-definite matrix changes by a rank-one term and the downstream computation may not need the full modified matrix or even the full modified factor.</p>
+<p>Implementation: Python API with C++/pybind11 kernels and pure Python fallbacks.</p>
 <p>Links: <a href="https://github.com/smiryusupov/cholrot">GitHub</a> · <a href="https://pypi.org/project/cholrot/">PyPI</a> · <a href="https://cholrot.readthedocs.io/">Documentation</a> · License: Apache-2.0</p>
-<div id="1d93d585" class="cell" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>python <span class="op">-</span>m pip install cholrot</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div id="2d7afb46" class="cell" data-execution_count="2">
+<pre class="{bash}"><code>#| eval: false
+python -m pip install cholrot</code></pre>
+<div id="4d7b39d3" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> cholrot <span class="im">import</span> downdate, matvec, cholsolve</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -212,7 +212,7 @@ D D^\top = L L^\top + \alpha z z^\top.
 D^\top D = R^\top R - z z^\top,
 </span></p>
 <p>then</p>
-<div id="4d4a917e" class="cell" data-execution_count="3">
+<div id="8857fa16" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>w <span class="op">=</span> matvec(R, z, v)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>computes</p>
@@ -231,7 +231,7 @@ w = Dv
 (A+\alpha z z^\top)x=b,
 </span></p>
 <p>where <span class="math inline">A</span> is represented by a Cholesky factor.</p>
-<div id="977e592e" class="cell" data-execution_count="4">
+<div id="b44cab3c" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> cholrot <span class="im">import</span> cholsolve</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> cholsolve(R, z, b, alpha<span class="op">=-</span><span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>

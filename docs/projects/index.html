@@ -58,11 +58,16 @@ ul.task-list li input[type="checkbox"] {
 
 
 <p>Software and reproducible research projects.</p>
+<p>These are small scientific Python packages that I maintain as research software. The emphasis is on focused numerical methods, tested examples, documentation, and clear scope boundaries.</p>
 <h2 id="cholrot"><a href="./cholrot/">cholrot</a></h2>
-<p><code>cholrot</code> is an alpha-stage scientific Python package for rank-one Cholesky updates, downdates, modified-factor products, and solves, with C++/pybind11 kernels and pure Python fallbacks.</p>
+<p><code>cholrot</code> is a focused package for rank-one Cholesky updates, downdates, modified-factor products, and solves.</p>
+<p>It may be useful in numerical experiments where a positive-definite matrix changes by a rank-one term and recomputing or materializing every intermediate matrix is unnecessary. The package is intentionally narrow: it does not replace LAPACK or dense Cholesky factorization, but provides routines for rank-one modification workflows.</p>
+<p>Implementation: Python API with C++/pybind11 kernels and pure Python fallbacks.</p>
 <p><a href="./cholrot/">Project page</a> · <a href="https://github.com/smiryusupov/cholrot">GitHub</a> · <a href="https://pypi.org/project/cholrot/">PyPI</a> · <a href="https://cholrot.readthedocs.io/">Documentation</a></p>
 <h2 id="lattice-dsp"><a href="./lattice-dsp/">lattice-dsp</a></h2>
-<p><code>lattice-dsp</code> is an alpha-stage scientific Python package for stable IIR lattice filters, adaptive recursive DSP, finite-Hankel model-reduction diagnostics, and experimental matrix/MIMO lattice workflows, with C++/pybind11 kernels and optional OpenMP batch processing.</p>
+<p><code>lattice-dsp</code> is a research-oriented package for experiments with stability-aware recursive signal processing: IIR lattice filters, reflection/PARCOR coefficient parameterizations, adaptive recursive filtering, AR diagnostics, and finite-dimensional MIMO/model-reduction examples.</p>
+<p>The scalar filtering pieces are the most direct practical APIs. The MIMO, Schur/Pick, and model-reduction pieces are best read as tested experimental diagnostics rather than production solvers.</p>
+<p>Implementation: Python API with C++/pybind11 kernels and optional OpenMP batch processing.</p>
 <p><a href="./lattice-dsp/">Project page</a> · <a href="https://github.com/smiryusupov/lattice-dsp">GitHub</a> · <a href="https://pypi.org/project/lattice-dsp/">PyPI</a> · <a href="https://lattice-dsp.readthedocs.io/">Documentation</a></p>
 
 
