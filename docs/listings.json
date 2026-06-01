@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/blog/posts/good_gp_fit_bad_prediction/index.html",
       "/blog/posts/discrepancy_is_not_risk/index.html",
       "/blog/posts/prokhorov_continuity_ml/index.html",
       "/blog/posts/linear_readability_bottleneck/index.html",
@@ -19,6 +20,7 @@
   {
     "listing": "/blog/index.html",
     "items": [
+      "/blog/posts/good_gp_fit_bad_prediction/index.html",
       "/blog/posts/discrepancy_is_not_risk/index.html",
       "/blog/posts/prokhorov_continuity_ml/index.html",
       "/blog/posts/linear_readability_bottleneck/index.html",
