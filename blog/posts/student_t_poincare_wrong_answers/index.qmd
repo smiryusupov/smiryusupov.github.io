@@ -1,6 +1,6 @@
 ---
 title: "Student-t Fisher geometry and the Poincaré half-plane"
-date: 2026-06-02
+date: 2026-06-06
 description: "A note on Fisher--Rao geometry for Student-t location-scale families, fixed degrees of freedom, and the variable-nu extension."
 categories: [notes, information-geometry, statistics]
 jupyter: python3
@@ -950,6 +950,7 @@ only when $\nu$ is genuinely pinned down as a modelling constraint.
 | Distance | closed form (§6) | numerical; §6 is an upper bound when endpoints lie in one fixed-$\nu$ slice |
 | Same-$\nu$ shortest path | constrained to stay in slice | may leave the slice; in the example only mildly |
 
+
 ## References
 
 * Amari, S. *Differential-Geometrical Methods in Statistics*. Springer, 1985.
@@ -957,3 +958,15 @@ only when $\nu$ is genuinely pinned down as a modelling constraint.
 * Mitchell, A. F. S. "The information matrix, skewness tensor and α-connections for the general multivariate elliptic distribution." *Annals of the Institute of Statistical Mathematics* 41 (1989), 289–304.
 * Costa, S., Santos, S., and Strapasson, J. "Fisher information distance: A geometrical reading." *Discrete Applied Mathematics* 197 (2015), 59–69.
 * Calin, O. and Udrişte, C. *Geometric Modeling in Probability and Statistics*. Springer, 2014.
+
+## Suggested citation
+
+```bibtex
+@misc{miryusupov2026studentt,
+  author = {Miryusupov, Shohruh},
+  title = {Student-t Fisher Geometry and the Poincaré Half-Plane},
+  year = {2026},
+  howpublished = {Research note},
+  url = {https://www.miryusupov.com/blog/posts/student_t_poincare_wrong_answers},
+}
+```
