@@ -153,9 +153,8 @@ window.Quarto = {
 <p><code>lattice-dsp</code> is an alpha-stage scientific Python package for experiments with stability-aware recursive signal processing. It focuses on IIR lattice filters, reflection/PARCOR coefficient parameterizations, adaptive recursive filtering, AR diagnostics, and finite-dimensional MIMO/model-reduction examples.</p>
 <p>The scalar filtering pieces are the most direct practical APIs. The MIMO, Schur/Pick, and model-reduction pieces are best read as tested experimental diagnostics rather than production solvers.</p>
 <p>Links: <a href="https://github.com/smiryusupov/lattice-dsp">GitHub</a> · <a href="https://pypi.org/project/lattice-dsp/">PyPI</a> · <a href="https://lattice-dsp.readthedocs.io/">Documentation</a> · License: Apache-2.0</p>
-<pre class="{bash}"><code>#| eval: false
-python -m pip install lattice-dsp</code></pre>
-<div id="6897533b" class="cell" data-execution_count="1">
+<pre class="{bash}"><code>python -m pip install lattice-dsp</code></pre>
+<div id="306c83c2" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> lattice_dsp <span class="im">as</span> ld</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -193,7 +192,7 @@ python -m pip install lattice-dsp</code></pre>
 <li>tangential Schur/Pick/J-inner diagnostic helpers.</li>
 </ul>
 <h2 id="stable-adaptive-iir-example">Stable adaptive IIR example</h2>
-<div id="59112eb5" class="cell" data-execution_count="2">
+<div id="f8b9f4e1" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> lattice_dsp <span class="im">as</span> ld</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>

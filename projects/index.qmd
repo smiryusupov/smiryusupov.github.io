@@ -26,3 +26,13 @@ The scalar filtering pieces are the most direct practical APIs. The MIMO, Schur/
 Implementation: Python API with C++/pybind11 kernels and optional OpenMP batch processing.
 
 [Project page](./lattice-dsp/) · [GitHub](https://github.com/smiryusupov/lattice-dsp) · [PyPI](https://pypi.org/project/lattice-dsp/) · [Documentation](https://lattice-dsp.readthedocs.io/)
+
+## [robustcov](./robustcov/)
+
+`robustcov` is a research-oriented package for robust covariance estimation, heavy-tail scatter modeling, and interpretable robust-distance anomaly diagnostics.
+
+It is intended for workflows where classical covariance estimates are unstable: contaminated samples, heavy-tailed data, small-sample regimes, high-dimensional scatter estimation, and Mahalanobis-style anomaly screening. The package includes robust scatter estimators, automatic estimator-selection helpers, robust outlier detectors, diagnostic reports, plotting utilities, benchmarks, and use-case galleries.
+
+Implementation: Python API with C++/pybind11 kernels and optional OpenMP acceleration.
+
+[Project page](./robustcov/) · [GitHub](https://github.com/smiryusupov/robustcov) · [PyPI](https://pypi.org/project/robustcov/) · [Documentation](https://robustcov.readthedocs.io/)

@@ -1,0 +1,599 @@
+---
+title: "robustcov"
+description: "Robust covariance estimation, heavy-tail scatter models, and interpretable anomaly diagnostics."
+categories: [projects, robust-statistics, anomaly-detection, Python, C++]
+execute:
+  freeze: auto
+  warning: false
+  message: false
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-depth: 2
+    anchor-sections: false
+    smooth-scroll: false
+---
+
+`robustcov` is an alpha-stage scientific Python package for robust covariance estimation, heavy-tail scatter estimation, and interpretable robust-distance anomaly diagnostics.
+
+It is designed for workflows where ordinary covariance estimates become unstable: contaminated samples, heavy-tailed data, small-sample regimes, high-dimensional scatter estimation, and Mahalanobis-style anomaly screening.
+
+The package combines a Python API with C++/pybind11 kernels for selected compute-heavy routines. The focus is practical robust scatter estimation, diagnostic reporting, benchmark galleries, and application-oriented examples rather than a full probabilistic modeling framework.
+
+Links: [GitHub](https://github.com/smiryusupov/robustcov) · [PyPI](https://pypi.org/project/robustcov/) · [Documentation](https://robustcov.readthedocs.io/) · License: Apache-2.0
+
+```{bash}
+python -m pip install robustcov
+```
+
+```{python}
+#| eval: false
+import numpy as np
+import robustcov as rc
+
+rng = np.random.default_rng(0)
+
+# Heavy-tailed data with injected outliers
+X = rng.standard_t(df=3, size=(400, 5))
+X[:30] += 8.0
+
+est = rc.FastMCD(quality="balanced", random_state=42).fit(X)
+
+print(est.location_)
+print(est.covariance_)
+print(est.radial_kurtosis_)
+
+det = rc.RobustOutlierDetector(
+    estimator=est,
+    contamination=0.075,
+).fit(X)
+
+print(det.labels_)
+```
+
+## Motivation
+
+Classical covariance is highly sensitive to outliers and heavy tails. A small number of extreme observations can inflate covariance estimates, rotate principal directions, distort Mahalanobis distances, and hide the very anomalies one wants to detect.
+
+This is especially visible in settings such as:
+
+- fraud screening;
+- sensor anomaly detection;
+- portfolio stress diagnostics;
+- biomedical feature screening;
+- network traffic monitoring;
+- image or text embedding outlier detection;
+- small-sample, high-dimensional scientific data.
+
+`robustcov` provides robust covariance and scatter estimators that try to separate central structure from contamination or diffuse heavy tails. The resulting robust distances can then be used for diagnostics, anomaly scores, plots, and benchmark comparisons.
+
+## What the package does
+
+The package currently focuses on four related tasks:
+
+1. robust covariance estimation under contamination;
+2. heavy-tail scatter estimation for small-sample or high-dimensional data;
+3. robust-distance anomaly detection and diagnostic reporting;
+4. reproducible benchmark and use-case galleries.
+
+Main public APIs include:
+
+- `FastMCD`;
+- `MinCovDet`;
+- `RegularizedTyler`;
+- `StudentTScatter`;
+- `RegularizedCauchy`;
+- `KLRegularizedTyler`;
+- `WieselTyler`;
+- `HellingerRegularizedTyler`;
+- `AutoRobustScatter`;
+- `RobustOutlierDetector`;
+- `AutoRobustAnomalyDetector`;
+- `ClusterRobustOutlierDetector`;
+- `RobustMedianImputer`;
+- plotting and diagnostic helpers.
+
+The package is not intended to be a replacement for scikit-learn or SciPy. It is narrower: robust covariance, robust scatter, robust distances, and interpretable anomaly diagnostics.
+
+## Robust distances
+
+Most workflows are built around robust squared Mahalanobis distances. Given observations
+
+$$
+x_i \in \mathbb{R}^p,
+$$
+
+a robust location estimate
+
+$$
+\hat\mu
+$$
+
+and a robust covariance or scatter estimate
+
+$$
+\hat\Sigma,
+$$
+
+the robust squared distance is
+
+$$
+d_i^2 =
+(x_i - \hat\mu)^T
+\hat\Sigma^{-1}
+(x_i - \hat\mu).
+$$
+
+Large robust distances indicate observations that are far from the estimated central elliptical structure.
+
+This idea is simple, but the quality of the result depends heavily on the covariance estimate. If the covariance is fitted using all outliers, then the distances may be distorted. `robustcov` focuses on estimators that are less sensitive to this failure mode.
+
+## FastMCD for classical contamination
+
+`FastMCD` is the main estimator for a classical contamination setting: most observations form a central cloud, while a minority are separated outliers.
+
+```{python}
+#| eval: false
+import numpy as np
+import robustcov as rc
+
+rng = np.random.default_rng(1)
+
+X = rng.normal(size=(600, 4))
+X[:40] += np.array([7.0, 0.0, 7.0, 0.0])
+
+mcd = rc.FastMCD(
+    quality="balanced",
+    random_state=0,
+).fit(X)
+
+print("location:", np.round(mcd.location_, 3))
+print("support size:", int(mcd.support_.sum()))
+print("radial kurtosis:", round(mcd.radial_kurtosis_, 3))
+```
+
+`FastMCD` is useful when
+
+$$
+n \gg p
+$$
+
+and the outliers are at least partly separable from the central data. It is less appropriate when the data are mostly heavy-tailed but not clearly split into clean and contaminated subsets.
+
+## Heavy-tail scatter estimators
+
+For diffuse heavy tails, small samples, or high-dimensional regimes, hard subset selection may not be the right tool. `robustcov` includes several iteratively reweighted scatter estimators.
+
+```{python}
+#| eval: false
+import numpy as np
+import robustcov as rc
+
+rng = np.random.default_rng(2)
+
+X = rng.standard_t(df=2.5, size=(120, 40))
+
+cauchy = rc.RegularizedCauchy(alpha=0.10).fit(X)
+student = rc.StudentTScatter(df=3, alpha=0.05).fit(X)
+tyler = rc.RegularizedTyler(
+    alpha=0.10,
+    scale_correction="radial_median",
+).fit(X)
+
+print("Cauchy condition:", np.linalg.cond(cauchy.covariance_))
+print("Student-t radial kurtosis:", student.radial_kurtosis_)
+print("Tyler scale:", getattr(tyler, "scale_", None))
+```
+
+The main heavy-tail estimators are:
+
+- `RegularizedCauchy`;
+- `StudentTScatter`;
+- `RegularizedTyler`.
+
+`RegularizedCauchy` applies strong radial downweighting with shrinkage. It is intended for very heavy-tailed samples and small-sample regimes.
+
+`StudentTScatter` uses Student-t style weights. Smaller degrees of freedom correspond to heavier tails and more aggressive downweighting.
+
+`RegularizedTyler` estimates robust shape. Tyler-style estimators are scale-free unless a scale correction is applied, so they are often best interpreted through robust shape and robust distances.
+
+## Automatic estimator selection
+
+`AutoRobustScatter` is a practical exploratory selector. It fits candidate estimators and chooses one using diagnostic or stability-based criteria.
+
+```{python}
+#| eval: false
+import numpy as np
+import robustcov as rc
+
+rng = np.random.default_rng(3)
+X = rng.standard_t(df=3, size=(300, 12))
+X[:20] += 5.0
+
+auto = rc.AutoRobustScatter(selection="diagnostic").fit(X)
+
+print(auto.best_estimator_name_)
+print(auto.summary())
+```
+
+This is not an oracle. It is meant as a helpful first pass when the user does not yet know whether the data are better described as classical contamination, diffuse heavy tails, or a small-sample high-dimensional problem.
+
+## Robust outlier detection
+
+The robust covariance estimators can be wrapped into anomaly detectors.
+
+```{python}
+#| eval: false
+import numpy as np
+import robustcov as rc
+
+rng = np.random.default_rng(4)
+
+X = rng.normal(size=(500, 6))
+X[:25] += 6.0
+
+detector = rc.RobustOutlierDetector(
+    estimator=rc.FastMCD(quality="fast", random_state=42),
+    threshold="empirical",
+    alpha=0.95,
+).fit(X)
+
+scores = detector.decision_function(X)
+labels = detector.predict(X)
+
+print("detected outliers:", int((labels == -1).sum()))
+print("largest scores:", np.sort(scores)[-5:])
+```
+
+The anomaly score is based on robust distance. This makes the results interpretable: a point is suspicious because it is far from the robustly estimated center relative to the robust covariance or scatter shape.
+
+## Diagnostic reports
+
+`robustcov` includes diagnostic summaries to help interpret fitted estimators.
+
+```{python}
+#| eval: false
+import numpy as np
+import robustcov as rc
+
+rng = np.random.default_rng(5)
+X = rng.standard_t(df=3, size=(400, 8))
+
+est = rc.RegularizedCauchy(alpha=0.10).fit(X)
+
+report = rc.diagnostic_report(est)
+print(report.summary())
+```
+
+Reports are intended to summarize quantities such as:
+
+- robust-distance behavior;
+- radial kurtosis;
+- condition number;
+- detected fraction;
+- support fraction when applicable;
+- tail diagnostics;
+- heuristic recommendations.
+
+This is useful because robust covariance is rarely a one-number problem. The same estimator can behave differently depending on tail behavior, sample size, dimension, and contamination structure.
+
+## Visual diagnostics
+
+The package includes plotting helpers for robust distances, QQ plots, covariance heatmaps, benchmark curves, and anomaly panels.
+
+```{python}
+#| eval: false
+import numpy as np
+import robustcov as rc
+
+rng = np.random.default_rng(6)
+X = rng.normal(size=(500, 5))
+X[:30] += 5.0
+
+est = rc.FastMCD(quality="balanced", random_state=0).fit(X)
+
+rc.plot_robust_distance_profile(
+    est,
+    output_path="distance_profile.png",
+    show=False,
+)
+
+rc.plot_mahalanobis_qq(
+    est,
+    output_path="qq.png",
+    show=False,
+)
+
+rc.plot_covariance_heatmap(
+    est.covariance_,
+    title="FastMCD covariance",
+    output_path="covariance.png",
+    show=False,
+)
+```
+
+The plotting API is designed for reports and documentation, not only for notebooks. Most functions support saving figures through `output_path`.
+
+## Multimodal diagnostics
+
+A single global robust covariance model is not always appropriate. If a data set contains several legitimate clusters or regimes, a global robust estimator may treat small valid modes as anomalies.
+
+`ClusterRobustOutlierDetector` provides a cluster-then-local-robust-scatter workflow.
+
+```{python}
+#| eval: false
+import numpy as np
+import robustcov as rc
+
+rng = np.random.default_rng(7)
+
+X1 = rng.normal(loc=(-3, 0), scale=0.8, size=(250, 2))
+X2 = rng.normal(loc=(3, 0), scale=0.8, size=(250, 2))
+X = np.vstack([X1, X2])
+X[:20] += np.array([0, 6])
+
+det = rc.ClusterRobustOutlierDetector(
+    n_clusters=2,
+    contamination=0.05,
+    random_state=0,
+).fit(X)
+
+scores = det.decision_function(X)
+labels = det.predict(X)
+
+print("detected outliers:", int((labels == -1).sum()))
+```
+
+This is not a full robust mixture model. It is a practical diagnostic workflow for multimodal data where local robust distances are more meaningful than one global covariance estimate.
+
+## Missing values and preprocessing
+
+The package includes a robust median imputer for simple preprocessing pipelines.
+
+```{python}
+#| eval: false
+import numpy as np
+import robustcov as rc
+
+X = np.array([
+    [1.0, 2.0, np.nan],
+    [2.0, np.nan, 3.0],
+    [100.0, 4.0, 4.0],
+])
+
+imputer = rc.RobustMedianImputer().fit(X)
+X_clean = imputer.transform(X)
+
+print(X_clean)
+```
+
+The goal is not to replace full-featured preprocessing libraries. The helper exists so robust covariance examples can handle simple missing-value cases without leaving the package.
+
+## OpenMP acceleration
+
+If OpenMP is available at build time, the C++ backend can parallelize selected operations.
+
+```{python}
+#| eval: false
+import robustcov as rc
+
+print("OpenMP available:", rc.has_openmp())
+print("threads:", rc.get_num_threads())
+
+rc.set_num_threads(4)
+```
+
+For reproducible timing, avoid thread oversubscription from BLAS libraries:
+
+```{bash}
+#| eval: false
+OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 \
+python benchmarks/openmp_scaling.py \
+  --n 8000 \
+  --p 20 \
+  --threads 1 2 4 \
+  --csv results/openmp_scaling.csv
+```
+
+## Benchmarks
+
+The benchmark gallery is intended to show trade-offs rather than universal wins.
+
+Examples include:
+
+```{bash}
+#| eval: false
+python benchmarks/speed_estimators.py
+
+python benchmarks/accuracy_vs_contamination.py
+
+python benchmarks/small_sample_heavy_tail.py
+
+python benchmarks/fastmcd_quality_speed_tradeoff.py
+
+python benchmarks/anomaly_detection_baselines.py
+
+python benchmarks/openmp_scaling.py
+
+python benchmarks/make_report.py --outdir results/report
+```
+
+The benchmark documentation is intentionally conservative. `robustcov` is strongest when the signal is covariance-shaped, heavy-tailed, high-dimensional, or benefits from interpretable robust distances. It is not expected to win every anomaly-detection benchmark.
+
+For fair local benchmarking, report:
+
+- hardware;
+- operating system;
+- Python version;
+- NumPy and SciPy versions;
+- compiler;
+- OpenMP availability;
+- BLAS thread settings;
+- sample size and dimension;
+- random seed.
+
+## Use-case gallery
+
+The examples directory includes practical scripts for different application patterns.
+
+```{bash}
+#| eval: false
+python examples/run_use_case_gallery.py --all
+
+python examples/use_case_finance_risk.py
+python examples/use_case_multimodal_anomaly.py
+python examples/use_case_sensor_anomaly.py
+python examples/use_case_breast_cancer_screening.py
+python examples/use_case_digits_one_class_baselines.py
+python examples/use_case_ml_preprocessing.py
+```
+
+Use cases include:
+
+- finance risk and portfolio stress;
+- fraud screening;
+- predictive maintenance;
+- sensor anomaly detection;
+- biomedical screening;
+- network traffic diagnostics;
+- text embedding outliers;
+- image feature anomaly detection;
+- multimodal anomaly detection.
+
+The examples are meant to be reproducible templates rather than leaderboard claims.
+
+## External and Kaggle examples
+
+External examples live separately from the normal test suite because they may require manual data downloads or separate dataset licenses.
+
+```{bash}
+#| eval: false
+python examples_external/kaggle_credit_card_fraud.py \
+  --data examples_external/data/creditcard.csv \
+  --outdir results/external/credit_card_fraud
+
+python examples_external/collect_external_results.py \
+  --root results/external \
+  --outdir results/external_registry
+```
+
+The external-data pages should be read as evidence and diagnostics, not as universal claims. Some data sets are good fits for robust covariance methods, some are competitive but slower, and some are included mainly to show limitations.
+
+## Algorithms
+
+The package connects several robust-statistics ideas:
+
+- minimum covariance determinant estimation;
+- C-step refinement for robust subset selection;
+- robust Mahalanobis distances;
+- Tyler shape estimation;
+- regularized Tyler scatter;
+- Student-t M-estimation;
+- Cauchy-style radial downweighting;
+- shrinkage toward stable covariance targets;
+- empirical and diagnostic anomaly thresholds;
+- cluster-aware local robust scatter diagnostics.
+
+A simplified view of the robust-distance workflow is:
+
+```{text}
+raw data
+  ↓
+robust location and scatter estimation
+  ↓
+robust squared distances
+  ↓
+diagnostic thresholds or empirical contamination rule
+  ↓
+outlier labels, anomaly scores, plots, and reports
+```
+
+For heavy-tailed M-estimators, the core idea is iterative radial reweighting. Observations with large robust distance receive smaller weights when updating the scatter matrix.
+
+For example, a Student-t style weight has the form
+
+$$
+w_i(d_i^2) =
+\frac{\nu + p}{\nu + d_i^2},
+$$
+
+where
+
+$$
+\nu
+$$
+
+is the degrees-of-freedom parameter and
+
+$$
+p
+$$
+
+is the dimension.
+
+Tyler-style estimators use a shape equation of the form
+
+$$
+\hat S =
+\frac{p}{n}
+\sum_{i=1}^n
+\frac{z_i z_i^T}{z_i^T \hat S^{-1} z_i},
+\qquad
+z_i = x_i - \hat\mu.
+$$
+
+Regularization then shrinks the update toward a stable target matrix,
+
+$$
+S_{\text{new}}
+=
+(1-\alpha)S_{\text{robust}}
++
+\alpha T.
+$$
+
+This improves conditioning in small-sample or high-dimensional regimes.
+
+## Development status
+
+`robustcov` is an alpha-stage scientific package. The current public release focuses on:
+
+- robust covariance under contamination;
+- heavy-tail scatter estimation;
+- robust-distance anomaly diagnostics;
+- automatic estimator selection heuristics;
+- multimodal cluster-aware diagnostics;
+- plotting and diagnostic reports;
+- use-case and benchmark galleries;
+- cross-platform wheels for Python 3.12+;
+- Sphinx documentation with examples.
+
+Out of scope for the current alpha:
+
+- full robust mixture modeling;
+- minimum-volume ellipsoid as a main production API;
+- density modeling with AIC/BIC model selection;
+- deep anomaly detection;
+- universal fraud or intrusion-detection leadership claims;
+- replacing scikit-learn covariance estimators in all settings.
+
+The package is best understood as a focused robust-covariance and diagnostic toolkit.
+
+## References
+
+P. J. Rousseeuw. “Least Median of Squares Regression.”
+
+P. J. Rousseeuw and K. Van Driessen. “A Fast Algorithm for the Minimum Covariance Determinant Estimator.”
+
+D. E. Tyler. “A Distribution-Free M-Estimator of Multivariate Scatter.”
+
+E. Ollila, D. E. Tyler, V. Koivunen, and H. V. Poor. Work on complex elliptically symmetric distributions and robust covariance.
+
+Y. Chen, A. Wiesel, and A. O. Hero. Work on shrinkage covariance estimation under elliptical models.
+
+R. A. Maronna, R. D. Martin, V. J. Yohai, and M. Salibián-Barrera. *Robust Statistics: Theory and Methods.*
+
+P. J. Huber and E. M. Ronchetti. *Robust Statistics.*
+
+T. W. Anderson. *An Introduction to Multivariate Statistical Analysis.*
