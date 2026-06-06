@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2026-06-02">
+<meta name="description" content="A note on Fisher–Rao geometry for Student-t location-scale families, fixed degrees of freedom, and the variable-nu extension.">
+
+<title>Student-t Fisher geometry and the Poincaré half-plane – Shohruh Miryusupov</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-html/tabby.min.js"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-html-640605f58ae58ee79329c070719e555b.min.css" rel="stylesheet" append-hash="true" data-mode="light">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../../styles.css">
+</head>
+
+<body>
+
+<nav class="site-nav">
+  <a class="nav-name" href="../../../">Shohruh Miryusupov</a>
+  <div class="nav-links">
+    <a href="../../../blog/">Writings</a>
+    <a href="../../../projects/">Projects</a>
+    <a href="../../../about.html">About</a>
+    <a href="https://github.com/smiryusupov">GitHub</a>
+  </div>
+</nav>
+
+<header id="title-block-header">
+<h1 class="title">Student-t Fisher geometry and the Poincaré half-plane</h1>
+
+<p class="date">2026-06-02</p>
+</header>
+
+<nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#why-geometry-enters" id="toc-why-geometry-enters">Why geometry enters</a></li>
+  <li><a href="#locationscale-families" id="toc-locationscale-families">Location–scale families</a></li>
+  <li><a href="#the-student-t-metric" id="toc-the-student-t-metric">The Student-t metric</a></li>
+  <li><a href="#the-poincaré-half-plane" id="toc-the-poincaré-half-plane">The Poincaré half-plane</a></li>
+  <li><a href="#geodesics-and-distance" id="toc-geodesics-and-distance">Geodesics and distance</a></li>
+  <li><a href="#closed-form-distance" id="toc-closed-form-distance">Closed-form distance</a></li>
+  <li><a href="#reading-the-geometry" id="toc-reading-the-geometry">Reading the geometry</a></li>
+  <li><a href="#where-euclidean-geometry-gives-wrong-answers" id="toc-where-euclidean-geometry-gives-wrong-answers">Where Euclidean geometry gives wrong answers</a></li>
+  <li><a href="#checks-for-the-fixed-nu-formulas" id="toc-checks-for-the-fixed-nu-formulas">Checks for the fixed-<span class="math inline">\nu</span> formulas</a></li>
+  <li><a href="#what-changes-when-nu-is-free" id="toc-what-changes-when-nu-is-free">What changes when <span class="math inline">\nu</span> is free</a></li>
+  <li><a href="#the-full-fisher-matrix" id="toc-the-full-fisher-matrix">The full Fisher matrix</a></li>
+  <li><a href="#numerical-geodesics-in-the-full-model" id="toc-numerical-geodesics-in-the-full-model">Numerical geodesics in the full model</a></li>
+  <li><a href="#leaving-the-fixed-nu-slice" id="toc-leaving-the-fixed-nu-slice">Leaving the fixed-<span class="math inline">\nu</span> slice</a></li>
+  <li><a href="#fixed-nu-versus-free-nu" id="toc-fixed-nu-versus-free-nu">Fixed <span class="math inline">\nu</span> versus free <span class="math inline">\nu</span></a></li>
+  <li><a href="#references" id="toc-references">References</a></li>
+  </ul>
+</nav>
+<style>
+.narrow-figure {
+  max-width: 620px;
+  margin: 1.25rem auto;
+}
+.narrow-figure figure,
+.narrow-figure .quarto-figure {
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+.narrow-figure img {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+<p>We usually index a Student-<span class="math inline">t</span> distribution by a location <span class="math inline">\mu</span>, a scale <span class="math inline">\sigma</span>, and degrees of freedom <span class="math inline">\nu</span>. Those coordinates are convenient, but they don’t really measure anything on their own. A shift of <span class="math inline">0.5</span> does very different work for a narrow distribution than for a wide one, and adding a unit of scale is not the same operation at <span class="math inline">\sigma=1</span> as it is at <span class="math inline">\sigma=10</span>.</p>
+<p>What we’d like instead is a ruler that comes from the distributions themselves, one that calls two parameter values close when their densities are hard to tell apart and far when they’re easy to tell apart. The Fisher–Rao metric is exactly that ruler. For fixed <span class="math inline">\nu</span> it hands the Student-<span class="math inline">t</span> location–scale family a clean answer — a rescaled Poincaré half-plane — and most of this note lives in that case. The clean picture stops being the whole story the moment <span class="math inline">\nu</span> is allowed to move, and that is where the note ends up.</p>
+<h2 id="why-geometry-enters">Why geometry enters</h2>
+<p>Coordinate distance measures the wrong thing. It tells you how far apart two parameter values sit in the chart <span class="math inline">(\mu,\sigma,\nu)</span>, which is not the same as how far apart the corresponding distributions are.</p>
+<p>The Fisher information metric <span class="math display">
+g_{ij}(\theta)=\mathbb{E}_\theta[\partial_i\log f\,\partial_j\log f]
+</span> fixes this, because it is the quadratic term in the local KL divergence: <span class="math display">
+D_{\mathrm{KL}}(p_\theta\|p_{\theta+d\theta})
+=\frac12 g_{ij}(\theta)d\theta^i d\theta^j+O(\|d\theta\|^3).
+</span> Read that way, the metric records which small parameter moves are actually visible at the level of the probability laws and quietly discounts the ones that aren’t. For fixed degrees of freedom it takes a pleasantly simple form — it turns out to be hyperbolic — and the next few sections work that out before I circle back to what breaks if you ignore it.</p>
+<h2 id="locationscale-families">Location–scale families</h2>
+<p>Let <span class="math inline">g</span> be a symmetric, smooth probability density on <span class="math inline">\mathbb{R}</span>, and form the location–scale family <span class="math display">
+f(x;\mu,\sigma) = \frac{1}{\sigma}\,g\!\left(\frac{x-\mu}{\sigma}\right),
+\qquad \sigma &gt; 0.
+</span></p>
+<p>Writing <span class="math inline">\ell = \log f</span> and <span class="math inline">z = (x-\mu)/\sigma</span>, one has <span class="math inline">\partial_\mu \ell = -\sigma^{-1} (g'/g)(z)</span> and <span class="math inline">\partial_\sigma \ell = -\sigma^{-1}\,(1 + z\,(g'/g)(z))</span>.</p>
+<p>Symmetry of <span class="math inline">g</span> kills the cross-term, so the Fisher matrix comes out diagonal: <span class="math display">
+I_{\mu\mu}(\mu,\sigma) = \frac{A}{\sigma^2},\qquad
+I_{\sigma\sigma}(\mu,\sigma) = \frac{B}{\sigma^2},
+</span> with constants <span class="math display">
+A = \int (g'/g)^2 \, g\,dz,\qquad
+B = \int (1 + z\,g'/g)^2 \, g\,dz.
+</span></p>
+<p>Since <span class="math inline">A</span> and <span class="math inline">B</span> depend only on the <em>shape</em> <span class="math inline">g</span> and not on <span class="math inline">\mu</span> or <span class="math inline">\sigma</span>, the Fisher–Rao line element on the upper half-plane is <span class="math display">
+\boxed{\;ds^2 = \frac{A\,d\mu^2 + B\,d\sigma^2}{\sigma^2}\;}
+</span></p>
+<p>That is a <strong>Poincaré-type metric</strong> for any reasonably regular symmetric location–scale family whose Fisher constants <span class="math inline">A</span> and <span class="math inline">B</span> are finite. The Gaussian gives <span class="math inline">A=1, B=2</span>; next we work out the constants for the Student-t.</p>
+<h2 id="the-student-t-metric">The Student-t metric</h2>
+<p>For the Student-t with <span class="math inline">\nu</span> degrees of freedom, <span class="math display">
+g(z) \propto \left(1 + \tfrac{z^2}{\nu}\right)^{-(\nu+1)/2},
+\qquad \frac{g'(z)}{g(z)} = -\frac{(\nu+1)\,z}{\nu + z^2}.
+</span></p>
+<p>Both integrals are standard — substitute <span class="math inline">z = \sqrt{\nu}\,\tan\theta</span> and lean on the beta-function identities — and they give <span class="math display">
+A = \frac{\nu+1}{\nu+3},\qquad
+B = \frac{2\nu}{\nu+3}.
+</span></p>
+<p>So the Fisher–Rao line element is <span class="math display">
+ds^2 \;=\; \frac{1}{\nu+3}\cdot\frac{(\nu+1)\,d\mu^2 + 2\nu\,d\sigma^2}{\sigma^2}.
+</span></p>
+<p>As <span class="math inline">\nu\to\infty</span> this recovers the Gaussian metric <span class="math inline">(d\mu^2 + 2\,d\sigma^2)/\sigma^2</span>, and <span class="math inline">\nu=1</span> is the Cauchy case.</p>
+<h2 id="the-poincaré-half-plane">The Poincaré half-plane</h2>
+<p>Substitute <span class="math inline">\tilde\mu = (a/b)\,\mu</span> with <span class="math inline">a=\sqrt{A}</span>, <span class="math inline">b=\sqrt{B}</span>. Then <span class="math display">
+ds^2 = b^2 \cdot \frac{d\tilde\mu^2 + d\sigma^2}{\sigma^2},
+</span> which is <span class="math inline">b^2</span> times the <strong>standard Poincaré metric</strong> on the upper half-plane. That metric has Gaussian curvature <span class="math inline">-1</span>, and multiplying a metric by <span class="math inline">b^2</span> scales its curvature by <span class="math inline">1/b^2</span>, so <span class="math display">
+\boxed{\;K_\nu = -\frac{1}{b^2} = -\frac{\nu+3}{2\nu}\;}
+</span></p>
+<p>The limiting cases:</p>
+<ul>
+<li><span class="math inline">\nu \to \infty</span> (Gaussian): <span class="math inline">K \to -1/2</span>.</li>
+<li><span class="math inline">\nu = 1</span> (Cauchy): <span class="math inline">K = -2</span>.</li>
+<li><span class="math inline">\nu \to 0^+</span>: <span class="math inline">K \to -\infty</span> — the geometry degenerates along with the tails.</li>
+</ul>
+<h2 id="geodesics-and-distance">Geodesics and distance</h2>
+<p>In the rescaled coordinate <span class="math inline">(\tilde\mu, \sigma)</span> we are back to the standard Poincaré metric, whose geodesics everyone knows:</p>
+<ul>
+<li><strong>vertical lines</strong> <span class="math inline">\tilde\mu = \text{const}</span>, or</li>
+<li><strong>semicircles</strong> centred on the <span class="math inline">\sigma=0</span> axis.</li>
+</ul>
+<p>Pulling these back through <span class="math inline">\mu = (b/a)\,\tilde\mu</span> stretches them horizontally by <span class="math inline">b/a = \sqrt{2\nu/(\nu+1)}</span>. In the original <span class="math inline">(\mu,\sigma)</span> coordinates, then, a non-vertical geodesic is <strong>half of an ellipse</strong> centred on the line <span class="math inline">\sigma=0</span>, with horizontal semi-axis <span class="math inline">b/a</span> times the vertical one. The aspect ratio depends only on <span class="math inline">\nu</span>:</p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th style="text-align: right;"><span class="math inline">\nu</span></th>
+<th style="text-align: right;"><span class="math inline">b/a</span></th>
+<th style="text-align: left;">shape</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;"><span class="math inline">1</span> (Cauchy)</td>
+<td style="text-align: right;"><span class="math inline">1</span></td>
+<td style="text-align: left;">circle</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;"><span class="math inline">3</span></td>
+<td style="text-align: right;"><span class="math inline">\sqrt{3/2} \approx 1.22</span></td>
+<td style="text-align: left;">slightly stretched</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;"><span class="math inline">\infty</span> (Gaussian)</td>
+<td style="text-align: right;"><span class="math inline">\sqrt{2} \approx 1.41</span></td>
+<td style="text-align: left;">ellipse</td>
+</tr>
+</tbody>
+</table>
+<h2 id="closed-form-distance">Closed-form distance</h2>
+<p>The standard Poincaré distance on <span class="math inline">(\tilde\mu, \sigma)</span> is <span class="math inline">d_P(P_1,P_2) = \operatorname{arccosh}(1 + \Delta)</span> with <span class="math inline">\Delta = \tfrac{(\tilde\mu_1-\tilde\mu_2)^2 + (\sigma_1-\sigma_2)^2}{2\sigma_1\sigma_2}</span>. Scaling the metric by <span class="math inline">b^2</span> scales distances by <span class="math inline">b</span>, and undoing <span class="math inline">\tilde\mu = (a/b)\mu</span> gives <span class="math inline">(\tilde\mu_1-\tilde\mu_2)^2 = (\nu+1)/(2\nu)\cdot (\mu_1-\mu_2)^2</span>. Put together, <span class="math display">
+\boxed{\;
+d_{\mathrm{FR}}\bigl(t_\nu(\mu_1,\sigma_1),\,t_\nu(\mu_2,\sigma_2)\bigr)
+=\sqrt{\tfrac{2\nu}{\nu+3}}\;
+\operatorname{arccosh}\!\left(1 + \frac{\tfrac{\nu+1}{2\nu}(\mu_1-\mu_2)^2 + (\sigma_1-\sigma_2)^2}{2\sigma_1\sigma_2}\right).
+\;}
+</span></p>
+<p>In the Gaussian limit (<span class="math inline">\nu\to\infty</span>) this collapses to the classical Atkinson–Mitchell formula <span class="math inline">d_{\mathrm{FR}} = \sqrt{2}\,\operatorname{arccosh}(1 + (\Delta\mu^2/2 + \Delta\sigma^2)/(2\sigma_1\sigma_2))</span>.</p>
+<h2 id="reading-the-geometry">Reading the geometry</h2>
+<p>The closed form earns its keep by telling us how to read the pictures that follow. A straight line in the chart is usually not the shortest statistical path; an equal-distance set is not a Euclidean circle; and any change in <span class="math inline">\mu</span> gets divided by <span class="math inline">\sigma</span> before it counts for anything.</p>
+<h3 id="a-single-geodesic">A single geodesic</h3>
+<p>Take two distributions, <span class="math inline">P_1=t_3(-1.2,0.7)</span> and <span class="math inline">P_2=t_3(1.3,1.5)</span>. The shortest Fisher–Rao path between them is not the straight segment joining their coordinates — it bows upward, because travelling close to small <span class="math inline">\sigma</span> is expensive.</p>
+<div id="cell-fig-geodesic" class="cell" data-execution_count="2">
+<div class="cell-output cell-output-display">
+<div id="fig-geodesic" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-geodesic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-geodesic-output-1.png" width="754" height="445">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-geodesic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: A Fisher–Rao geodesic bends away from small scale.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<h3 id="how-nu-changes-the-shape">How <span class="math inline">\nu</span> changes the shape</h3>
+<p>Hold the endpoints fixed and vary <span class="math inline">\nu</span>, and what changes is the horizontal stretch of the hyperbolic half-plane. Heavy Cauchy-like tails give one shape; the Gaussian limit gives another.</p>
+<div id="cell-fig-nu-comparison" class="cell" data-execution_count="3">
+<div class="cell-output cell-output-display">
+<div id="fig-nu-comparison" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-nu-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-nu-comparison-output-1.png" width="754" height="445">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-nu-comparison-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Changing ν changes the shape of the same endpoint-to-endpoint path.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<h3 id="balls-are-not-euclidean-balls">Balls are not Euclidean balls</h3>
+<p>A Fisher–Rao ball gathers the distributions at equal information distance from the centre. Drawn in the <span class="math inline">(\mu,\sigma)</span> chart, these balls sit higher than you’d expect and curl away from <span class="math inline">\sigma=0</span>. That boundary is infinitely far off, which is why a tiny Euclidean step near zero scale can amount to a large statistical move.</p>
+<div id="cell-fig-balls" class="cell" data-execution_count="4">
+<div class="cell-output cell-output-display">
+<div id="fig-balls" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-balls-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-balls-output-1.png" width="754" height="445">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-balls-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Fisher–Rao distance level sets from <span class="math inline">(0,1)</span> at <span class="math inline">\nu=3</span>.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<h3 id="back-to-densities">Back to densities</h3>
+<p>The points in the half-plane are only a compact shorthand for densities. Here are the two distributions behind the points in the geodesic picture above.</p>
+<div id="cell-fig-densities" class="cell" data-execution_count="5">
+<div class="cell-output cell-output-display">
+<div id="fig-densities" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-densities-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-densities-output-1.png" width="754" height="367">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-densities-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: The two densities represented by the points <span class="math inline">P_1</span> and <span class="math inline">P_2</span>.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<h3 id="curvature-across-degrees-of-freedom">Curvature across degrees of freedom</h3>
+<div id="cell-fig-curvature" class="cell" data-execution_count="6">
+<div class="cell-output cell-output-display">
+<div id="fig-curvature" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-curvature-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-curvature-output-1.png" width="754" height="368">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-curvature-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: Gaussian curvature <span class="math inline">K_\nu = -(\nu+3)/(2\nu)</span> of the Student-t Fisher–Rao half-plane.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<h2 id="where-euclidean-geometry-gives-wrong-answers">Where Euclidean geometry gives wrong answers</h2>
+<p>None of this matters unless the geometry actually flips an answer somewhere, so here are a handful of cases where Euclidean distance in <span class="math inline">(\mu,\sigma)</span> ranks distributional changes the wrong way round.</p>
+<p>To keep the comparison honest I’ll also report total variation as a check at the level of probabilities: <span class="math display">
+\operatorname{TV}(P,Q)=\frac12\int |p(x)-q(x)|\,dx.
+</span> With equal class priors, the best possible binary classifier telling <span class="math inline">P</span> from <span class="math inline">Q</span> has accuracy <span class="math display">
+\operatorname{Acc}^*(P,Q)=\frac{1+\operatorname{TV}(P,Q)}{2}.
+</span> So a small TV means even the optimal classifier is barely better than guessing, and that gives the numbers in the tables below something tangible to mean.</p>
+<h3 id="same-coordinate-move-different-statistical-change">Same coordinate move, different statistical change</h3>
+<p>Shift the location by the same raw amount, <span class="math inline">\Delta\mu=0.5</span>, once for a narrow <span class="math inline">t_3</span> distribution and once for a wide one:</p>
+<div id="cell-wrong-same-euclidean-move" class="cell" data-execution_count="8">
+<div id="wrong-same-euclidean-move" class="cell-output cell-output-display cell-output-markdown" data-execution_count="8">
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Comparison</th>
+<th>Euclidean</th>
+<th>Fisher–Rao</th>
+<th>TV</th>
+<th>Bayes accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">t_3(0,0.2)</span> vs <span class="math inline">t_3(0.5,0.2)</span></td>
+<td>0.5000</td>
+<td>1.7918</td>
+<td>0.7001</td>
+<td>0.8500</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">t_3(0,2)</span> vs <span class="math inline">t_3(0.5,2)</span></td>
+<td>0.5000</td>
+<td>0.2038</td>
+<td>0.0916</td>
+<td>0.5458</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>By the Euclidean reckoning these are the same move. As distributions they are nothing alike: the narrow pair is easy to separate, while the same shift barely disturbs the wide pair. The <span class="math inline">d\mu^2/\sigma^2</span> term in the metric is precisely this effect — a location error only means something relative to the scale it sits on.</p>
+<div id="cell-fig-wrong-same-shift" class="cell" data-execution_count="9">
+<div class="cell-output cell-output-display">
+<div id="fig-wrong-same-shift" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-wrong-same-shift-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-wrong-same-shift-output-1.png" width="754" height="367">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-wrong-same-shift-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: The same raw location shift is statistically large at small scale and small at large scale.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<h3 id="a-ranking-reversal">A ranking reversal</h3>
+<p>A starker failure. Pair A moves only <span class="math inline">0.1</span> in raw location; pair B moves a full <span class="math inline">5</span>. By Euclidean distance B wins easily. But A is extremely narrow and B is very wide, so once you look at the distributions the verdict flips.</p>
+<div id="cell-wrong-ranking-reversal" class="cell" data-execution_count="10">
+<div id="wrong-ranking-reversal" class="cell-output cell-output-display cell-output-markdown" data-execution_count="10">
+<table class="caption-top">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Comparison</th>
+<th>Euclidean</th>
+<th>Fisher–Rao</th>
+<th>TV</th>
+<th>Bayes accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A: <span class="math inline">t_3(0,0.05)</span> vs <span class="math inline">t_3(0.1,0.05)</span></td>
+<td>0.1000</td>
+<td>1.4910</td>
+<td>0.6090</td>
+<td>0.8045</td>
+</tr>
+<tr class="even">
+<td>B: <span class="math inline">t_3(0,10)</span> vs <span class="math inline">t_3(5,10)</span></td>
+<td>5.0000</td>
+<td>0.4055</td>
+<td>0.1813</td>
+<td>0.5906</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Euclidean distance is answering the coordinate question correctly and the statistical question wrongly: it ranks the raw <span class="math inline">5</span>-unit move as the larger one, whereas Fisher–Rao distance, TV distance, and optimal classification accuracy all agree that the tiny <span class="math inline">0.1</span> move at small scale is the bigger change in distribution.</p>
+<h3 id="scale-changes-are-multiplicative">Scale changes are multiplicative</h3>
+<p>Euclidean geometry misreads scale too. In Fisher–Rao geometry, stretching <span class="math inline">\sigma</span> to <span class="math inline">2\sigma</span> costs the same information distance wherever you start, since along a vertical geodesic <span class="math display">
+d_{\mathrm{FR}}\bigl(t_\nu(\mu,\sigma),t_\nu(\mu,c\sigma)\bigr)
+= \sqrt{\frac{2\nu}{\nu+3}}\,|\log c|.
+</span> At <span class="math inline">\nu=3</span> the prefactor is one, so the distance is just <span class="math inline">|\log c|</span>.</p>
+<div id="cell-wrong-scale-multiplicative" class="cell" data-execution_count="11">
+<div id="wrong-scale-multiplicative" class="cell-output cell-output-display cell-output-markdown" data-execution_count="11">
+<table class="caption-top">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Comparison</th>
+<th>Euclidean</th>
+<th>Fisher–Rao</th>
+<th>TV</th>
+<th>Bayes accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>doubling: <span class="math inline">t_3(0,1)</span> vs <span class="math inline">t_3(0,2)</span></td>
+<td>1.0000</td>
+<td>0.6931</td>
+<td>0.2783</td>
+<td>0.6392</td>
+</tr>
+<tr class="even">
+<td>doubling: <span class="math inline">t_3(0,10)</span> vs <span class="math inline">t_3(0,20)</span></td>
+<td>10.0000</td>
+<td>0.6931</td>
+<td>0.2783</td>
+<td>0.6392</td>
+</tr>
+<tr class="odd">
+<td>add one: <span class="math inline">t_3(0,10)</span> vs <span class="math inline">t_3(0,11)</span></td>
+<td>1.0000</td>
+<td>0.0953</td>
+<td>0.0394</td>
+<td>0.5197</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Euclidean geometry puts the two doublings at distances <span class="math inline">1</span> and <span class="math inline">10</span>; the statistical geometry calls them the very same change. Going the other way, adding one unit of scale at <span class="math inline">\sigma=10</span> is almost invisible next to doubling from <span class="math inline">1</span> to <span class="math inline">2</span>, even though both have a raw scale increment of <span class="math inline">1</span>.</p>
+<h3 id="wrong-nearest-neighbor">Wrong nearest neighbor</h3>
+<p>For a last example, take a query distribution <span class="math display">
+Q=t_3(0,1)
+</span> and two candidate prototypes <span class="math display">
+A=t_3(0.2,0.05),\qquad B=t_3(0.1,2).
+</span> Which one is closer to <span class="math inline">Q</span>?</p>
+<div id="cell-wrong-nearest-neighbour" class="cell" data-execution_count="12">
+<div id="wrong-nearest-neighbour" class="cell-output cell-output-display cell-output-markdown" data-execution_count="12">
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Comparison</th>
+<th>Euclidean</th>
+<th>Fisher–Rao</th>
+<th>TV</th>
+<th>Bayes accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">Q</span> vs <span class="math inline">A=t_3(0.2,0.05)</span></td>
+<td>0.9708</td>
+<td>3.0221</td>
+<td>0.8368</td>
+<td>0.9184</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">Q</span> vs <span class="math inline">B=t_3(0.1,2)</span></td>
+<td>1.0050</td>
+<td>0.6954</td>
+<td>0.2792</td>
+<td>0.6396</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>A nearest-neighbour rule on Euclidean distance picks <span class="math inline">A</span>, since <span class="math inline">(0.2,0.05)</span> is marginally closer to <span class="math inline">(0,1)</span> in raw coordinates than <span class="math inline">(0.1,2)</span> is. As distributions, though, <span class="math inline">A</span> is the far one — a narrow spike — while <span class="math inline">B</span> is just a moderate change of scale. Fisher–Rao, TV, and Bayes accuracy all prefer <span class="math inline">B</span>.</p>
+<p>That, more than the tidy formula, is why one bothers with the Poincaré metric. It keeps nearest-neighbour search, clustering, interpolation, and model comparison from mistaking proximity in coordinates for proximity in distribution.</p>
+<h2 id="checks-for-the-fixed-nu-formulas">Checks for the fixed-<span class="math inline">\nu</span> formulas</h2>
+<p>Before promoting <span class="math inline">\nu</span> to a coordinate, it’s worth checking the fixed-slice formulas against direct numerical integration — mostly to catch the sign and scaling slips that are easy to make here.</p>
+<div id="cell-verify-fixed" class="cell" data-execution_count="13">
+<div id="verify-fixed" class="cell-output cell-output-display">
+<p>The direct numerical checks agree with the closed forms to numerical precision.</p>
+
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">ν</th>
+<th data-quarto-table-cell-role="th">A, numerical</th>
+<th data-quarto-table-cell-role="th">A, closed form</th>
+<th data-quarto-table-cell-role="th">B, numerical</th>
+<th data-quarto-table-cell-role="th">B, closed form</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>0.500000</td>
+<td>0.500000</td>
+<td>0.500000</td>
+<td>0.500000</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>0.666667</td>
+<td>0.666667</td>
+<td>1.000000</td>
+<td>1.000000</td>
+</tr>
+<tr class="odd">
+<td>10</td>
+<td>0.846154</td>
+<td>0.846154</td>
+<td>1.538462</td>
+<td>1.538462</td>
+</tr>
+<tr class="even">
+<td>50</td>
+<td>0.962264</td>
+<td>0.962264</td>
+<td>1.886792</td>
+<td>1.886792</td>
+</tr>
+</tbody>
+</table>
+
+
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">ν</th>
+<th data-quarto-table-cell-role="th">geodesic arc length</th>
+<th data-quarto-table-cell-role="th">closed-form distance</th>
+<th data-quarto-table-cell-role="th">absolute difference</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>1.508537</td>
+<td>1.508537</td>
+<td>4.6e-10</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>1.859740</td>
+<td>1.859740</td>
+<td>3.4e-10</td>
+</tr>
+<tr class="odd">
+<td>10</td>
+<td>2.160554</td>
+<td>2.160554</td>
+<td>3.3e-10</td>
+</tr>
+<tr class="even">
+<td>50</td>
+<td>2.332169</td>
+<td>2.332169</td>
+<td>3.4e-10</td>
+</tr>
+</tbody>
+</table>
+
+<p>Density normalization check over [-100,100]: 0.999999.</p>
+</div>
+</div>
+<h2 id="what-changes-when-nu-is-free">What changes when <span class="math inline">\nu</span> is free</h2>
+<p>The Poincaré result is a fixed-<span class="math inline">\nu</span> statement. Let <span class="math inline">\nu</span> vary and the model becomes the three-dimensional manifold <span class="math display">
+\mathcal M=\{t_\nu(\mu,\sigma):\mu\in\mathbb R,\ \sigma&gt;0,\ \nu&gt;0\}.
+</span> Now the Fisher matrix carries a genuine shape direction. The location coordinate still decouples by symmetry, but <span class="math inline">\sigma</span> and <span class="math inline">\nu</span> no longer do, and the fixed-slice constant-curvature half-plane stops being the whole geometry.</p>
+<h2 id="the-full-fisher-matrix">The full Fisher matrix</h2>
+<p>Symmetry of the standardized density keeps <span class="math inline">\mu</span> decoupled: <span class="math inline">I_{\mu\sigma}=I_{\mu\nu}=0</span>. The fixed-<span class="math inline">\nu</span> block is still sitting in the upper-left corner. What’s new is the signed coupling between scale and tail thickness: <span class="math display">
+\boxed{\;
+I(\mu,\sigma,\nu)=
+\begin{pmatrix}
+\dfrac{\nu+1}{(\nu+3)\,\sigma^2} &amp; 0 &amp; 0 \\[1.1em]
+0 &amp; \dfrac{2\nu}{(\nu+3)\,\sigma^2} &amp;
+-\dfrac{2}{\sigma(\nu+1)(\nu+3)} \\[1.1em]
+0 &amp; -\dfrac{2}{\sigma(\nu+1)(\nu+3)} &amp; I_{\nu\nu}(\nu)
+\end{pmatrix}
+\;}
+</span> <span class="math display">
+I_{\nu\nu}(\nu)=\tfrac14\!\left[\psi'\!\left(\tfrac{\nu}{2}\right)-\psi'\!\left(\tfrac{\nu+1}{2}\right)\right]
+-\frac{\nu+5}{2\nu(\nu+1)(\nu+3)}.
+</span></p>
+<p>That trigamma term is exactly what stops the metric from staying a nice rational form. The sign of the cross term also matters: with the usual scale coordinate <span class="math inline">\sigma</span> we have <span class="math inline">\partial_\sigma\log f=-(1+z\,\partial_z\log g_\nu(z))/\sigma</span>, which makes the <span class="math inline">(\sigma,\nu)</span> entry negative. Both new entries are confirmed below by direct integration of the signed score products.</p>
+<div id="cell-fisher3-verify" class="cell" data-execution_count="14">
+<div id="fisher3-verify" class="cell-output cell-output-display">
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">ν</th>
+<th data-quarto-table-cell-role="th">I<sub>σν</sub>, numerical</th>
+<th data-quarto-table-cell-role="th">I<sub>σν</sub>, closed form</th>
+<th data-quarto-table-cell-role="th">I<sub>νν</sub>, numerical</th>
+<th data-quarto-table-cell-role="th">I<sub>νν</sub>, closed form</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>3</td>
+<td>-0.083333</td>
+<td>-0.083333</td>
+<td>0.016911</td>
+<td>0.016911</td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>-0.013986</td>
+<td>-0.013986</td>
+<td>0.000250</td>
+<td>0.000250</td>
+</tr>
+<tr class="odd">
+<td>30</td>
+<td>-0.001955</td>
+<td>-0.001955</td>
+<td>0.000004</td>
+<td>0.000004</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="cell-fig-fisher-entries" class="cell" data-execution_count="15">
+<div class="cell-output cell-output-display">
+<div id="fig-fisher-entries" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-fisher-entries-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-fisher-entries-output-1.png" width="862" height="345">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-fisher-entries-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7: The two new metric components versus ν (at σ=1). <span class="math inline">I_{\nu\nu}</span> shown on a log scale.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Both new entries die off as <span class="math inline">\nu\to\infty</span> (<span class="math inline">I_{\sigma\nu}\to0</span>, and in fact <span class="math inline">I_{\nu\nu}=O(\nu^{-4})</span>): the shape direction decouples and the Gaussian half-plane re-emerges as the limiting location-scale geometry.</p>
+<h2 id="numerical-geodesics-in-the-full-model">Numerical geodesics in the full model</h2>
+<p>Below I assemble the metric, its analytic derivatives (the <span class="math inline">\nu</span>-derivative of <span class="math inline">I_{\nu\nu}</span> drags in the tetragamma <span class="math inline">\psi''</span>), and the Christoffel symbols <span class="math inline">\Gamma^i_{jk}=\tfrac12 g^{im}(\partial_j g_{ml}+\partial_l g_{mj}-\partial_m g_{jl})</span>. Geodesics solve <span class="math inline">\ddot\theta^{\,i}+\Gamma^i_{jk}\dot\theta^{\,j}\dot\theta^{\,k}=0</span>, and to find the one between two prescribed distributions I solve the boundary-value problem and then measure its metric arc length.</p>
+<p>Treat what follows as a transparent numerical check rather than a production geodesic solver. The boundary-value problem is solved directly in <span class="math inline">(\mu,\sigma,\nu)</span>, so the examples keep an eye on whether the path stays inside the domain <span class="math inline">\sigma&gt;0,\nu&gt;0</span>; anything more robust would work in <span class="math inline">(\mu,\log\sigma,\log\nu)</span> or impose the domain constraints explicitly.</p>
+<h2 id="leaving-the-fixed-nu-slice">Leaving the fixed-<span class="math inline">\nu</span> slice</h2>
+<p>Take two distributions sharing the <strong>same</strong> degrees of freedom, <span class="math inline">P_1 = t_3(-1.2, 0.7)</span> and <span class="math inline">P_2 = t_3(1.3, 1.5)</span>. Pinned to the <span class="math inline">\nu=3</span> slice, the geodesic between them has length about <span class="math inline">1.860</span>. In the full three-parameter manifold that same curve is still a legal path — it just need not be the shortest one. With the cross-term sign handled correctly the effect turns out mild, far milder than the earlier unsigned calculation suggested: the optimal path dips out of the slice only a little, <span class="math inline">\nu</span> wandering between roughly <span class="math inline">2.76</span> and <span class="math inline">3.55</span>, and the length drops only slightly, to about <span class="math inline">1.852</span>.</p>
+<p>That is the honest reading. Freeing <span class="math inline">\nu</span> can shorten the path, but how far it moves and in which direction depends on the endpoints. There is no generic plunge toward Cauchy tails.</p>
+<div id="cell-bow-result" class="cell" data-execution_count="17">
+<div id="bow-result" class="cell-output cell-output-display">
+<p>At the first endpoint,
+Γ<sup>ν</sup><sub>μμ</sub> = 5.688 and
+Γ<sup>ν</sup><sub>σσ</sub> = -17.063.
+These nonzero normal components show that the fixed-ν slice is not totally geodesic.</p>
+
+
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">quantity</th>
+<th data-quarto-table-cell-role="th">value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>full three-parameter geodesic length, L<sub>3D</sub></td>
+<td>1.85176</td>
+</tr>
+<tr class="even">
+<td>fixed-ν in-slice distance, d<sub>ν=3</sub></td>
+<td>1.85974</td>
+</tr>
+<tr class="odd">
+<td>ν range along the full geodesic</td>
+<td>[2.7618, 3.5517]</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="cell-fig-bow" class="cell" data-execution_count="18">
+<div class="cell-output cell-output-display">
+<div id="fig-bow" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-bow-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-bow-output-1.png" width="864" height="356">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bow-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8: The 3D geodesic between two ν=3 distributions: its (μ,σ) projection and the mild off-slice variation in ν.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell" data-execution_count="19">
+<div id="fig-3d" class="cell quarto-float quarto-figure quarto-figure-center" data-execution_count="19">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-3d-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output cell-output-display">
+<div id="fig-3d-1" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-3d-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-3d-output-1.png" data-ref-parent="fig-3d" width="534" height="536">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-3d-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Three Fisher–Rao geodesics in the full (μ,σ,ν) manifold.
+</figcaption>
+</figure>
+</div>
+</div>
+<div id="fig-3d-2" class="cell-output cell-output-display quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-subfloat-fig">
+<div aria-describedby="fig-3d-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">case</th>
+<th data-quarto-table-cell-role="th">geodesic length</th>
+<th data-quarto-table-cell-role="th">ν range</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>ν: 3 → 3</td>
+<td>1.85176</td>
+<td>[2.76, 3.55]</td>
+</tr>
+<tr class="even">
+<td>ν: 2.5 → 20</td>
+<td>1.54804</td>
+<td>[2.50, 20.00]</td>
+</tr>
+<tr class="odd">
+<td>ν: 2 → 30</td>
+<td>0.59907</td>
+<td>[2.00, 30.00]</td>
+</tr>
+</tbody>
+</table>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-3d-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b)
+</figcaption>
+</figure>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-3d-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9
+</figcaption>
+</figure>
+</div>
+</div>
+<p>When the two endpoints sit in the same fixed-<span class="math inline">\nu</span> slice, the fixed-<span class="math inline">\nu</span> distance is a constrained distance, and so it can only be an <strong>upper bound</strong> on the true three-parameter Fisher–Rao distance. Here the bound is tight: freeing <span class="math inline">\nu</span> buys a small shortcut, not a dramatic heavy-tail detour. The two distances coincide only when <span class="math inline">\nu</span> is genuinely pinned down as a modelling constraint.</p>
+<h2 id="fixed-nu-versus-free-nu">Fixed <span class="math inline">\nu</span> versus free <span class="math inline">\nu</span></h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Quantity</th>
+<th style="text-align: left;">Fixed <span class="math inline">\nu</span></th>
+<th style="text-align: left;">Free <span class="math inline">\nu</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Manifold dimension</td>
+<td style="text-align: left;"><span class="math inline">2</span></td>
+<td style="text-align: left;"><span class="math inline">3</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Curvature</td>
+<td style="text-align: left;">constant <span class="math inline">-(\nu+3)/(2\nu)</span> on each fixed slice</td>
+<td style="text-align: left;">not captured by one fixed-slice constant-curvature model</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Metric form</td>
+<td style="text-align: left;">rational in <span class="math inline">\nu</span></td>
+<td style="text-align: left;">trigamma <span class="math inline">\psi'</span> in <span class="math inline">I_{\nu\nu}</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Geodesics</td>
+<td style="text-align: left;">half-ellipses (closed form)</td>
+<td style="text-align: left;">numerical (BVP)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Distance</td>
+<td style="text-align: left;">closed form (§6)</td>
+<td style="text-align: left;">numerical; §6 is an upper bound when endpoints lie in one fixed-<span class="math inline">\nu</span> slice</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Same-<span class="math inline">\nu</span> shortest path</td>
+<td style="text-align: left;">constrained to stay in slice</td>
+<td style="text-align: left;">may leave the slice; in the example only mildly</td>
+</tr>
+</tbody>
+</table>
+<h2 id="references">References</h2>
+<ul>
+<li>Amari, S. <em>Differential-Geometrical Methods in Statistics</em>. Springer, 1985.</li>
+<li>Atkinson, C. and Mitchell, A. F. S. “Rao’s distance measure.” <em>Sankhyā A</em> 43 (1981), 345–365.</li>
+<li>Mitchell, A. F. S. “The information matrix, skewness tensor and α-connections for the general multivariate elliptic distribution.” <em>Annals of the Institute of Statistical Mathematics</em> 41 (1989), 289–304.</li>
+<li>Costa, S., Santos, S., and Strapasson, J. “Fisher information distance: A geometrical reading.” <em>Discrete Applied Mathematics</em> 197 (2015), 59–69.</li>
+<li>Calin, O. and Udrişte, C. <em>Geometric Modeling in Probability and Statistics</em>. Springer, 2014.</li>
+</ul>
+
+
+<footer id="site-footer" class="site-footer">
+  <span class="site-disclaimer">
+    Personal academic site. Views and notes are my own and do not represent my employer. Written independently, using public sources and personal resources.
+  </span>
+</footer>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const footer = document.getElementById("site-footer");
+    if (footer) {
+      document.body.appendChild(footer);
+    }
+  });
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const tocLinks = [...document.querySelectorAll("#TOC a[href^='#']")];
+  const sections = tocLinks
+    .map(link => document.querySelector(decodeURIComponent(link.getAttribute("href"))))
+    .filter(Boolean);
+
+  if (!tocLinks.length || !sections.length) return;
+
+  const setActive = () => {
+    let active = sections[0];
+
+    for (const section of sections) {
+      if (section.getBoundingClientRect().top <= 120) {
+        active = section;
+      }
+    }
+
+    tocLinks.forEach(link => {
+      link.classList.toggle(
+        "active",
+        link.getAttribute("href") === "#" + CSS.escape(active.id)
+      );
+    });
+  };
+
+  setActive();
+  window.addEventListener("scroll", setActive, { passive: true });
+});
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+    tabsets.forEach(function(tabset) {
+      const tabby = new Tabby('#' + tabset.id);
+    });
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/www\.miryusupov\.com");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'light-border',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+
+
+
+
+</body></html>
