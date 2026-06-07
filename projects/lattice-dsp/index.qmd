@@ -21,6 +21,8 @@ The scalar filtering pieces are the most direct practical APIs. The MIMO, Schur/
 
 Links: [GitHub](https://github.com/smiryusupov/lattice-dsp) · [PyPI](https://pypi.org/project/lattice-dsp/) · [Documentation](https://lattice-dsp.readthedocs.io/) · License: Apache-2.0
 
+`lattice-dsp` is independently maintained volunteer open-source research software released under the Apache-2.0 license.
+
 ```{bash}
 python -m pip install lattice-dsp
 ```

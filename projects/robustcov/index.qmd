@@ -23,6 +23,8 @@ The package combines a Python API with C++/pybind11 kernels for selected compute
 
 Links: [GitHub](https://github.com/smiryusupov/robustcov) · [PyPI](https://pypi.org/project/robustcov/) · [Documentation](https://robustcov.readthedocs.io/) · License: Apache-2.0
 
+`robustcov` is independently maintained volunteer open-source research software released under the Apache-2.0 license.
+
 ```{bash}
 python -m pip install robustcov
 ```

@@ -164,8 +164,9 @@ window.Quarto = {
 <p>It is designed for workflows where ordinary covariance estimates become unstable: contaminated samples, heavy-tailed data, small-sample regimes, high-dimensional scatter estimation, Mahalanobis-style anomaly screening, covariance drift monitoring, and robust input-metric construction for kernel or similarity methods.</p>
 <p>The package combines a Python API with C++/pybind11 kernels for selected compute-heavy routines. The focus is practical robust scatter estimation, diagnostic reporting, SPD geometry utilities, robust input metrics, benchmark galleries, and application-oriented examples. It is not intended to be a full probabilistic modeling framework or a replacement for general-purpose machine-learning libraries.</p>
 <p>Links: <a href="https://github.com/smiryusupov/robustcov">GitHub</a> · <a href="https://pypi.org/project/robustcov/">PyPI</a> · <a href="https://robustcov.readthedocs.io/">Documentation</a> · License: Apache-2.0</p>
+<p><code>robustcov</code> is independently maintained volunteer open-source research software released under the Apache-2.0 license.</p>
 <pre class="{bash}"><code>python -m pip install robustcov</code></pre>
-<div id="a1b78c76" class="cell" data-execution_count="1">
+<div id="b2308c89" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -267,7 +268,7 @@ robust Mahalanobis distance
   ↓
 robust similarity / kernel geometry</code></pre>
 <p>The <code>robustcov.geometry</code> module includes utilities for SPD matrix normalization, matrix powers, matrix logarithms and exponentials, affine-invariant distance, log-Euclidean distance, geodesic interpolation, and Tyler fixed-point diagnostics.</p>
-<div id="db25a4ca" class="cell" data-execution_count="2">
+<div id="2515de95" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov.geometry <span class="im">as</span> rcg</span>
@@ -301,7 +302,7 @@ k_R(x, y)
 \hat\Sigma_R
 </span></p>
 <p>is a robust covariance or scatter estimate.</p>
-<div id="6537ba61" class="cell" data-execution_count="3">
+<div id="f0dc5a71" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> robustcov.kernels <span class="im">import</span> robust_rbf_kernel</span>
@@ -323,7 +324,7 @@ k_R(x, y)
 <p>The package also includes sklearn-style and GPyTorch-style adapters for robust input metrics. These utilities target the input geometry of kernel methods and Gaussian-process workflows. They do not replace GP inference, likelihood modeling, posterior computation, or training loops.</p>
 <h2 id="fastmcd-for-classical-contamination">FastMCD for classical contamination</h2>
 <p><code>FastMCD</code> is the main estimator for a classical contamination setting: most observations form a central cloud, while a minority are separated outliers.</p>
-<div id="8d3c5cf0" class="cell" data-execution_count="4">
+<div id="b91d2233" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -348,7 +349,7 @@ n \gg p
 <p>and the outliers are at least partly separable from the central data. It is less appropriate when the data are mostly heavy-tailed but not clearly split into clean and contaminated subsets.</p>
 <h2 id="heavy-tail-scatter-estimators">Heavy-tail scatter estimators</h2>
 <p>For diffuse heavy tails, small samples, or high-dimensional regimes, hard subset selection may not be the right tool. <code>robustcov</code> includes several iteratively reweighted scatter estimators.</p>
-<div id="12ab6d22" class="cell" data-execution_count="5">
+<div id="3c198089" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -378,7 +379,7 @@ n \gg p
 <p><code>RegularizedTyler</code> estimates robust shape. Tyler-style estimators are scale-free unless a scale correction is applied, so they are often best interpreted through robust shape and robust distances.</p>
 <h2 id="automatic-estimator-selection">Automatic estimator selection</h2>
 <p><code>AutoRobustScatter</code> is a practical exploratory selector. It fits candidate estimators and chooses one using diagnostic or stability-based criteria.</p>
-<div id="24798929" class="cell" data-execution_count="6">
+<div id="dfe13f0d" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -394,7 +395,7 @@ n \gg p
 <p>This is not an oracle. It is meant as a helpful first pass when the user does not yet know whether the data are better described as classical contamination, diffuse heavy tails, or a small-sample high-dimensional problem.</p>
 <h2 id="robust-outlier-detection">Robust outlier detection</h2>
 <p>The robust covariance estimators can be wrapped into anomaly detectors.</p>
-<div id="8056d7ec" class="cell" data-execution_count="7">
+<div id="53e00b81" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -418,7 +419,7 @@ n \gg p
 <p>The anomaly score is based on robust distance. This makes the results interpretable: a point is suspicious because it is far from the robustly estimated center relative to the robust covariance or scatter shape.</p>
 <h2 id="diagnostic-reports-and-plotting">Diagnostic reports and plotting</h2>
 <p><code>robustcov</code> includes diagnostic summaries to help interpret fitted estimators.</p>
-<div id="ab7fa790" class="cell" data-execution_count="8">
+<div id="c2898907" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -444,7 +445,7 @@ n \gg p
 <h2 id="multimodal-diagnostics">Multimodal diagnostics</h2>
 <p>A single global robust covariance model is not always appropriate. If a data set contains several legitimate clusters or regimes, a global robust estimator may treat small valid modes as anomalies.</p>
 <p><code>ClusterRobustOutlierDetector</code> provides a cluster-then-local-robust-scatter workflow.</p>
-<div id="0dfc1a35" class="cell" data-execution_count="9">
+<div id="6555e8b6" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -469,7 +470,7 @@ n \gg p
 <p>This is not a full robust mixture model. It is a practical diagnostic workflow for multimodal data where local robust distances are more meaningful than one global covariance estimate.</p>
 <h2 id="missing-values-and-preprocessing">Missing values and preprocessing</h2>
 <p>The package includes a robust median imputer for simple preprocessing pipelines.</p>
-<div id="d8ab04cd" class="cell" data-execution_count="10">
+<div id="e3d48990" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -487,7 +488,7 @@ n \gg p
 <p>The goal is not to replace full-featured preprocessing libraries. The helper exists so robust covariance examples can handle simple missing-value cases without leaving the package.</p>
 <h2 id="openmp-acceleration">OpenMP acceleration</h2>
 <p>If OpenMP is available at build time, the C++ backend can parallelize selected operations.</p>
-<div id="df709874" class="cell" data-execution_count="11">
+<div id="968c9d11" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"OpenMP available:"</span>, rc.has_openmp())</span>
