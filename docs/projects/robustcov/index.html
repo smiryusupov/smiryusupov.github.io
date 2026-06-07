@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Robust covariance estimation, heavy-tail scatter models, and interpretable anomaly diagnostics.">
+<meta name="description" content="Robust scatter geometry for anomaly detection, kernels, and ML workflows.">
 
 <title>robustcov – Shohruh Miryusupov</title>
 <style>
@@ -142,12 +142,13 @@ window.Quarto = {
   <li><a href="#motivation" id="toc-motivation">Motivation</a></li>
   <li><a href="#what-the-package-does" id="toc-what-the-package-does">What the package does</a></li>
   <li><a href="#robust-distances" id="toc-robust-distances">Robust distances</a></li>
+  <li><a href="#spd-geometry-and-robust-similarity" id="toc-spd-geometry-and-robust-similarity">SPD geometry and robust similarity</a></li>
+  <li><a href="#robust-kernels-and-gp-input-metrics" id="toc-robust-kernels-and-gp-input-metrics">Robust kernels and GP input metrics</a></li>
   <li><a href="#fastmcd-for-classical-contamination" id="toc-fastmcd-for-classical-contamination">FastMCD for classical contamination</a></li>
   <li><a href="#heavy-tail-scatter-estimators" id="toc-heavy-tail-scatter-estimators">Heavy-tail scatter estimators</a></li>
   <li><a href="#automatic-estimator-selection" id="toc-automatic-estimator-selection">Automatic estimator selection</a></li>
   <li><a href="#robust-outlier-detection" id="toc-robust-outlier-detection">Robust outlier detection</a></li>
-  <li><a href="#diagnostic-reports" id="toc-diagnostic-reports">Diagnostic reports</a></li>
-  <li><a href="#visual-diagnostics" id="toc-visual-diagnostics">Visual diagnostics</a></li>
+  <li><a href="#diagnostic-reports-and-plotting" id="toc-diagnostic-reports-and-plotting">Diagnostic reports and plotting</a></li>
   <li><a href="#multimodal-diagnostics" id="toc-multimodal-diagnostics">Multimodal diagnostics</a></li>
   <li><a href="#missing-values-and-preprocessing" id="toc-missing-values-and-preprocessing">Missing values and preprocessing</a></li>
   <li><a href="#openmp-acceleration" id="toc-openmp-acceleration">OpenMP acceleration</a></li>
@@ -159,12 +160,12 @@ window.Quarto = {
   <li><a href="#references" id="toc-references">References</a></li>
   </ul>
 </nav>
-<p><code>robustcov</code> is an alpha-stage scientific Python package for robust covariance estimation, heavy-tail scatter estimation, and interpretable robust-distance anomaly diagnostics.</p>
-<p>It is designed for workflows where ordinary covariance estimates become unstable: contaminated samples, heavy-tailed data, small-sample regimes, high-dimensional scatter estimation, and Mahalanobis-style anomaly screening.</p>
-<p>The package combines a Python API with C++/pybind11 kernels for selected compute-heavy routines. The focus is practical robust scatter estimation, diagnostic reporting, benchmark galleries, and application-oriented examples rather than a full probabilistic modeling framework.</p>
+<p><code>robustcov</code> is a research-oriented Python/C++ package for robust covariance and scatter estimation, SPD geometry, anomaly diagnostics, and robust kernel/similarity workflows.</p>
+<p>It is designed for workflows where ordinary covariance estimates become unstable: contaminated samples, heavy-tailed data, small-sample regimes, high-dimensional scatter estimation, Mahalanobis-style anomaly screening, covariance drift monitoring, and robust input-metric construction for kernel or similarity methods.</p>
+<p>The package combines a Python API with C++/pybind11 kernels for selected compute-heavy routines. The focus is practical robust scatter estimation, diagnostic reporting, SPD geometry utilities, robust input metrics, benchmark galleries, and application-oriented examples. It is not intended to be a full probabilistic modeling framework or a replacement for general-purpose machine-learning libraries.</p>
 <p>Links: <a href="https://github.com/smiryusupov/robustcov">GitHub</a> · <a href="https://pypi.org/project/robustcov/">PyPI</a> · <a href="https://robustcov.readthedocs.io/">Documentation</a> · License: Apache-2.0</p>
 <pre class="{bash}"><code>python -m pip install robustcov</code></pre>
-<div id="c6463d03" class="cell" data-execution_count="1">
+<div id="a1b78c76" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -197,15 +198,19 @@ window.Quarto = {
 <li>biomedical feature screening;</li>
 <li>network traffic monitoring;</li>
 <li>image or text embedding outlier detection;</li>
-<li>small-sample, high-dimensional scientific data.</li>
+<li>small-sample, high-dimensional scientific data;</li>
+<li>covariance drift monitoring;</li>
+<li>robust input metrics for kernel and similarity workflows.</li>
 </ul>
-<p><code>robustcov</code> provides robust covariance and scatter estimators that try to separate central structure from contamination or diffuse heavy tails. The resulting robust distances can then be used for diagnostics, anomaly scores, plots, and benchmark comparisons.</p>
+<p><code>robustcov</code> provides robust covariance and scatter estimators that try to separate central structure from contamination or diffuse heavy tails. The resulting robust geometry can then be used for diagnostics, anomaly scores, plots, benchmark comparisons, SPD-matrix comparisons, and robust kernel or similarity methods.</p>
 <h2 id="what-the-package-does">What the package does</h2>
-<p>The package currently focuses on four related tasks:</p>
+<p>The package currently focuses on six related tasks:</p>
 <ol type="1">
 <li>robust covariance estimation under contamination;</li>
 <li>heavy-tail scatter estimation for small-sample or high-dimensional data;</li>
 <li>robust-distance anomaly detection and diagnostic reporting;</li>
+<li>SPD geometry for covariance and scatter matrices;</li>
+<li>robust input metrics for kernel, Gaussian-process, and similarity workflows;</li>
 <li>reproducible benchmark and use-case galleries.</li>
 </ol>
 <p>Main public APIs include:</p>
@@ -223,9 +228,12 @@ window.Quarto = {
 <li><code>AutoRobustAnomalyDetector</code>;</li>
 <li><code>ClusterRobustOutlierDetector</code>;</li>
 <li><code>RobustMedianImputer</code>;</li>
+<li><code>robustcov.geometry</code>;</li>
+<li>robust metric and kernel helpers;</li>
+<li>sklearn-style and GPyTorch-style kernel adapters;</li>
 <li>plotting and diagnostic helpers.</li>
 </ul>
-<p>The package is not intended to be a replacement for scikit-learn or SciPy. It is narrower: robust covariance, robust scatter, robust distances, and interpretable anomaly diagnostics.</p>
+<p>The package is not intended to be a replacement for scikit-learn, SciPy, or GPyTorch. It is narrower: robust covariance, robust scatter, robust geometry, robust distances, and input-metric tools for interpretable diagnostics and ML workflows.</p>
 <h2 id="robust-distances">Robust distances</h2>
 <p>Most workflows are built around robust squared Mahalanobis distances. Given observations</p>
 <p><span class="math display">
@@ -248,25 +256,90 @@ d_i^2 =
 </span></p>
 <p>Large robust distances indicate observations that are far from the estimated central elliptical structure.</p>
 <p>This idea is simple, but the quality of the result depends heavily on the covariance estimate. If the covariance is fitted using all outliers, then the distances may be distorted. <code>robustcov</code> focuses on estimators that are less sensitive to this failure mode.</p>
+<h2 id="spd-geometry-and-robust-similarity">SPD geometry and robust similarity</h2>
+<p>A fitted robust scatter estimate gives more than a covariance matrix. It defines geometry on the cone of symmetric positive-definite matrices and a robust geometry on the input space.</p>
+<p>The typical chain is:</p>
+<pre class="{text}"><code>robust scatter
+  ↓
+robust precision
+  ↓
+robust Mahalanobis distance
+  ↓
+robust similarity / kernel geometry</code></pre>
+<p>The <code>robustcov.geometry</code> module includes utilities for SPD matrix normalization, matrix powers, matrix logarithms and exponentials, affine-invariant distance, log-Euclidean distance, geodesic interpolation, and Tyler fixed-point diagnostics.</p>
+<div id="db25a4ca" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov.geometry <span class="im">as</span> rcg</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">8</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>X_baseline <span class="op">=</span> rng.normal(size<span class="op">=</span>(<span class="dv">400</span>, <span class="dv">5</span>))</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>X_current <span class="op">=</span> rng.normal(size<span class="op">=</span>(<span class="dv">400</span>, <span class="dv">5</span>))</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>X_current[:, <span class="dv">0</span>] <span class="op">*=</span> <span class="fl">1.8</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>S_ref <span class="op">=</span> rc.FastMCD(contamination<span class="op">=</span><span class="fl">0.08</span>, random_state<span class="op">=</span><span class="dv">0</span>).fit(X_baseline).covariance_</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>S_now <span class="op">=</span> rc.FastMCD(contamination<span class="op">=</span><span class="fl">0.08</span>, random_state<span class="op">=</span><span class="dv">0</span>).fit(X_current).covariance_</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>drift_score <span class="op">=</span> rcg.affine_invariant_distance(S_ref, S_now)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"covariance drift:"</span>, drift_score)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>This is useful for covariance drift monitoring, estimator stability diagnostics, robust whitening, comparing empirical and robust scatter, and embedding or nearest-neighbor workflows where Euclidean distance may be distorted by leverage directions.</p>
+<h2 id="robust-kernels-and-gp-input-metrics">Robust kernels and GP input metrics</h2>
+<p>A robust scatter estimate can also define a robust input metric. Instead of using an isotropic Euclidean distance, kernel methods can use a robust Mahalanobis geometry induced by a fitted covariance or scatter estimator.</p>
+<p>For example, a robust RBF-style similarity can be written as</p>
+<p><span class="math display">
+k_R(x, y)
+=
+\exp\left(
+-\frac{1}{2\ell^2}
+(x-y)^T \hat\Sigma_R^{-1} (x-y)
+\right),
+</span></p>
+<p>where</p>
+<p><span class="math display">
+\hat\Sigma_R
+</span></p>
+<p>is a robust covariance or scatter estimate.</p>
+<div id="6537ba61" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> robustcov.kernels <span class="im">import</span> robust_rbf_kernel</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">9</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>X_train <span class="op">=</span> rng.standard_t(df<span class="op">=</span><span class="dv">3</span>, size<span class="op">=</span>(<span class="dv">250</span>, <span class="dv">8</span>))</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>est <span class="op">=</span> rc.RegularizedCauchy(alpha<span class="op">=</span><span class="fl">0.10</span>).fit(X_train)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>K <span class="op">=</span> robust_rbf_kernel(</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    X_train,</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    X_train,</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    covariance<span class="op">=</span>est.covariance_,</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    length_scale<span class="op">=</span><span class="fl">1.0</span>,</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(K.shape)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>The package also includes sklearn-style and GPyTorch-style adapters for robust input metrics. These utilities target the input geometry of kernel methods and Gaussian-process workflows. They do not replace GP inference, likelihood modeling, posterior computation, or training loops.</p>
 <h2 id="fastmcd-for-classical-contamination">FastMCD for classical contamination</h2>
 <p><code>FastMCD</code> is the main estimator for a classical contamination setting: most observations form a central cloud, while a minority are separated outliers.</p>
-<div id="dfd73970" class="cell" data-execution_count="2">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">1</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> rng.normal(size<span class="op">=</span>(<span class="dv">600</span>, <span class="dv">4</span>))</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>X[:<span class="dv">40</span>] <span class="op">+=</span> np.array([<span class="fl">7.0</span>, <span class="fl">0.0</span>, <span class="fl">7.0</span>, <span class="fl">0.0</span>])</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>mcd <span class="op">=</span> rc.FastMCD(</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    quality<span class="op">=</span><span class="st">"balanced"</span>,</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    random_state<span class="op">=</span><span class="dv">0</span>,</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>).fit(X)</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"location:"</span>, np.<span class="bu">round</span>(mcd.location_, <span class="dv">3</span>))</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"support size:"</span>, <span class="bu">int</span>(mcd.support_.<span class="bu">sum</span>()))</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"radial kurtosis:"</span>, <span class="bu">round</span>(mcd.radial_kurtosis_, <span class="dv">3</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="8d3c5cf0" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">1</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> rng.normal(size<span class="op">=</span>(<span class="dv">600</span>, <span class="dv">4</span>))</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>X[:<span class="dv">40</span>] <span class="op">+=</span> np.array([<span class="fl">7.0</span>, <span class="fl">0.0</span>, <span class="fl">7.0</span>, <span class="fl">0.0</span>])</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>mcd <span class="op">=</span> rc.FastMCD(</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    quality<span class="op">=</span><span class="st">"balanced"</span>,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    random_state<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>).fit(X)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"location:"</span>, np.<span class="bu">round</span>(mcd.location_, <span class="dv">3</span>))</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"support size:"</span>, <span class="bu">int</span>(mcd.support_.<span class="bu">sum</span>()))</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"radial kurtosis:"</span>, <span class="bu">round</span>(mcd.radial_kurtosis_, <span class="dv">3</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><code>FastMCD</code> is useful when</p>
 <p><span class="math display">
@@ -275,24 +348,24 @@ n \gg p
 <p>and the outliers are at least partly separable from the central data. It is less appropriate when the data are mostly heavy-tailed but not clearly split into clean and contaminated subsets.</p>
 <h2 id="heavy-tail-scatter-estimators">Heavy-tail scatter estimators</h2>
 <p>For diffuse heavy tails, small samples, or high-dimensional regimes, hard subset selection may not be the right tool. <code>robustcov</code> includes several iteratively reweighted scatter estimators.</p>
-<div id="480b03c5" class="cell" data-execution_count="3">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">2</span>)</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> rng.standard_t(df<span class="op">=</span><span class="fl">2.5</span>, size<span class="op">=</span>(<span class="dv">120</span>, <span class="dv">40</span>))</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>cauchy <span class="op">=</span> rc.RegularizedCauchy(alpha<span class="op">=</span><span class="fl">0.10</span>).fit(X)</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>student <span class="op">=</span> rc.StudentTScatter(df<span class="op">=</span><span class="dv">3</span>, alpha<span class="op">=</span><span class="fl">0.05</span>).fit(X)</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>tyler <span class="op">=</span> rc.RegularizedTyler(</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    alpha<span class="op">=</span><span class="fl">0.10</span>,</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    scale_correction<span class="op">=</span><span class="st">"radial_median"</span>,</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>).fit(X)</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Cauchy condition:"</span>, np.linalg.cond(cauchy.covariance_))</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Student-t radial kurtosis:"</span>, student.radial_kurtosis_)</span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Tyler scale:"</span>, <span class="bu">getattr</span>(tyler, <span class="st">"scale_"</span>, <span class="va">None</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="12ab6d22" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">2</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> rng.standard_t(df<span class="op">=</span><span class="fl">2.5</span>, size<span class="op">=</span>(<span class="dv">120</span>, <span class="dv">40</span>))</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>cauchy <span class="op">=</span> rc.RegularizedCauchy(alpha<span class="op">=</span><span class="fl">0.10</span>).fit(X)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>student <span class="op">=</span> rc.StudentTScatter(df<span class="op">=</span><span class="dv">3</span>, alpha<span class="op">=</span><span class="fl">0.05</span>).fit(X)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>tyler <span class="op">=</span> rc.RegularizedTyler(</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    alpha<span class="op">=</span><span class="fl">0.10</span>,</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    scale_correction<span class="op">=</span><span class="st">"radial_median"</span>,</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>).fit(X)</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Cauchy condition:"</span>, np.linalg.cond(cauchy.covariance_))</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Student-t radial kurtosis:"</span>, student.radial_kurtosis_)</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Tyler scale:"</span>, <span class="bu">getattr</span>(tyler, <span class="st">"scale_"</span>, <span class="va">None</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The main heavy-tail estimators are:</p>
 <ul>
@@ -305,57 +378,57 @@ n \gg p
 <p><code>RegularizedTyler</code> estimates robust shape. Tyler-style estimators are scale-free unless a scale correction is applied, so they are often best interpreted through robust shape and robust distances.</p>
 <h2 id="automatic-estimator-selection">Automatic estimator selection</h2>
 <p><code>AutoRobustScatter</code> is a practical exploratory selector. It fits candidate estimators and chooses one using diagnostic or stability-based criteria.</p>
-<div id="12855603" class="cell" data-execution_count="4">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">3</span>)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> rng.standard_t(df<span class="op">=</span><span class="dv">3</span>, size<span class="op">=</span>(<span class="dv">300</span>, <span class="dv">12</span>))</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>X[:<span class="dv">20</span>] <span class="op">+=</span> <span class="fl">5.0</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>auto <span class="op">=</span> rc.AutoRobustScatter(selection<span class="op">=</span><span class="st">"diagnostic"</span>).fit(X)</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(auto.best_estimator_name_)</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(auto.summary())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="24798929" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">3</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> rng.standard_t(df<span class="op">=</span><span class="dv">3</span>, size<span class="op">=</span>(<span class="dv">300</span>, <span class="dv">12</span>))</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>X[:<span class="dv">20</span>] <span class="op">+=</span> <span class="fl">5.0</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>auto <span class="op">=</span> rc.AutoRobustScatter(selection<span class="op">=</span><span class="st">"diagnostic"</span>).fit(X)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(auto.best_estimator_name_)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(auto.summary())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>This is not an oracle. It is meant as a helpful first pass when the user does not yet know whether the data are better described as classical contamination, diffuse heavy tails, or a small-sample high-dimensional problem.</p>
 <h2 id="robust-outlier-detection">Robust outlier detection</h2>
 <p>The robust covariance estimators can be wrapped into anomaly detectors.</p>
-<div id="7e08d984" class="cell" data-execution_count="5">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">4</span>)</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> rng.normal(size<span class="op">=</span>(<span class="dv">500</span>, <span class="dv">6</span>))</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>X[:<span class="dv">25</span>] <span class="op">+=</span> <span class="fl">6.0</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>detector <span class="op">=</span> rc.RobustOutlierDetector(</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    estimator<span class="op">=</span>rc.FastMCD(quality<span class="op">=</span><span class="st">"fast"</span>, random_state<span class="op">=</span><span class="dv">42</span>),</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    threshold<span class="op">=</span><span class="st">"empirical"</span>,</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    alpha<span class="op">=</span><span class="fl">0.95</span>,</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>).fit(X)</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>scores <span class="op">=</span> detector.decision_function(X)</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>labels <span class="op">=</span> detector.predict(X)</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"detected outliers:"</span>, <span class="bu">int</span>((labels <span class="op">==</span> <span class="op">-</span><span class="dv">1</span>).<span class="bu">sum</span>()))</span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"largest scores:"</span>, np.sort(scores)[<span class="op">-</span><span class="dv">5</span>:])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="8056d7ec" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">4</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> rng.normal(size<span class="op">=</span>(<span class="dv">500</span>, <span class="dv">6</span>))</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>X[:<span class="dv">25</span>] <span class="op">+=</span> <span class="fl">6.0</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>detector <span class="op">=</span> rc.RobustOutlierDetector(</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    estimator<span class="op">=</span>rc.FastMCD(quality<span class="op">=</span><span class="st">"fast"</span>, random_state<span class="op">=</span><span class="dv">42</span>),</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    threshold<span class="op">=</span><span class="st">"empirical"</span>,</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    alpha<span class="op">=</span><span class="fl">0.95</span>,</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>).fit(X)</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>scores <span class="op">=</span> detector.decision_function(X)</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>labels <span class="op">=</span> detector.predict(X)</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"detected outliers:"</span>, <span class="bu">int</span>((labels <span class="op">==</span> <span class="op">-</span><span class="dv">1</span>).<span class="bu">sum</span>()))</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"largest scores:"</span>, np.sort(scores)[<span class="op">-</span><span class="dv">5</span>:])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The anomaly score is based on robust distance. This makes the results interpretable: a point is suspicious because it is far from the robustly estimated center relative to the robust covariance or scatter shape.</p>
-<h2 id="diagnostic-reports">Diagnostic reports</h2>
+<h2 id="diagnostic-reports-and-plotting">Diagnostic reports and plotting</h2>
 <p><code>robustcov</code> includes diagnostic summaries to help interpret fitted estimators.</p>
-<div id="a1129027" class="cell" data-execution_count="6">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">5</span>)</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> rng.standard_t(df<span class="op">=</span><span class="dv">3</span>, size<span class="op">=</span>(<span class="dv">400</span>, <span class="dv">8</span>))</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>est <span class="op">=</span> rc.RegularizedCauchy(alpha<span class="op">=</span><span class="fl">0.10</span>).fit(X)</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>report <span class="op">=</span> rc.diagnostic_report(est)</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(report.summary())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="ab7fa790" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">5</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> rng.standard_t(df<span class="op">=</span><span class="dv">3</span>, size<span class="op">=</span>(<span class="dv">400</span>, <span class="dv">8</span>))</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>est <span class="op">=</span> rc.RegularizedCauchy(alpha<span class="op">=</span><span class="fl">0.10</span>).fit(X)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>report <span class="op">=</span> rc.diagnostic_report(est)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(report.summary())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Reports are intended to summarize quantities such as:</p>
 <ul>
@@ -367,92 +440,60 @@ n \gg p
 <li>tail diagnostics;</li>
 <li>heuristic recommendations.</li>
 </ul>
-<p>This is useful because robust covariance is rarely a one-number problem. The same estimator can behave differently depending on tail behavior, sample size, dimension, and contamination structure.</p>
-<h2 id="visual-diagnostics">Visual diagnostics</h2>
-<p>The package includes plotting helpers for robust distances, QQ plots, covariance heatmaps, benchmark curves, and anomaly panels.</p>
-<div id="82438a3e" class="cell" data-execution_count="7">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">6</span>)</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> rng.normal(size<span class="op">=</span>(<span class="dv">500</span>, <span class="dv">5</span>))</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>X[:<span class="dv">30</span>] <span class="op">+=</span> <span class="fl">5.0</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>est <span class="op">=</span> rc.FastMCD(quality<span class="op">=</span><span class="st">"balanced"</span>, random_state<span class="op">=</span><span class="dv">0</span>).fit(X)</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>rc.plot_robust_distance_profile(</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    est,</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    output_path<span class="op">=</span><span class="st">"distance_profile.png"</span>,</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    show<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>rc.plot_mahalanobis_qq(</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    est,</span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    output_path<span class="op">=</span><span class="st">"qq.png"</span>,</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    show<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>rc.plot_covariance_heatmap(</span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    est.covariance_,</span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>    title<span class="op">=</span><span class="st">"FastMCD covariance"</span>,</span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>    output_path<span class="op">=</span><span class="st">"covariance.png"</span>,</span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>    show<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<p>The plotting API is designed for reports and documentation, not only for notebooks. Most functions support saving figures through <code>output_path</code>.</p>
+<p>The package also includes plotting helpers for robust distances, QQ plots, covariance heatmaps, benchmark curves, and anomaly panels. Most plotting functions support saving figures through <code>output_path</code>, which makes them useful for reports and documentation.</p>
 <h2 id="multimodal-diagnostics">Multimodal diagnostics</h2>
 <p>A single global robust covariance model is not always appropriate. If a data set contains several legitimate clusters or regimes, a global robust estimator may treat small valid modes as anomalies.</p>
 <p><code>ClusterRobustOutlierDetector</code> provides a cluster-then-local-robust-scatter workflow.</p>
-<div id="4142f40a" class="cell" data-execution_count="8">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">7</span>)</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>X1 <span class="op">=</span> rng.normal(loc<span class="op">=</span>(<span class="op">-</span><span class="dv">3</span>, <span class="dv">0</span>), scale<span class="op">=</span><span class="fl">0.8</span>, size<span class="op">=</span>(<span class="dv">250</span>, <span class="dv">2</span>))</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>X2 <span class="op">=</span> rng.normal(loc<span class="op">=</span>(<span class="dv">3</span>, <span class="dv">0</span>), scale<span class="op">=</span><span class="fl">0.8</span>, size<span class="op">=</span>(<span class="dv">250</span>, <span class="dv">2</span>))</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> np.vstack([X1, X2])</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>X[:<span class="dv">20</span>] <span class="op">+=</span> np.array([<span class="dv">0</span>, <span class="dv">6</span>])</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>det <span class="op">=</span> rc.ClusterRobustOutlierDetector(</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    n_clusters<span class="op">=</span><span class="dv">2</span>,</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    contamination<span class="op">=</span><span class="fl">0.05</span>,</span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    random_state<span class="op">=</span><span class="dv">0</span>,</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>).fit(X)</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>scores <span class="op">=</span> det.decision_function(X)</span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>labels <span class="op">=</span> det.predict(X)</span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"detected outliers:"</span>, <span class="bu">int</span>((labels <span class="op">==</span> <span class="op">-</span><span class="dv">1</span>).<span class="bu">sum</span>()))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="0dfc1a35" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">7</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>X1 <span class="op">=</span> rng.normal(loc<span class="op">=</span>(<span class="op">-</span><span class="dv">3</span>, <span class="dv">0</span>), scale<span class="op">=</span><span class="fl">0.8</span>, size<span class="op">=</span>(<span class="dv">250</span>, <span class="dv">2</span>))</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>X2 <span class="op">=</span> rng.normal(loc<span class="op">=</span>(<span class="dv">3</span>, <span class="dv">0</span>), scale<span class="op">=</span><span class="fl">0.8</span>, size<span class="op">=</span>(<span class="dv">250</span>, <span class="dv">2</span>))</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> np.vstack([X1, X2])</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>X[:<span class="dv">20</span>] <span class="op">+=</span> np.array([<span class="dv">0</span>, <span class="dv">6</span>])</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>det <span class="op">=</span> rc.ClusterRobustOutlierDetector(</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    n_clusters<span class="op">=</span><span class="dv">2</span>,</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    contamination<span class="op">=</span><span class="fl">0.05</span>,</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    random_state<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>).fit(X)</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>scores <span class="op">=</span> det.decision_function(X)</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>labels <span class="op">=</span> det.predict(X)</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"detected outliers:"</span>, <span class="bu">int</span>((labels <span class="op">==</span> <span class="op">-</span><span class="dv">1</span>).<span class="bu">sum</span>()))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>This is not a full robust mixture model. It is a practical diagnostic workflow for multimodal data where local robust distances are more meaningful than one global covariance estimate.</p>
 <h2 id="missing-values-and-preprocessing">Missing values and preprocessing</h2>
 <p>The package includes a robust median imputer for simple preprocessing pipelines.</p>
-<div id="eba208d7" class="cell" data-execution_count="9">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> np.array([</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">1.0</span>, <span class="fl">2.0</span>, np.nan],</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">2.0</span>, np.nan, <span class="fl">3.0</span>],</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">100.0</span>, <span class="fl">4.0</span>, <span class="fl">4.0</span>],</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>])</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>imputer <span class="op">=</span> rc.RobustMedianImputer().fit(X)</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>X_clean <span class="op">=</span> imputer.transform(X)</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(X_clean)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="d8ab04cd" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> np.array([</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">1.0</span>, <span class="fl">2.0</span>, np.nan],</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">2.0</span>, np.nan, <span class="fl">3.0</span>],</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">100.0</span>, <span class="fl">4.0</span>, <span class="fl">4.0</span>],</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>imputer <span class="op">=</span> rc.RobustMedianImputer().fit(X)</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>X_clean <span class="op">=</span> imputer.transform(X)</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(X_clean)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The goal is not to replace full-featured preprocessing libraries. The helper exists so robust covariance examples can handle simple missing-value cases without leaving the package.</p>
 <h2 id="openmp-acceleration">OpenMP acceleration</h2>
 <p>If OpenMP is available at build time, the C++ backend can parallelize selected operations.</p>
-<div id="123601d5" class="cell" data-execution_count="10">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"OpenMP available:"</span>, rc.has_openmp())</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"threads:"</span>, rc.get_num_threads())</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>rc.set_num_threads(<span class="dv">4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="df709874" class="cell" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"OpenMP available:"</span>, rc.has_openmp())</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"threads:"</span>, rc.get_num_threads())</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>rc.set_num_threads(<span class="dv">4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>For reproducible timing, avoid thread oversubscription from BLAS libraries:</p>
 <pre class="{bash}"><code>#| eval: false
@@ -500,9 +541,11 @@ python examples/run_use_case_gallery.py --all
 python examples/use_case_finance_risk.py
 python examples/use_case_multimodal_anomaly.py
 python examples/use_case_sensor_anomaly.py
-python examples/use_case_breast_cancer_screening.py
-python examples/use_case_digits_one_class_baselines.py
-python examples/use_case_ml_preprocessing.py</code></pre>
+python examples/use_case_ml_preprocessing.py
+python examples/gp_robust_input_metric.py
+python examples/spd_geometry_diagnostics.py
+python examples/spd_geometry_ml_use_cases.py
+python examples/embedding_reranking_robust_geometry.py</code></pre>
 <p>Use cases include:</p>
 <ul>
 <li>finance risk and portfolio stress;</li>
@@ -513,7 +556,10 @@ python examples/use_case_ml_preprocessing.py</code></pre>
 <li>network traffic diagnostics;</li>
 <li>text embedding outliers;</li>
 <li>image feature anomaly detection;</li>
-<li>multimodal anomaly detection.</li>
+<li>multimodal anomaly detection;</li>
+<li>covariance drift monitoring;</li>
+<li>robust embedding retrieval / RAG-style filtering;</li>
+<li>robust input metrics for Gaussian-process and kernel workflows.</li>
 </ul>
 <p>The examples are meant to be reproducible templates rather than leaderboard claims.</p>
 <h2 id="external-and-kaggle-examples">External and Kaggle examples</h2>
@@ -528,7 +574,7 @@ python examples_external/collect_external_results.py \
   --outdir results/external_registry</code></pre>
 <p>The external-data pages should be read as evidence and diagnostics, not as universal claims. Some data sets are good fits for robust covariance methods, some are competitive but slower, and some are included mainly to show limitations.</p>
 <h2 id="algorithms">Algorithms</h2>
-<p>The package connects several robust-statistics ideas:</p>
+<p>The package connects several robust-statistics and geometry ideas:</p>
 <ul>
 <li>minimum covariance determinant estimation;</li>
 <li>C-step refinement for robust subset selection;</li>
@@ -539,18 +585,26 @@ python examples_external/collect_external_results.py \
 <li>Cauchy-style radial downweighting;</li>
 <li>shrinkage toward stable covariance targets;</li>
 <li>empirical and diagnostic anomaly thresholds;</li>
-<li>cluster-aware local robust scatter diagnostics.</li>
+<li>cluster-aware local robust scatter diagnostics;</li>
+<li>SPD matrix normalization, logarithms, powers, and geodesics;</li>
+<li>affine-invariant and log-Euclidean distances between scatter matrices;</li>
+<li>Tyler fixed-point residual diagnostics;</li>
+<li>robust input metrics for kernel and similarity methods;</li>
+<li>robust RBF-style kernels using fitted scatter geometry;</li>
+<li>sklearn-style and GPyTorch-style kernel adapters.</li>
 </ul>
-<p>A simplified view of the robust-distance workflow is:</p>
+<p>A simplified view of the robust-distance and robust-similarity workflow is:</p>
 <pre class="{text}"><code>raw data
   ↓
 robust location and scatter estimation
   ↓
+robust precision / SPD geometry
+  ↓
 robust squared distances
   ↓
-diagnostic thresholds or empirical contamination rule
+diagnostic thresholds, robust similarities, or kernel matrices
   ↓
-outlier labels, anomaly scores, plots, and reports</code></pre>
+outlier labels, anomaly scores, plots, reports, and ML workflow components</code></pre>
 <p>For heavy-tailed M-estimators, the core idea is iterative radial reweighting. Observations with large robust distance receive smaller weights when updating the scatter matrix.</p>
 <p>For example, a Student-t style weight has the form</p>
 <p><span class="math display">
@@ -592,6 +646,8 @@ S_{\text{new}}
 <li>robust-distance anomaly diagnostics;</li>
 <li>automatic estimator selection heuristics;</li>
 <li>multimodal cluster-aware diagnostics;</li>
+<li>SPD geometry utilities for scatter diagnostics and covariance comparison;</li>
+<li>robust input metrics for kernel, GP, and similarity workflows;</li>
 <li>plotting and diagnostic reports;</li>
 <li>use-case and benchmark galleries;</li>
 <li>cross-platform wheels for Python 3.12+;</li>
@@ -604,9 +660,11 @@ S_{\text{new}}
 <li>density modeling with AIC/BIC model selection;</li>
 <li>deep anomaly detection;</li>
 <li>universal fraud or intrusion-detection leadership claims;</li>
-<li>replacing scikit-learn covariance estimators in all settings.</li>
+<li>replacing scikit-learn covariance estimators in all settings;</li>
+<li>replacing GP frameworks such as GPyTorch or scikit-learn Gaussian processes;</li>
+<li>robust output-likelihood modeling for Gaussian processes.</li>
 </ul>
-<p>The package is best understood as a focused robust-covariance and diagnostic toolkit.</p>
+<p>The package is best understood as a focused robust scatter geometry toolkit: robust covariance and scatter estimation, robust distances, SPD geometry, anomaly diagnostics, and robust input metrics for ML workflows.</p>
 <h2 id="references">References</h2>
 <p>P. J. Rousseeuw. “Least Median of Squares Regression.”</p>
 <p>P. J. Rousseeuw and K. Van Driessen. “A Fast Algorithm for the Minimum Covariance Determinant Estimator.”</p>
@@ -615,6 +673,8 @@ S_{\text{new}}
 <p>Y. Chen, A. Wiesel, and A. O. Hero. Work on shrinkage covariance estimation under elliptical models.</p>
 <p>R. A. Maronna, R. D. Martin, V. J. Yohai, and M. Salibián-Barrera. <em>Robust Statistics: Theory and Methods.</em></p>
 <p>P. J. Huber and E. M. Ronchetti. <em>Robust Statistics.</em></p>
+<p>X. Pennec, P. Fillard, and N. Ayache. “A Riemannian Framework for Tensor Computing.”</p>
+<p>V. Arsigny, P. Fillard, X. Pennec, and N. Ayache. “Geometric Means in a Novel Vector Space Structure on Symmetric Positive-Definite Matrices.”</p>
 <p>T. W. Anderson. <em>An Introduction to Multivariate Statistical Analysis.</em></p>
 
 
