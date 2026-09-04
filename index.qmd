@@ -17,11 +17,12 @@ body-classes: "home-page"
 Applied ML, retrieval, and reliable production systems.
 :::
 
-I build machine learning systems from models to deployment. My professional work spans statistical learning, numerical methods, and production ML systems.
+Professionally, I build machine learning systems from models to deployment. My work spans statistical learning, retrieval, ranking and evaluation, computer vision, numerical methods, and high-performance Python/C++ systems.
 
-Alongside this, I collaborate on retrieval and LLM systems, including search and RAG pipelines, tool-using applications, ranking, and evaluation.
+Independently, I maintain open-source numerical software and collaborate on retrieval and LLM systems, including search and RAG pipelines and tool-using applications. I also write about statistics, signal processing, and machine learning, especially where mathematical guarantees and observed behaviour diverge.
 
-My work also spans computer vision and high-performance Python/C++ systems. Applied mathematician by training, with a PhD in the field. Based in Paris.
+Applied mathematician by training, with a PhD in the field. Based in Paris.
+
 
 ::: {.home-links}
 [Email](mailto:shohruh.miryusupov@gmail.com) · [LinkedIn](https://www.linkedin.com/in/shohruh-miryusupov) · [GitHub](https://github.com/smiryusupov)
