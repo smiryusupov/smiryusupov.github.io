@@ -2,12 +2,36 @@
 title: "Writings"
 body-classes: "section-page writings-page"
 listing:
-  contents:
-    - posts/*/index.qmd
-  type: default
-  sort: "date desc"
-  fields: [title, date, description]
-  date-format: "MMM YYYY"
-  filter-ui: false
-  sort-ui: false
+  - id: featured
+    contents:
+      - posts/nearest_neighbors_noisy_features_retrieval/index.qmd
+      - posts/linear_readability_bottleneck/index.qmd
+      - posts/discrepancy_is_not_risk/index.qmd
+      - posts/geometry_conformal_scores/index.qmd
+    type: default
+    sort: false
+    fields: [title, description]
+    filter-ui: false
+    sort-ui: false
+  - id: all
+    contents:
+      - posts/*/index.qmd
+    type: default
+    sort: "date desc"
+    fields: [title, date, description]
+    date-format: "MMM YYYY"
+    filter-ui: false
+    sort-ui: false
 ---
+
+Short notes on places where a method behaves differently than its guarantees suggest — why a retrieval metric stops tracking relevance, what a distribution distance does not tell you about downstream error. Mostly small diagnostics and counterexamples rather than large experiments.
+
+## Start here
+
+::: {#featured}
+:::
+
+## All writings
+
+::: {#all}
+:::

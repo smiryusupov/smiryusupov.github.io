@@ -1,11 +1,95 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://www.miryusupov.com/projects/index.html</loc>
-    <lastmod>2026-07-30T20:30:33.987Z</lastmod>
+    <loc>https://www.miryusupov.com/index.html</loc>
+    <lastmod>2026-09-04T09:39:37.800Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.miryusupov.com/blog/posts/student_t_poincare_wrong_answers/index.html</loc>
+    <lastmod>2026-06-06T22:51:43.822Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.miryusupov.com/blog/posts/prokhorov_continuity_ml/index.html</loc>
+    <lastmod>2026-05-25T11:38:50.241Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.miryusupov.com/blog/posts/kosmidis-firth/index.html</loc>
+    <lastmod>2026-05-25T12:08:25.834Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.miryusupov.com/blog/posts/when_exact_matching_is_the_wrong_comfort/index.html</loc>
+    <lastmod>2026-05-25T11:43:37.419Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.miryusupov.com/blog/posts/linear_readability_bottleneck/linear_readability_conformal_runner.html</loc>
+    <lastmod>2026-05-25T09:59:11.531Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.miryusupov.com/blog/posts/thin-shells/index.html</loc>
+    <lastmod>2026-05-25T12:11:47.460Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.miryusupov.com/blog/posts/wasserstein-wrong-geometry/index.html</loc>
+    <lastmod>2026-05-25T11:34:01.598Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.miryusupov.com/blog/posts/nearest_neighbors_noisy_features_retrieval/index.html</loc>
+    <lastmod>2026-05-25T11:56:52.475Z</lastmod>
   </url>
   <url>
     <loc>https://www.miryusupov.com/projects/robustcov/index.html</loc>
     <lastmod>2026-07-30T20:34:12.226Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.miryusupov.com/projects/index.html</loc>
+    <lastmod>2026-07-30T20:30:33.987Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.miryusupov.com/about.html</loc>
+    <lastmod>2026-09-04T09:45:35.661Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.miryusupov.com/projects/lattice-dsp/index.html</loc>
+    <lastmod>2026-06-07T19:20:13.810Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.miryusupov.com/projects/cholrot/index.html</loc>
+    <lastmod>2026-06-07T19:20:37.955Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.miryusupov.com/blog/index.html</loc>
+    <lastmod>2026-07-30T22:56:10.082Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.miryusupov.com/blog/posts/geometry_conformal_scores/index.html</loc>
+    <lastmod>2026-05-25T11:48:07.750Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.miryusupov.com/blog/posts/discrepancy_is_not_risk/index.html</loc>
+    <lastmod>2026-05-29T00:10:42.854Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.miryusupov.com/blog/posts/linear_readability_bottleneck/index.html</loc>
+    <lastmod>2026-05-25T11:39:39.302Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.miryusupov.com/blog/posts/linear_readability_bottleneck/summary.html</loc>
+    <lastmod>2026-05-25T09:59:29.784Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.miryusupov.com/blog/posts/superefficiency/index.html</loc>
+    <lastmod>2026-05-25T12:04:34.400Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.miryusupov.com/blog/posts/first-post.html</loc>
+    <lastmod>2026-04-17T23:33:38.148Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.miryusupov.com/blog/posts/power_function_not_error_bar/index.html</loc>
+    <lastmod>2026-05-25T12:14:16.671Z</lastmod>
+  </url>
+  <url>
+    <loc>https://www.miryusupov.com/blog/posts/fisher_geometry_basin_selection/index.html</loc>
+    <lastmod>2026-05-25T11:51:36.473Z</lastmod>
   </url>
 </urlset>

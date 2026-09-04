@@ -33,6 +33,18 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* ─── responsive media ───────────────────────────────── */
+/* Global safety net: any figure not wrapped in .narrow-figure
+   would otherwise render at natural width and overflow on phones.
+   SVG is excluded so KaTeX radicals and stretchy delimiters keep
+   their explicit dimensions. */
+img,
+video,
+iframe {
+  max-width: 100%;
+  height: auto;
+}
+
 /* ─── links ──────────────────────────────────────────── */
 a {
   color: inherit;
@@ -51,11 +63,12 @@ a:hover {
   position: sticky;
   top: 0;
   z-index: 100;
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
   padding: 1rem 2rem;
   background: var(--bg);
   border-bottom: 1px solid var(--border);
@@ -86,6 +99,8 @@ a:hover {
 }
 
 /* ─── base content layout ────────────────────────────── */
+/* With `theme: none`, Quarto renders content as direct children
+   of <body>, so these blocks carry the page gutters themselves. */
 body > p,
 body > h1,
 body > h2,
@@ -97,6 +112,7 @@ body > ul,
 body > ol,
 body > blockquote,
 body > pre,
+body > hr,
 body > section,
 body > div,
 body > header {
@@ -124,6 +140,8 @@ body.projects-page #title-block-header,
 body.projects-page > p,
 body.projects-page > h2,
 body.writings-page #title-block-header,
+body.writings-page > p,
+body.writings-page > h2,
 body.writings-page #listing-listing,
 body.writings-page .quarto-listing-container-default {
   max-width: var(--reading) !important;
@@ -151,6 +169,8 @@ body.about-page .epigraph {
 
 /* Writings page: keep Quarto content wide, but center title/listing column */
 body.writings-page #title-block-header,
+body.writings-page > p,
+body.writings-page > h2,
 body.writings-page #listing-listing,
 body.writings-page .quarto-listing-container-default {
   max-width: var(--reading) !important;
@@ -235,6 +255,14 @@ li {
   margin-bottom: 0.28rem;
 }
 
+/* ─── horizontal rules ───────────────────────────────── */
+hr {
+  max-width: var(--reading);
+  margin: 2.75rem auto;
+  border: 0;
+  border-top: 1px solid var(--border);
+}
+
 /* ─── optional eyebrow class ─────────────────────────── */
 .eyebrow {
   max-width: var(--reading);
@@ -247,79 +275,165 @@ li {
 }
 
 /* ─── homepage ───────────────────────────────────────── */
-.home-intro,
-.home-posts {
-  max-width: var(--reading) !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
+/* These blocks are direct children of <body>, so they inherit the
+   2rem gutter above. Overriding max-width alone leaves that padding
+   in place, which is why dividers are drawn with pseudo-elements:
+   a border on the element itself would span the padding box and sit
+   wider than the text column. */
+body.home-page h1,
+body.home-page h2,
+body.home-page p,
+body.home-page .lede,
+body.home-page .home-links,
+body.home-page .home-note,
+body.home-page .themes,
+body.home-page .proj {
+  max-width: var(--reading);
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.home-intro {
-  padding-top: 2.25rem !important;
-  margin-bottom: 0 !important;
+/* Smaller than the global h1 so it stops competing with the
+   persistent name in the nav bar. */
+body.home-page h1 {
+  margin-bottom: 0.5rem;
+  font-size: clamp(1.9rem, 4vw, 2.35rem);
 }
 
-.home-intro > p {
+body.home-page .lede {
+  margin-bottom: 1.1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+body.home-page .lede p {
   max-width: none;
   margin: 0;
-  font-size: 0.96rem;
-  line-height: 1.55;
-  color: var(--muted);
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
 }
 
-.home-posts {
-  margin-top: 1.25rem !important;
-  padding-bottom: 5rem;
+body.home-page h2 {
+  margin-top: 3.25rem;
+}
+
+/* ─── homepage: contact line and divider ─────────────── */
+body.home-page .home-links {
+  margin-top: 1.6rem;
+  font-size: 0.92rem;
+}
+
+body.home-page .home-links p {
+  max-width: none;
+  margin: 0;
+  font-size: inherit;
+}
+
+body.home-page .home-links::after {
+  content: "";
+  display: block;
+  margin-top: 2.25rem;
   border-top: 1px solid var(--border);
 }
 
-.post-row {
-  max-width: none;
-  padding: 0.95rem 0;
-  border-bottom: 1px solid var(--border);
+/* ─── homepage: what I work on ───────────────────────── */
+.themes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-top: 1.5rem;
 }
 
-.post-row > p {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 2rem;
+.themes h3 {
+  max-width: none;
+  margin: 0 0 0.35rem;
+  font-size: 0.98rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0;
+}
+
+.themes p {
   max-width: none;
   margin: 0;
-}
-
-.post-title {
-  font-size: 0.96rem;
-  font-weight: 500;
-}
-
-.post-title a {
-  text-decoration: none;
-}
-
-.post-title a:hover {
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
-  text-decoration-color: var(--fg);
-}
-
-.post-date {
-  flex-shrink: 0;
-  font-size: 0.8rem;
+  font-size: 0.88rem;
+  line-height: 1.55;
   color: var(--muted);
-  white-space: nowrap;
 }
 
+/* ─── homepage: projects ─────────────────────────────── */
+.proj {
+  margin-top: 1.25rem;
+  margin-bottom: 1.5rem;
+}
 
-/* ─── section-page font-size alignment ──────────────────── */
-/* Match About/Projects body copy to the homepage intro scale. */
+.proj p {
+  max-width: none;
+  margin: 0 0 0.85rem;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+/* Project names are links first, code second: drop the chip
+   background so the underline reads as a link. */
+.proj a code {
+  padding: 0;
+  background: none;
+  font-size: 0.9em;
+  font-weight: 600;
+}
+
+/* ─── homepage: closing note ─────────────────────────── */
+body.home-page .home-note {
+  margin-top: 3.5rem;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+body.home-page .home-note::before {
+  content: "";
+  display: block;
+  margin-bottom: 1.25rem;
+  border-top: 1px solid var(--border);
+}
+
+body.home-page .home-note p {
+  max-width: none;
+  margin: 0;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+}
+
+/* ─── section-page font-size alignment ───────────────── */
+/* Match About/Projects body copy to the homepage scale. */
 body.about-page > p,
-body.projects-page > p {
+body.projects-page > p,
+body.writings-page > p {
   font-size: 0.96rem;
   line-height: 1.55;
+}
+
+/* ─── writings: section labels ───────────────────────── */
+/* The page h1 (1.55rem) and a normal h2 (1.45rem) sit too close to
+   read as different levels. Section labels take the eyebrow
+   treatment so the page title stays dominant and the labels stop
+   competing with post titles. */
+body.writings-page > h2 {
+  margin-top: 2.75rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.76rem;
+  font-weight: 650;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
 /* Keep Home and Writings listing titles on the same scale. */
@@ -387,6 +501,12 @@ blockquote p {
   letter-spacing: 0;
   color: var(--fg);
   text-transform: none;
+}
+
+/* Quarto wraps the whole post row in an anchor; only the title
+   should read as a link. */
+.quarto-post a {
+  text-decoration: none;
 }
 
 .quarto-post .body h3 a {
@@ -695,6 +815,13 @@ footer.footer,
 }
 
 /* ─── responsive ─────────────────────────────────────── */
+@media (max-width: 760px) {
+  .themes {
+    grid-template-columns: 1fr;
+    gap: 1.6rem;
+  }
+}
+
 @media (max-width: 700px) {
   .site-footer {
     margin-top: 3rem;
@@ -723,6 +850,7 @@ footer.footer,
   body > ol,
   body > blockquote,
   body > pre,
+  body > hr,
   body > section,
   body > div,
   body > header {
@@ -737,9 +865,6 @@ footer.footer,
     padding-bottom: 5rem;
   }
 
-
-  .home-intro,
-  .home-posts,
   #listing-listing,
   .quarto-listing-container-default {
     padding-left: 1.5rem !important;
@@ -754,6 +879,8 @@ footer.footer,
   body.projects-page > p,
   body.projects-page > h2,
   body.writings-page #title-block-header,
+  body.writings-page > p,
+  body.writings-page > h2,
   body.writings-page #listing-listing,
   body.writings-page .quarto-listing-container-default {
     padding-left: 1.5rem !important;
@@ -778,15 +905,6 @@ footer.footer,
     font-size: 0.78rem;
   }
 
-  .post-row {
-    padding: 1.05rem 0.35rem;
-  }
-
-  .post-row > p {
-    flex-direction: column !important;
-    gap: 0.12rem !important;
-  }
-
   #title-block-header {
     margin-top: 1.5rem;
   }
@@ -801,5 +919,27 @@ footer.footer,
 
   h3 {
     font-size: 1.08rem;
+  }
+
+  body.home-page .lede {
+    font-size: 1.05rem;
+  }
+
+  body.home-page h2 {
+    margin-top: 2.5rem;
+  }
+
+  body.home-page .home-note {
+    margin-top: 2.75rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .nav-links {
+    gap: 0.9rem;
+  }
+
+  .nav-links a {
+    font-size: 0.8rem;
   }
 }

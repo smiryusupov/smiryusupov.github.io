@@ -1,20 +1,53 @@
 ---
-title: "Home"
-page-layout: full
-listing:
-  contents:
-    - blog/posts/*/index.qmd
-  sort: "date desc"
-  type: default
-  fields: [title, description, date]
+title: "Shohruh Miryusupov"
+pagetitle: "Shohruh Miryusupov — Machine learning engineer"
+description: "Senior machine learning engineer working across applied ML, retrieval, LLM systems, and numerical computing."
+toc: false
+page-layout: article
+body-classes: "home-page"
 ---
 
 <style>
-#title-block-header {
-  display: none !important;
-}
+#title-block-header { display: none !important; }
 </style>
 
-<div class="home-intro">
-  <p>Experiments, notes, and small studies on statistical learning, geometry, optimization, and the gap between formal guarantees and practical interpretation.</p>
-</div>
+# Senior machine learning engineer
+
+::: {.lede}
+Applied ML, retrieval, and reliable production systems.
+:::
+
+I build machine learning systems from models to deployment. My professional work spans statistical learning, numerical methods, and production ML systems.
+
+Alongside this, I collaborate on retrieval and LLM systems, including search and RAG pipelines, tool-using applications, ranking, and evaluation.
+
+My work also spans computer vision and high-performance Python/C++ systems. Applied mathematician by training, with a PhD in the field. Based in Paris.
+
+::: {.home-links}
+[Email](mailto:shohruh.miryusupov@gmail.com) · [LinkedIn](https://www.linkedin.com/in/shohruh-miryusupov) · [GitHub](https://github.com/smiryusupov)
+:::
+
+
+## Selected projects
+
+Independent open-source work in applied mathematics and statistical computing.
+
+::: {.proj}
+**[`robustcov`](projects/robustcov/)** — Robust covariance, scatter estimation, anomaly geometry, and contamination-resistant reference data for SHAP and LIME.
+
+**[`lattice-dsp`](projects/lattice-dsp/)** — Stability-aware lattice methods for recursive digital filters.
+
+**[`cholrot`](projects/cholrot/)** — Rank-one Cholesky updates and downdates based on hyperbolic rotations.
+:::
+
+[View all projects →](projects/)
+
+## Writings
+
+Short notes on statistics, signal processing, and machine learning — mostly on where a method's guarantees stop matching its behaviour.
+
+[Browse the writings →](blog/)
+
+::: {.home-note}
+Broader interests: statistical learning, kernel methods, time-series and state-space models, and the relationship between mathematical guarantees and observed behaviour.
+:::

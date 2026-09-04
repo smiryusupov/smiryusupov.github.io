@@ -1,18 +1,18 @@
 cff-version: 1.2.0
-message: "If you use or reference this research notebook, please cite the specific note or archived version."
-title: "Shohruh Miryusupov Research Notebook"
+message: "If you refer to a note from this site, please cite the specific page."
+title: "miryusupov.com"
 authors:
   - family-names: "Miryusupov"
     given-names: "Shohruh"
 type: website
 url: "https://www.miryusupov.com"
 repository-code: "https://github.com/smiryusupov/smiryusupov.github.io"
-abstract: "Personal research notes, experiments, and small studies by Shohruh Miryusupov."
+abstract: "Personal site of Shohruh Miryusupov, machine learning engineer: technical notes and open-source numerical software."
 keywords:
-  - research notebook
-  - statistical learning
-  - geometry
-  - optimization
-  - mathematics
   - machine learning
+  - retrieval
+  - evaluation
+  - statistics
+  - signal processing
+  - scientific computing
 license: "Other"

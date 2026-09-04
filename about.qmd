@@ -8,13 +8,15 @@ body-classes: "section-page about-page"
 <p class="translation" lang="en">By nature, all human beings desire to know.</p>
 </div>
 
-I work on state space models, signal processing, statistics, applied mathematics, and machine learning.
+I am a machine learning engineer based in Paris, trained in applied mathematics. I hold a PhD in the field, and that background still shapes how I approach engineering problems: I tend to ask what a method actually guarantees, what assumptions it relies on, and where those guarantees stop matching the behaviour you observe.
 
-I write short mathematical notes about places where formal guarantees meet interpretation.
+My professional work has covered statistical learning, numerical methods, and production ML systems. Outside that work, I maintain a few open-source numerical packages and collaborate on retrieval and LLM systems. I keep those activities separate from employer and client work; this site is a place for the independent side.
 
-The recurring theme is that a method can be mathematically correct and still easy to read too strongly. A loss may measure one geometry while the application needs another. A guarantee may hold marginally while local behavior changes. An estimator may be biased for a good reason. A finite optimization problem may be solved exactly while the population question remains open.
+The writings here are mostly about statistics, signal processing, state space models, and machine learning. A recurring theme is that a method can be mathematically correct and still easy to read too strongly. A loss may measure one geometry while the application needs another. A guarantee may hold marginally while local behaviour changes. An estimator may be biased for a good reason. A finite optimization problem may be solved exactly while the population question remains open.
 
 Most posts use small diagnostics, examples, and geometric viewpoints to make those gaps visible.
+
+[Projects](/projects/) · [Writings](/blog/) · [Email](mailto:shohruh.miryusupov@gmail.com) · [GitHub](https://github.com/smiryusupov) · [LinkedIn](https://www.linkedin.com/in/shohruh-miryusupov)
 
 ## Independence and sources
 

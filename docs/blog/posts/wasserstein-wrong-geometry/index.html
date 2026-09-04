@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2026-05-16">
+<meta name="description" content="A note on why raw Wasserstein loss measures displacement in the chosen ground geometry, not automatically scale-relative statistical error.">
+
+<title>When Wasserstein loss uses the wrong geometry – Shohruh Miryusupov</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-html/tabby.min.js"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-html-640605f58ae58ee79329c070719e555b.min.css" rel="stylesheet" append-hash="true" data-mode="light">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../../styles.css">
+</head>
+
+<body>
+
+<nav class="site-nav">
+  <a class="nav-name" href="../../../">Shohruh Miryusupov</a>
+  <div class="nav-links">
+    <a href="../../../projects/">Projects</a>
+    <a href="../../../blog/">Writings</a>
+    <a href="../../../about.html">About</a>
+    <a href="https://github.com/smiryusupov">GitHub</a>
+  </div>
+</nav>
+
+<header id="title-block-header">
+<h1 class="title">When Wasserstein loss uses the wrong geometry</h1>
+
+<p class="date">2026-05-16</p>
+</header>
+
+<nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#wasserstein-distance-depends-on-the-ground-geometry" id="toc-wasserstein-distance-depends-on-the-ground-geometry">Wasserstein distance depends on the ground geometry</a></li>
+  <li><a href="#a-two-gaussian-diagnostic" id="toc-a-two-gaussian-diagnostic">A two-Gaussian diagnostic</a></li>
+  <li><a href="#fisher-geometry-as-a-contrast" id="toc-fisher-geometry-as-a-contrast">Fisher geometry as a contrast</a></li>
+  <li><a href="#a-small-numerical-check" id="toc-a-small-numerical-check">A small numerical check</a></li>
+  <li><a href="#a-scaled-ground-cost-changes-the-answer" id="toc-a-scaled-ground-cost-changes-the-answer">A scaled ground cost changes the answer</a></li>
+  <li><a href="#predictive-distributions" id="toc-predictive-distributions">Predictive distributions</a></li>
+  <li><a href="#unscaled-data" id="toc-unscaled-data">Unscaled data</a></li>
+  <li><a href="#where-this-comes-up" id="toc-where-this-comes-up">Where this comes up</a></li>
+  <li><a href="#what-to-do" id="toc-what-to-do">What to do</a></li>
+  <li><a href="#takeaway" id="toc-takeaway">Takeaway</a></li>
+  <li><a href="#references" id="toc-references">References</a></li>
+  <li><a href="#suggested-citation" id="toc-suggested-citation">Suggested citation</a></li>
+  </ul>
+</nav>
+<style>
+.narrow-figure {
+  max-width: 620px;
+  margin: 1.25rem auto;
+}
+.narrow-figure figure,
+.narrow-figure .quarto-figure {
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+.narrow-figure img {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+<p>Wasserstein distance has a clean promise: it compares probability distributions by asking how much mass must move, and how far. If the sample-space geometry matches the geometry of the problem, that is exactly the right question. A meter is a meter. A pixel is a pixel.</p>
+<p>But when Wasserstein distance is used as a statistical loss, there is a small trap. Absolute displacement is not the same as scale-relative discrepancy. Raw Wasserstein distance detects location shifts; what it does not automatically detect is whether a shift is large or small relative to the uncertainty or intrinsic scale of the distributions being compared.</p>
+<p>Three diagnostics below. For equal-variance Gaussians, raw Euclidean <span class="math inline">W_2</span> sees the mean shift but not its size in standard-deviation units. Fisher–Rao geometry gives a contrasting scale-relative notion of distance. And a scaled Wasserstein ground cost can recover scale-relative behavior — but only after the geometry is changed.</p>
+<h2 id="wasserstein-distance-depends-on-the-ground-geometry">Wasserstein distance depends on the ground geometry</h2>
+<p>Optimal transport is defined after choosing a cost for moving mass from one point to another. In the usual Wasserstein distance, this cost comes from a ground metric on the sample space; see Peyré and Cuturi (2019). This is not an implementation detail — it is the geometry of the loss.</p>
+<p>If the data are measured in meters, the loss sees meters. If they are represented by coordinates, labels, features, embeddings, or point clouds, the loss sees whatever geometry has been assigned to those objects. So the practical question is not only whether you are using Wasserstein distance, but also what geometry you gave it.</p>
+<p>In some problems, absolute displacement is exactly the right notion of error: moving mass by one physical unit is what matters. In other problems, the relevant question is scale-relative: how large is this displacement relative to the uncertainty or intrinsic scale of the distribution? Raw Euclidean Wasserstein answers the first question. It does not automatically answer the second.</p>
+<h2 id="a-two-gaussian-diagnostic">A two-Gaussian diagnostic</h2>
+<p>Consider the univariate Gaussian family <span class="math inline">N(\mu,\sigma^2)</span>. For two Gaussians with the same variance, the squared 2-Wasserstein distance reduces to the squared difference between means. This is a special case of the Gaussian Wasserstein formula; see Dowson and Landau (1982):</p>
+<p><span class="math display">
+W_2^2(P,Q)=|\mu_1-\mu_2|^2,
+\qquad
+W_2(P,Q)=|\mu_1-\mu_2|.
+</span></p>
+<p>Now compare these two pairs:</p>
+<p><span class="math display">
+N(0,0.1^2) \ \text{vs.}\ N(1,0.1^2),
+\qquad
+N(0,100^2) \ \text{vs.}\ N(1,100^2).
+</span></p>
+<p>In both cases the means differ by one, so <span class="math inline">W_2=1</span>. But the scale-relative meaning is very different:</p>
+<p><span class="math display">
+\frac{|\Delta\mu|}{\sigma}
+=
+\frac{1}{0.1}
+=
+10,
+\qquad
+\frac{|\Delta\mu|}{\sigma}
+=
+\frac{1}{100}
+=
+0.01.
+</span></p>
+<p>The Wasserstein value is the same. The statistical interpretation is not. This does not mean Wasserstein distance is blind to variance in general. It means that in this equal-variance location comparison, the same absolute displacement gets the same cost regardless of whether that displacement is statistically large or small.</p>
+<h2 id="fisher-geometry-as-a-contrast">Fisher geometry as a contrast</h2>
+<p>The Fisher–Rao metric gives a different geometry on a statistical model. It is not a universal replacement for Wasserstein distance, but it is useful here because it encodes the intrinsic statistical scale of the Gaussian family.</p>
+<p>For <span class="math inline">N(\mu,\sigma^2)</span>, the Fisher–Rao line element is</p>
+<p><span class="math display">
+ds^2
+=
+\frac{d\mu^2+2\,d\sigma^2}{\sigma^2}.
+</span></p>
+<p>For a small location perturbation with <span class="math inline">\sigma</span> fixed,</p>
+<p><span class="math display">
+ds
+\approx
+\frac{|d\mu|}{\sigma}.
+</span></p>
+<p>So a one-unit displacement is large when <span class="math inline">\sigma=0.1</span> and small when <span class="math inline">\sigma=100</span>.</p>
+<p>Wasserstein distance measures displacement in the external sample-space geometry. Fisher–Rao distance measures displacement in the internal statistical geometry of the model. They are not contradicting each other — they are measuring different things.</p>
+<p>For equal-variance univariate Gaussians, the exact Fisher–Rao distance is</p>
+<p><span class="math display">
+d_{\mathrm{FR}}
+\left(
+N(\mu_1,\sigma^2),
+N(\mu_2,\sigma^2)
+\right)
+=
+\sqrt{2}\,
+\operatorname{arcosh}
+\left(
+1+
+\frac{(\mu_1-\mu_2)^2}{4\sigma^2}
+\right),
+</span></p>
+<p>which agrees locally with <span class="math inline">|\mu_1-\mu_2|/\sigma</span> when the displacement is small relative to <span class="math inline">\sigma</span>; see Pinele, Strapasson, and Costa (2020). The <span class="math inline">\operatorname{arcosh}</span> term is geometric: after the change of variables</p>
+<p><span class="math display">
+x=\frac{\mu}{\sqrt{2}},
+\qquad
+y=\sigma,
+</span></p>
+<p>the Fisher–Rao line element becomes</p>
+<p><span class="math display">
+ds^2
+=
+2\,\frac{dx^2+dy^2}{y^2}.
+</span></p>
+<p>So the univariate Gaussian Fisher–Rao geometry is, up to a constant factor, the Poincaré upper half-plane geometry.</p>
+<h2 id="a-small-numerical-check">A small numerical check</h2>
+<p>Let <span class="math inline">\Delta\mu=1</span>.</p>
+<div id="tbl-scale-diagnostic" class="cell quarto-float quarto-figure quarto-figure-center" data-execution_count="2">
+<figure class="quarto-float quarto-float-tbl">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-scale-diagnostic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: A unit mean shift under two different scales.
+</figcaption>
+<div aria-describedby="tbl-scale-diagnostic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="cell caption-top">
+<colgroup>
+<col style="width: 40%">
+<col style="width: 16%">
+<col style="width: 12%">
+<col style="width: 16%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">pair</th>
+<th style="text-align: right;"><span class="math inline">\sigma</span></th>
+<th style="text-align: right;"><span class="math inline">W_2</span></th>
+<th style="text-align: right;">FR local</th>
+<th style="text-align: right;">FR exact</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">N(0,0.1^2)</span> vs <span class="math inline">N(1,0.1^2)</span></td>
+<td style="text-align: right;">0.1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">5.587</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">N(0,100^2)</span> vs <span class="math inline">N(1,100^2)</span></td>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">0.01</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>The Wasserstein value does not move. The Fisher–Rao diagnostic changes dramatically. For <span class="math inline">\sigma=0.1</span>, the local Fisher–Rao value is not meant to be a precise numerical approximation because the shift is large relative to the scale. The qualitative conclusion is the same either way: the narrow Gaussian shift is much larger than the wide Gaussian shift in scale-relative terms.</p>
+<div class="narrow-figure">
+<div id="cell-fig-wasserstein-fisher-scale" class="cell" data-execution_count="3">
+<div class="cell-output cell-output-display">
+<div id="fig-wasserstein-fisher-scale" class="quarto-float quarto-figure quarto-figure-center">
+<figure class="quarto-float quarto-float-fig">
+<div aria-describedby="fig-wasserstein-fisher-scale-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-wasserstein-fisher-scale-output-1.png" width="628" height="375">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-wasserstein-fisher-scale-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: For a fixed unit mean shift, raw Euclidean Wasserstein distance stays fixed while the Fisher–Rao scale diagnostic changes with sigma.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<h2 id="a-scaled-ground-cost-changes-the-answer">A scaled ground cost changes the answer</h2>
+<p>Wasserstein distance can be made scale-aware. But scale awareness does not appear for free — it has to enter through the ground geometry.</p>
+<p>In the Gaussian example, suppose displacement is measured not by the raw Euclidean cost <span class="math inline">|x-y|</span> but by the standardized cost</p>
+<p><span class="math display">
+\frac{|x-y|}{\sigma}.
+</span></p>
+<p>Equivalently, transport the rescaled variable</p>
+<p><span class="math display">
+z=\frac{x}{\sigma}.
+</span></p>
+<p>Then the Wasserstein distance between <span class="math inline">N(0,\sigma^2)</span> and <span class="math inline">N(1,\sigma^2)</span> in standardized coordinates is <span class="math inline">1/\sigma</span>. That is <span class="math inline">10</span> for <span class="math inline">\sigma=0.1</span> and <span class="math inline">0.01</span> for <span class="math inline">\sigma=100</span>.</p>
+<p>This recovers the scale-relative quantity. But it is not the raw Wasserstein distance in the original coordinates. It is Wasserstein distance after changing the geometry. In this equal-variance example, the rescaling is unambiguous; if the two distributions have different scales, the choice of normalization becomes part of the modeling problem.</p>
+<p>The ground cost is part of the statistical meaning of the loss.</p>
+<h2 id="predictive-distributions">Predictive distributions</h2>
+<p>Suppose a model outputs a predictive distribution. Then the scale parameter is not decoration: a wide predictive distribution signals uncertainty, and a narrow one signals confidence. Now suppose the predicted mean is wrong by one unit. Should the loss treat that error the same in both cases?</p>
+<p>For the equal-variance Gaussian comparison above, raw Euclidean Wasserstein says yes for the location term. A Fisher-type geometry says no. A likelihood-based loss would also treat the same residual differently depending on <span class="math inline">\sigma</span>, because a one-unit error means something different under a sharp predictive distribution than under a diffuse one.</p>
+<p>There is also a distinction between comparing two distributions and comparing a distribution to a point observation. If <span class="math inline">P=N(\mu,\sigma^2)</span> and <span class="math inline">Q=\delta_y</span>, then</p>
+<p><span class="math display">
+W_2^2(P,Q)
+=
+(\mu-y)^2+\sigma^2.
+</span></p>
+<p>Wasserstein does see predictive spread here. But it sees spread as transport cost to collapse a distribution onto a point, which is different from treating <span class="math inline">\sigma</span> as calibrated uncertainty in the likelihood or Fisher-geometric sense.</p>
+<p>The practical question is whether the Wasserstein loss measures the kind of error the task actually cares about. For some tasks, absolute displacement is the right unit: one meter, one dollar, or one pixel may have the same cost regardless of predictive uncertainty. For other tasks, the relevant error is relative to the distribution’s scale. In those cases, raw Wasserstein loss can measure the wrong discrepancy.</p>
+<h2 id="unscaled-data">Unscaled data</h2>
+<p>The same issue appears on unscaled data. If one coordinate is in dollars and another in percentages, or one feature has variance <span class="math inline">10^{-2}</span> and another has variance <span class="math inline">10^4</span>, a Wasserstein loss built on the raw Euclidean ground cost inherits those units. It may emphasize coordinates with larger numerical scale even when they are not more meaningful.</p>
+<p>This is the same issue practitioners already know from feature scaling: a Euclidean cost on raw coordinates inherits raw units. Wasserstein loss does the same because its ground cost does the same.</p>
+<p>In raw coordinates,</p>
+<p><span class="math display">
+W_2
+=
+|\Delta\mu|.
+</span></p>
+<p>In standardized coordinates,</p>
+<p><span class="math display">
+W_2
+=
+\frac{|\Delta\mu|}{\sigma}.
+</span></p>
+<p>Both are Wasserstein distances. They differ because the geometry differs.</p>
+<h2 id="where-this-comes-up">Where this comes up</h2>
+<p>Some settings where the ground geometry choice is non-trivial:</p>
+<ul>
+<li>supervised learning with structured output spaces</li>
+<li>generative modeling on high-dimensional observations</li>
+<li>losses between distributions of distributions</li>
+<li>point-cloud and shape reconstruction</li>
+<li>transport losses on features, embeddings, labels, or raw coordinates</li>
+</ul>
+<p>In each case, applying a Wasserstein-type loss is also choosing a ground geometry. That choice is part of the model.</p>
+<h2 id="what-to-do">What to do</h2>
+<p>There is no universal fix — the right geometry depends on the problem. Some options:</p>
+<ul>
+<li>use Wasserstein distance directly when absolute displacement is the desired notion of error</li>
+<li>standardize variables before applying a Wasserstein loss</li>
+<li>choose a ground cost that reflects the relevant geometry of the task</li>
+<li>use a scale-aware transport cost, normalizing displacement by a relevant uncertainty scale</li>
+<li>use a Mahalanobis-type ground metric when covariance structure is meaningful</li>
+<li>combine losses — a Wasserstein term for physical displacement alongside a likelihood, Fisher-type, or calibration term for statistical meaning</li>
+</ul>
+<p>A useful diagnostic question is:</p>
+<blockquote>
+<p>If I multiply one coordinate by 100, should the loss care 100 times more about errors in that coordinate?</p>
+</blockquote>
+<p>If the answer is no, the raw ground geometry may not be the right geometry.</p>
+<h2 id="takeaway">Takeaway</h2>
+<p>The issue is not Wasserstein distance. It is the interpretation.</p>
+<p>For equal-variance Gaussians under the usual Euclidean ground metric, a unit mean shift has <span class="math inline">W_2=1</span> regardless of whether the standard deviation is <span class="math inline">0.1</span> or <span class="math inline">100</span>. That is not a defect — it is what the geometry says. Raw Wasserstein reports that both pairs require one unit of transport in the chosen sample-space geometry.</p>
+<p>Whether that one unit is statistically large or small is a separate question. Answering it requires either a different geometry, a rescaled ground cost, or an additional statistical loss.</p>
+<p>The practical question is simple:</p>
+<p><span class="math display">
+\text{Should the loss measure absolute displacement, or scale-relative discrepancy?}
+</span></p>
+<p>When the answer is absolute displacement, Wasserstein distance may be exactly the right tool. When the answer is scale-relative discrepancy, raw Wasserstein loss may have the wrong scale.</p>
+<h2 id="references">References</h2>
+<p>Shun-ichi Amari. <em>Information Geometry and Its Applications</em>. Springer, 2016.</p>
+<p>D. C. Dowson and B. V. Landau. “The Fréchet distance between multivariate normal distributions.” <em>Journal of Multivariate Analysis</em> 12(3), 1982.</p>
+<p>Yoni Dukler, Wuchen Li, Alex Lin, and Guido Montúfar. “Wasserstein of Wasserstein loss for learning generative models.” <em>Proceedings of the 36th International Conference on Machine Learning</em>, 2019.</p>
+<p>Haoqiang Fan, Hao Su, and Leonidas J. Guibas. “A point set generation network for 3D object reconstruction from a single image.” <em>Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition</em>, 2017.</p>
+<p>Charlie Frogner, Chiyuan Zhang, Hossein Mobahi, Mauricio Araya-Polo, and Tomaso Poggio. “Learning with a Wasserstein loss.” <em>Advances in Neural Information Processing Systems</em>, 2015.</p>
+<p>Aude Genevay, Gabriel Peyré, and Marco Cuturi. “Learning generative models with Sinkhorn divergences.” <em>Proceedings of the Twenty-First International Conference on Artificial Intelligence and Statistics</em>, 2018.</p>
+<p>Gabriel Peyré and Marco Cuturi. <em>Computational Optimal Transport</em>. <em>Foundations and Trends in Machine Learning</em> 11(5–6), 2019.</p>
+<p>Julia Pinele, João E. Strapasson, and Sueli I. R. Costa. “The Fisher–Rao distance between multivariate normal distributions: Special cases, bounds and applications.” <em>Entropy</em> 22(4), 2020.</p>
+<h2 id="suggested-citation">Suggested citation</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bibtex code-with-copy"><code class="sourceCode bibtex"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="va">@misc</span>{<span class="ot">miryusupov2026wassersteingeometry</span>,</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">author</span>       = {Miryusupov, Shohruh},</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">title</span>        = {When Wasserstein Loss Uses the Wrong Geometry},</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">year</span>         = {2026},</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">howpublished</span> = {Research note},</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">url</span>          = {https://www.miryusupov.com/blog/posts/wasserstein-wrong-geometry/index.html}</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+
+
+<footer id="site-footer" class="site-footer">
+  <span class="site-disclaimer">
+    Personal academic site. Views and notes are my own and do not represent my employer. Written independently, using public sources and personal resources.
+  </span>
+</footer>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const footer = document.getElementById("site-footer");
+    if (footer) {
+      document.body.appendChild(footer);
+    }
+  });
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const tocLinks = [...document.querySelectorAll("#TOC a[href^='#']")];
+  const sections = tocLinks
+    .map(link => document.querySelector(decodeURIComponent(link.getAttribute("href"))))
+    .filter(Boolean);
+
+  if (!tocLinks.length || !sections.length) return;
+
+  const setActive = () => {
+    let active = sections[0];
+
+    for (const section of sections) {
+      if (section.getBoundingClientRect().top <= 120) {
+        active = section;
+      }
+    }
+
+    tocLinks.forEach(link => {
+      link.classList.toggle(
+        "active",
+        link.getAttribute("href") === "#" + CSS.escape(active.id)
+      );
+    });
+  };
+
+  setActive();
+  window.addEventListener("scroll", setActive, { passive: true });
+});
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+    tabsets.forEach(function(tabset) {
+      const tabby = new Tabby('#' + tabset.id);
+    });
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/www\.miryusupov\.com");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'light-border',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+
+
+
+
+</body></html>
