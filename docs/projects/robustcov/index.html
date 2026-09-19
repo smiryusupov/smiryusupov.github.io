@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Robust multivariate geometry for contaminated data, anomaly detection, kernels, and model explanations.">
+<meta name="description" content="Robust multivariate geometry for contaminated, heavy-tailed, high-dimensional, and structured data.">
 
-<title>robustcov – Shohruh Miryusupov</title>
+<title>RobustCov – Shohruh Miryusupov</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -88,7 +88,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </nav>
 
 <header id="title-block-header">
-<h1 class="title">robustcov</h1>
+<h1 class="title">RobustCov</h1>
 
 </header>
 
@@ -98,39 +98,44 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#why-robust-geometry" id="toc-why-robust-geometry">Why robust geometry?</a></li>
   <li><a href="#a-compact-covariance-workflow" id="toc-a-compact-covariance-workflow">A compact covariance workflow</a></li>
-  <li><a href="#robust-references-for-shap-and-lime" id="toc-robust-references-for-shap-and-lime">Robust references for SHAP and LIME</a></li>
   <li><a href="#main-workflow-families" id="toc-main-workflow-families">Main workflow families</a></li>
+  <li><a href="#robust-references-for-shap-and-lime" id="toc-robust-references-for-shap-and-lime">Robust references for SHAP and LIME</a></li>
   <li><a href="#robust-similarity-and-spd-geometry" id="toc-robust-similarity-and-spd-geometry">Robust similarity and SPD geometry</a></li>
   <li><a href="#evidence-and-reproducibility" id="toc-evidence-and-reproducibility">Evidence and reproducibility</a></li>
   <li><a href="#where-it-helpsand-where-it-does-not" id="toc-where-it-helpsand-where-it-does-not">Where it helps—and where it does not</a></li>
   <li><a href="#development-status" id="toc-development-status">Development status</a></li>
   </ul>
 </nav>
-<p><code>robustcov</code> is a Python/C++ toolkit for estimating reliable multivariate geometry when ordinary covariance is distorted by outliers, heavy tails, limited samples, or unstable directions.</p>
-<p>A fitted robust location, covariance, precision matrix, support mask, or similarity geometry can be reused for anomaly detection, monitoring, robust kernels, Gaussian-process input metrics, structured models, and contamination-resistant SHAP and LIME references.</p>
+<p><code>robustcov</code> is a Python library for robust multivariate geometry when ordinary covariance becomes unreliable because of rowwise or cellwise contamination, heavy tails, high dimensionality, or structured observations.</p>
+<p>Rather than treating robust covariance as a single estimator-selection problem, <code>robustcov</code> organizes methods around <strong>how the data fail</strong> and <strong>what geometry the downstream task needs</strong>.</p>
+<p>A fitted robust location, covariance, scatter, shape, precision matrix, support mask, or similarity geometry can then be reused for anomaly detection, monitoring, whitening, PCA, robust kernels, Gaussian-process input metrics, structured models, and contamination-resistant SHAP and LIME references.</p>
 <p><strong>Current release:</strong> <code>0.2.0</code> · <strong>Python:</strong> 3.12–3.14 · <strong>License:</strong> Apache-2.0</p>
-<p><a href="https://github.com/smiryusupov/robustcov">GitHub</a> · <a href="https://pypi.org/project/robustcov/">PyPI</a> · <a href="https://robustcov.readthedocs.io/">Documentation</a> · <a href="https://robustcov.readthedocs.io/en/latest/algorithms.html">Method catalog</a> · <a href="https://robustcov.readthedocs.io/en/latest/performance_validation.html">Benchmarks and validation</a></p>
+<p><a href="https://github.com/smiryusupov/robustcov">GitHub</a> · <a href="https://pypi.org/project/robustcov/">PyPI</a> · <a href="https://robustcov.readthedocs.io/">Documentation</a> · <a href="https://robustcov.readthedocs.io/en/latest/algorithms.html">Method reference</a> · <a href="https://robustcov.readthedocs.io/en/latest/performance_validation.html">Benchmarks and validation</a></p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> pip install robustcov</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Install the optional SHAP and LIME integrations with:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> pip install <span class="st">"robustcov[explain]"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <h2 id="why-robust-geometry">Why robust geometry?</h2>
 <p>Many multivariate workflows quietly depend on an estimated reference geometry:</p>
 <ul>
-<li>Mahalanobis anomaly scores use a center and covariance;</li>
+<li>Mahalanobis anomaly scores depend on a center and covariance;</li>
 <li>whitening and PCA depend on scatter directions;</li>
-<li>covariance-drift monitoring compares SPD matrices;</li>
+<li>covariance-drift monitoring compares positive-definite matrices;</li>
 <li>kernels and nearest-neighbor methods depend on an input metric;</li>
 <li>SHAP and LIME depend on a background or reference distribution.</li>
 </ul>
-<p>A small number of leverage points can move that geometry substantially. The predictive model may remain unchanged while anomaly rankings, similarities, or local explanations change because the reference sample was contaminated.</p>
-<p><code>robustcov</code> addresses that failure mode at the geometry layer. It estimates a robust reference and then passes the resulting matrices, distances, support, or background sample into ordinary scientific-Python and machine-learning workflows.</p>
+<p>But there is no single kind of “bad data.” A minority of complete rows may be contaminated, individual cells may be corrupted, legitimate observations may be heavy-tailed, or the empirical covariance may become unstable because the dimension is large relative to the sample size.</p>
+<p>Those failure mechanisms call for different robust geometries.</p>
+<p><code>robustcov</code> therefore follows the pattern:</p>
+<p><strong>failure mechanism → robust statistical object → geometry → downstream task</strong></p>
+<p>It estimates an appropriate robust reference and exposes the resulting location, covariance, scatter, shape, precision, distances, support, or low-rank structure to ordinary scientific-Python and machine-learning workflows.</p>
 <h2 id="a-compact-covariance-workflow">A compact covariance workflow</h2>
+<p>Here the problem is simple rowwise contamination: most observations follow one distribution, while a small subset is strongly displaced.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">0</span>)</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> rng.standard_t(df<span class="op">=</span><span class="dv">3</span>, size<span class="op">=</span>(<span class="dv">400</span>, <span class="dv">5</span>))</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> rng.normal(size<span class="op">=</span>(<span class="dv">400</span>, <span class="dv">5</span>))</span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>X[:<span class="dv">30</span>] <span class="op">+=</span> <span class="fl">8.0</span></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>est <span class="op">=</span> rc.FastMCD(</span>
@@ -143,7 +148,79 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"robust location:"</span>, est.location_)</span>
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"support size:"</span>, <span class="bu">int</span>(est.support_.<span class="bu">sum</span>()))</span>
 <span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"largest distances:"</span>, np.argsort(scores)[<span class="op">-</span><span class="dv">10</span>:])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>The same fitted geometry can be used by <code>RobustOutlierDetector</code>, diagnostic reports, covariance-comparison utilities, robust kernels, or downstream code that accepts a covariance or precision matrix.</p>
+<p><code>FastMCD</code> is appropriate here because the contamination is concentrated in a minority of complete observations. For diffuse heavy tails, cellwise corruption, or high-dimensional data, a different estimator family may be more appropriate.</p>
+<p>The same fitted geometry can be reused by <code>RobustOutlierDetector</code>, diagnostic reports, covariance-comparison utilities, robust kernels, or downstream code that accepts a covariance or precision matrix.</p>
+<h2 id="main-workflow-families">Main workflow families</h2>
+<p>The first decision is not which estimator name to choose, but what kind of failure or structure is present in the data.</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Problem</th>
+<th>Typical <code>robustcov</code> output</th>
+<th>Downstream use</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Separated rowwise contamination</td>
+<td>robust subset, location, covariance</td>
+<td>anomaly screening, whitening, diagnostics</td>
+</tr>
+<tr class="even">
+<td>Diffuse heavy tails</td>
+<td>robust scatter or shape</td>
+<td>stable distances and multivariate geometry</td>
+</tr>
+<tr class="odd">
+<td>Dimension comparable to or larger than sample size</td>
+<td>regularized covariance or scatter</td>
+<td>PCA, distances, precision estimation</td>
+</tr>
+<tr class="even">
+<td>Cellwise corruption</td>
+<td>robust covariance and cell diagnostics</td>
+<td>screening, reconstruction, PCA</td>
+</tr>
+<tr class="odd">
+<td>Multiple legitimate regimes</td>
+<td>local robust geometries</td>
+<td>cluster-aware anomaly diagnostics</td>
+</tr>
+<tr class="even">
+<td>Matrix-valued observations</td>
+<td>structured covariance factors</td>
+<td>multivariate analysis without naive vectorization</td>
+</tr>
+<tr class="odd">
+<td>Covariance or subspace change</td>
+<td>SPD or principal-subspace diagnostics</td>
+<td>drift and regime monitoring</td>
+</tr>
+<tr class="even">
+<td>Contaminated explainer background</td>
+<td>robust reference sample and covariance</td>
+<td>SHAP and LIME</td>
+</tr>
+<tr class="odd">
+<td>Distorted feature geometry</td>
+<td>robust precision or similarity</td>
+<td>kernels, GP input metrics, retrieval</td>
+</tr>
+</tbody>
+</table>
+<p>The package includes FastMCD, MRCD, Tyler-family estimators, Student-t and Cauchy scatter, CellMCD and CellRCov, MatrixMCD, robust PCA and decomposition methods, sparse precision tools, anomaly and monitoring utilities, SPD geometry, and optional explanation adapters.</p>
+<p>The complete estimator inventory and support status belong in the documentation rather than on this page:</p>
+<ul>
+<li><a href="https://robustcov.readthedocs.io/en/latest/estimator_guide.html">Choose a method</a></li>
+<li><a href="https://robustcov.readthedocs.io/en/latest/algorithms.html">Method reference and provenance</a></li>
+<li><a href="https://robustcov.readthedocs.io/en/latest/api.html">API reference</a></li>
+<li><a href="https://robustcov.readthedocs.io/en/latest/api_stability.html">API stability policy</a></li>
+</ul>
 <h2 id="robust-references-for-shap-and-lime">Robust references for SHAP and LIME</h2>
 <p>SHAP and LIME are not reimplemented. <code>robustcov</code> prepares a contamination-resistant reference and passes it to the established packages.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
@@ -190,66 +267,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>The robust support retained <strong>0 of the 12</strong> injected leverage rows.</p>
 <p>This is the main reason for the integration: explanation methods can be correct while their reference distribution is not representative. <code>robustcov</code> supplies a robust reference without creating a competing explanation framework.</p>
 <p><a href="https://robustcov.readthedocs.io/en/latest/explanations.html">Read the robust SHAP and LIME workflow</a></p>
-<h2 id="main-workflow-families">Main workflow families</h2>
-<table class="caption-top">
-<colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Problem</th>
-<th>Typical robustcov output</th>
-<th>Downstream use</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Separated contamination</td>
-<td>robust subset, location, covariance</td>
-<td>anomaly screening, whitening, diagnostics</td>
-</tr>
-<tr class="even">
-<td>Heavy tails or small samples</td>
-<td>regularized robust scatter</td>
-<td>stable distances and covariance geometry</td>
-</tr>
-<tr class="odd">
-<td>High-dimensional data</td>
-<td>shrinkage or structured covariance</td>
-<td>precision estimation, PCA, kernels</td>
-</tr>
-<tr class="even">
-<td>Multiple legitimate regimes</td>
-<td>local robust models</td>
-<td>cluster-aware anomaly diagnostics</td>
-</tr>
-<tr class="odd">
-<td>Covariance change</td>
-<td>SPD distances and geodesics</td>
-<td>drift and regime monitoring</td>
-</tr>
-<tr class="even">
-<td>Contaminated explainer background</td>
-<td>robust reference sample and covariance</td>
-<td>SHAP and LIME</td>
-</tr>
-<tr class="odd">
-<td>Distorted feature geometry</td>
-<td>robust precision or similarity</td>
-<td>kernels, GP input metrics, retrieval</td>
-</tr>
-</tbody>
-</table>
-<p>The package includes FastMCD and Tyler-family estimators, Student-t and Cauchy scatter, MRCD/MMCD-style methods, cellwise and structured estimators, robust PCA and precision tools, anomaly and monitoring utilities, SPD geometry, and optional explanation adapters.</p>
-<p>The complete estimator inventory and support status belong in the documentation rather than on this page:</p>
-<ul>
-<li><a href="https://robustcov.readthedocs.io/en/latest/estimator_guide.html">Choose an estimator</a></li>
-<li><a href="https://robustcov.readthedocs.io/en/latest/algorithms.html">Method catalog and provenance</a></li>
-<li><a href="https://robustcov.readthedocs.io/en/latest/api.html">API reference</a></li>
-<li><a href="https://robustcov.readthedocs.io/en/latest/api_stability.html">API stability policy</a></li>
-</ul>
 <h2 id="robust-similarity-and-spd-geometry">Robust similarity and SPD geometry</h2>
 <p>A fitted robust scatter matrix defines a full-matrix input metric rather than an isotropic Euclidean one.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> robustcov <span class="im">as</span> rc</span>
@@ -280,18 +297,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Benchmark timing remains machine-specific. The documentation emphasizes estimator trade-offs and reproducible commands rather than universal speed claims.</p>
 <p><a href="https://robustcov.readthedocs.io/en/latest/performance_validation.html">Validation report</a> · <a href="https://robustcov.readthedocs.io/en/latest/benchmark_gallery.html">Benchmark gallery</a> · <a href="https://github.com/smiryusupov/robustcov/releases">Release history</a></p>
 <h2 id="where-it-helpsand-where-it-does-not">Where it helps—and where it does not</h2>
-<p><code>robustcov</code> is most useful when the downstream task depends on covariance-shaped structure and the reference data may contain outliers, heavy tails, leverage points, or unstable directions.</p>
+<p><code>robustcov</code> is most useful when the downstream task depends on covariance-shaped structure and the reference data may contain outliers, heavy tails, leverage points, cellwise corruption, unstable directions, or high-dimensional ill-conditioning.</p>
 <p>Good fits include:</p>
 <ul>
 <li>interpretable multivariate anomaly screening;</li>
-<li>robust covariance or correlation structure;</li>
-<li>small-sample and high-dimensional scatter estimation;</li>
+<li>robust covariance, scatter, shape, or correlation structure;</li>
+<li>regularized and high-dimensional scatter estimation;</li>
+<li>cellwise contamination diagnostics;</li>
 <li>covariance drift and regime comparison;</li>
 <li>robust whitening, PCA, precision, and factor workflows;</li>
 <li>robust similarity for kernels, retrieval, and embeddings;</li>
 <li>contamination-resistant SHAP and LIME reference data.</li>
 </ul>
-<p>It is not intended to replace general-purpose machine-learning libraries, probabilistic programming systems, deep anomaly-detection frameworks, or domain validation. A robust covariance score can prioritize cases for review; it does not create ground-truth labels or causal explanations.</p>
+<p>It is not intended to replace general-purpose machine-learning libraries, probabilistic programming systems, deep anomaly-detection frameworks, or domain validation.</p>
+<p><code>robustcov</code> supplies the robust geometry; it does not manufacture predictive information that is absent from the observed features. A robust covariance score can prioritize unusual cases for review, but it does not create ground-truth labels, resolve intrinsic label ambiguity, or provide causal explanations.</p>
 <h2 id="development-status">Development status</h2>
 <p><code>robustcov</code> is pre-1.0 research software. The public API is explicitly classified by stability tier, public exports are checked against a machine-readable manifest, and interface changes follow a documented deprecation policy. Experimental methods remain clearly separated.</p>
 <p>The package provides native and native-free builds, cross-platform wheels for Python 3.12–3.14, optional OpenMP acceleration, and an Apache-2.0 license.</p>

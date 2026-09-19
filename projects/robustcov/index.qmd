@@ -1,6 +1,6 @@
 ---
-title: "robustcov"
-description: "Robust multivariate geometry for contaminated data, anomaly detection, kernels, and model explanations."
+title: "RobustCov"
+description: "Robust multivariate geometry for contaminated, heavy-tailed, high-dimensional, and structured data."
 categories: [projects, robust-statistics, covariance-estimation, anomaly-detection, explainable-ai, kernel-methods, information-geometry, Python, C++]
 format:
   html:
@@ -11,13 +11,15 @@ format:
     smooth-scroll: false
 ---
 
-`robustcov` is a Python/C++ toolkit for estimating reliable multivariate geometry when ordinary covariance is distorted by outliers, heavy tails, limited samples, or unstable directions.
+`robustcov` is a Python library for robust multivariate geometry when ordinary covariance becomes unreliable because of rowwise or cellwise contamination, heavy tails, high dimensionality, or structured observations.
 
-A fitted robust location, covariance, precision matrix, support mask, or similarity geometry can be reused for anomaly detection, monitoring, robust kernels, Gaussian-process input metrics, structured models, and contamination-resistant SHAP and LIME references.
+Rather than treating robust covariance as a single estimator-selection problem, `robustcov` organizes methods around **how the data fail** and **what geometry the downstream task needs**.
+
+A fitted robust location, covariance, scatter, shape, precision matrix, support mask, or similarity geometry can then be reused for anomaly detection, monitoring, whitening, PCA, robust kernels, Gaussian-process input metrics, structured models, and contamination-resistant SHAP and LIME references.
 
 **Current release:** `0.2.0` · **Python:** 3.12–3.14 · **License:** Apache-2.0
 
-[GitHub](https://github.com/smiryusupov/robustcov) · [PyPI](https://pypi.org/project/robustcov/) · [Documentation](https://robustcov.readthedocs.io/) · [Method catalog](https://robustcov.readthedocs.io/en/latest/algorithms.html) · [Benchmarks and validation](https://robustcov.readthedocs.io/en/latest/performance_validation.html)
+[GitHub](https://github.com/smiryusupov/robustcov) · [PyPI](https://pypi.org/project/robustcov/) · [Documentation](https://robustcov.readthedocs.io/) · [Method reference](https://robustcov.readthedocs.io/en/latest/algorithms.html) · [Benchmarks and validation](https://robustcov.readthedocs.io/en/latest/performance_validation.html)
 
 ```bash
 python -m pip install robustcov
@@ -33,17 +35,25 @@ python -m pip install "robustcov[explain]"
 
 Many multivariate workflows quietly depend on an estimated reference geometry:
 
-- Mahalanobis anomaly scores use a center and covariance;
+- Mahalanobis anomaly scores depend on a center and covariance;
 - whitening and PCA depend on scatter directions;
-- covariance-drift monitoring compares SPD matrices;
+- covariance-drift monitoring compares positive-definite matrices;
 - kernels and nearest-neighbor methods depend on an input metric;
 - SHAP and LIME depend on a background or reference distribution.
 
-A small number of leverage points can move that geometry substantially. The predictive model may remain unchanged while anomaly rankings, similarities, or local explanations change because the reference sample was contaminated.
+But there is no single kind of "bad data." A minority of complete rows may be contaminated, individual cells may be corrupted, legitimate observations may be heavy-tailed, or the empirical covariance may become unstable because the dimension is large relative to the sample size.
 
-`robustcov` addresses that failure mode at the geometry layer. It estimates a robust reference and then passes the resulting matrices, distances, support, or background sample into ordinary scientific-Python and machine-learning workflows.
+Those failure mechanisms call for different robust geometries.
+
+`robustcov` therefore follows the pattern:
+
+**failure mechanism → robust statistical object → geometry → downstream task**
+
+It estimates an appropriate robust reference and exposes the resulting location, covariance, scatter, shape, precision, distances, support, or low-rank structure to ordinary scientific-Python and machine-learning workflows.
 
 ## A compact covariance workflow
+
+Here the problem is simple rowwise contamination: most observations follow one distribution, while a small subset is strongly displaced.
 
 ```python
 import numpy as np
@@ -51,7 +61,7 @@ import robustcov as rc
 
 rng = np.random.default_rng(0)
 
-X = rng.standard_t(df=3, size=(400, 5))
+X = rng.normal(size=(400, 5))
 X[:30] += 8.0
 
 est = rc.FastMCD(
@@ -66,7 +76,34 @@ print("support size:", int(est.support_.sum()))
 print("largest distances:", np.argsort(scores)[-10:])
 ```
 
-The same fitted geometry can be used by `RobustOutlierDetector`, diagnostic reports, covariance-comparison utilities, robust kernels, or downstream code that accepts a covariance or precision matrix.
+`FastMCD` is appropriate here because the contamination is concentrated in a minority of complete observations. For diffuse heavy tails, cellwise corruption, or high-dimensional data, a different estimator family may be more appropriate.
+
+The same fitted geometry can be reused by `RobustOutlierDetector`, diagnostic reports, covariance-comparison utilities, robust kernels, or downstream code that accepts a covariance or precision matrix.
+
+## Main workflow families
+
+The first decision is not which estimator name to choose, but what kind of failure or structure is present in the data.
+
+| Problem | Typical `robustcov` output | Downstream use |
+|---|---|---|
+| Separated rowwise contamination | robust subset, location, covariance | anomaly screening, whitening, diagnostics |
+| Diffuse heavy tails | robust scatter or shape | stable distances and multivariate geometry |
+| Dimension comparable to or larger than sample size | regularized covariance or scatter | PCA, distances, precision estimation |
+| Cellwise corruption | robust covariance and cell diagnostics | screening, reconstruction, PCA |
+| Multiple legitimate regimes | local robust geometries | cluster-aware anomaly diagnostics |
+| Matrix-valued observations | structured covariance factors | multivariate analysis without naive vectorization |
+| Covariance or subspace change | SPD or principal-subspace diagnostics | drift and regime monitoring |
+| Contaminated explainer background | robust reference sample and covariance | SHAP and LIME |
+| Distorted feature geometry | robust precision or similarity | kernels, GP input metrics, retrieval |
+
+The package includes FastMCD, MRCD, Tyler-family estimators, Student-t and Cauchy scatter, CellMCD and CellRCov, MatrixMCD, robust PCA and decomposition methods, sparse precision tools, anomaly and monitoring utilities, SPD geometry, and optional explanation adapters.
+
+The complete estimator inventory and support status belong in the documentation rather than on this page:
+
+- [Choose a method](https://robustcov.readthedocs.io/en/latest/estimator_guide.html)
+- [Method reference and provenance](https://robustcov.readthedocs.io/en/latest/algorithms.html)
+- [API reference](https://robustcov.readthedocs.io/en/latest/api.html)
+- [API stability policy](https://robustcov.readthedocs.io/en/latest/api_stability.html)
 
 ## Robust references for SHAP and LIME
 
@@ -112,27 +149,6 @@ This is the main reason for the integration: explanation methods can be correct 
 
 [Read the robust SHAP and LIME workflow](https://robustcov.readthedocs.io/en/latest/explanations.html)
 
-## Main workflow families
-
-| Problem | Typical robustcov output | Downstream use |
-|---|---|---|
-| Separated contamination | robust subset, location, covariance | anomaly screening, whitening, diagnostics |
-| Heavy tails or small samples | regularized robust scatter | stable distances and covariance geometry |
-| High-dimensional data | shrinkage or structured covariance | precision estimation, PCA, kernels |
-| Multiple legitimate regimes | local robust models | cluster-aware anomaly diagnostics |
-| Covariance change | SPD distances and geodesics | drift and regime monitoring |
-| Contaminated explainer background | robust reference sample and covariance | SHAP and LIME |
-| Distorted feature geometry | robust precision or similarity | kernels, GP input metrics, retrieval |
-
-The package includes FastMCD and Tyler-family estimators, Student-t and Cauchy scatter, MRCD/MMCD-style methods, cellwise and structured estimators, robust PCA and precision tools, anomaly and monitoring utilities, SPD geometry, and optional explanation adapters.
-
-The complete estimator inventory and support status belong in the documentation rather than on this page:
-
-- [Choose an estimator](https://robustcov.readthedocs.io/en/latest/estimator_guide.html)
-- [Method catalog and provenance](https://robustcov.readthedocs.io/en/latest/algorithms.html)
-- [API reference](https://robustcov.readthedocs.io/en/latest/api.html)
-- [API stability policy](https://robustcov.readthedocs.io/en/latest/api_stability.html)
-
 ## Robust similarity and SPD geometry
 
 A fitted robust scatter matrix defines a full-matrix input metric rather than an isotropic Euclidean one.
@@ -175,19 +191,22 @@ Benchmark timing remains machine-specific. The documentation emphasizes estimato
 
 ## Where it helps—and where it does not
 
-`robustcov` is most useful when the downstream task depends on covariance-shaped structure and the reference data may contain outliers, heavy tails, leverage points, or unstable directions.
+`robustcov` is most useful when the downstream task depends on covariance-shaped structure and the reference data may contain outliers, heavy tails, leverage points, cellwise corruption, unstable directions, or high-dimensional ill-conditioning.
 
 Good fits include:
 
 - interpretable multivariate anomaly screening;
-- robust covariance or correlation structure;
-- small-sample and high-dimensional scatter estimation;
+- robust covariance, scatter, shape, or correlation structure;
+- regularized and high-dimensional scatter estimation;
+- cellwise contamination diagnostics;
 - covariance drift and regime comparison;
 - robust whitening, PCA, precision, and factor workflows;
 - robust similarity for kernels, retrieval, and embeddings;
 - contamination-resistant SHAP and LIME reference data.
 
-It is not intended to replace general-purpose machine-learning libraries, probabilistic programming systems, deep anomaly-detection frameworks, or domain validation. A robust covariance score can prioritize cases for review; it does not create ground-truth labels or causal explanations.
+It is not intended to replace general-purpose machine-learning libraries, probabilistic programming systems, deep anomaly-detection frameworks, or domain validation.
+
+`robustcov` supplies the robust geometry; it does not manufacture predictive information that is absent from the observed features. A robust covariance score can prioritize unusual cases for review, but it does not create ground-truth labels, resolve intrinsic label ambiguity, or provide causal explanations.
 
 ## Development status
 
